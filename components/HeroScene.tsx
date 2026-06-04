@@ -12,48 +12,35 @@ const SCENE_URL = 'https://prod.spline.design/QAlR1Wa5GlWwyKQs/scene.splinecode'
 
 export default function HeroScene() {
   const sectionRef = useRef<HTMLElement>(null)
-  const appRef     = useRef<Application | null>(null)
-  const progress   = useRef(0)
 
   function onLoad(spline: Application) {
-    appRef.current = spline
+    // ── Log everything available on the spline app object ──
+    console.log('Spline app keys:', Object.keys(spline))
 
-    const camera = spline.findObjectByName('Camera')
-    if (!camera) {
-      console.warn('Camera object not found — check name in Spline')
-      return
-    }
-
-    // Capture start position from whatever angle Spline has the camera at
-    const startPos = { ...camera.position }
-    const startRot = { ...camera.rotation }
-
-    // End position: directly front-facing, closer to screen
-    // Tweak these values once you see the scene
-    const endPos = { x: 0,   y: camera.position.y * 0.5, z: camera.position.z * 0.4 }
-    const endRot = { x: 0,   y: 0,                        z: 0 }
-
-    gsap.to(progress, {
-      current: 1,
-      ease: 'power2.inOut',
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=200%',
-        scrub: 2,
-        pin: true,
-        anticipatePin: 1,
-        onUpdate: (self) => {
-          const t = self.progress
-          camera.position.x = gsap.utils.interpolate(startPos.x, endPos.x, t)
-          camera.position.y = gsap.utils.interpolate(startPos.y, endPos.y, t)
-          camera.position.z = gsap.utils.interpolate(startPos.z, endPos.z, t)
-          camera.rotation.x = gsap.utils.interpolate(startRot.x, endRot.x, t)
-          camera.rotation.y = gsap.utils.interpolate(startRot.y, endRot.y, t)
-          camera.rotation.z = gsap.utils.interpolate(startRot.z, endRot.z, t)
-        },
-      },
+    // Try to find camera-like objects
+    const names = ['Camera', 'camera', 'Camera 2', 'cam', 'Cam']
+    names.forEach(n => {
+      const obj = spline.findObjectByName(n)
+      console.log(`findObjectByName("${n}"):`, obj)
     })
+
+    // Try accessing the internal Three.js scene
+    const internalKeys = ['_scene', 'scene', '_camera', 'camera', '_renderer', 'renderer']
+    internalKeys.forEach(k => {
+      const val = (spline as any)[k]
+      if (val) console.log(`spline.${k}:`, val?.type || typeof val)
+    })
+
+    // Traverse the internal scene if accessible
+    const scene = (spline as any)._scene || (spline as any).scene
+    if (scene) {
+      console.log('Scene found, traversing...')
+      scene.traverse((obj: any) => {
+        if (obj.isCamera || obj.type?.toLowerCase().includes('camera')) {
+          console.log('CAMERA FOUND:', obj.name, obj.type, 'pos:', obj.position)
+        }
+      })
+    }
   }
 
   return (
