@@ -9,7 +9,7 @@ const SCENE_URL = 'https://prod.spline.design/QAlR1Wa5GlWwyKQs/scene.splinecode'
 export default function HeroScene() {
   const [pos, setPos] = useState({ x: 0, y: 0, z: 0 })
   const [rot, setRot] = useState({ x: 0, y: 0, z: 0 })
-  const rafRef = useRef<number>()
+  const rafRef = useRef<number>(0)
 
   function onLoad(spline: Application) {
     // Try every known way to reach the Three.js camera
