@@ -19,7 +19,15 @@ function Monitor() {
 
   useEffect(() => {
     if (!ref.current) return
-    // Compute bounding box of loaded scene and log it
+
+    // Override every material to solid white so geometry is visible
+    ref.current.traverse((obj: any) => {
+      if (obj.isMesh) {
+        obj.material = new THREE.MeshStandardMaterial({ color: '#cccccc', roughness: 0.4, metalness: 0.2 })
+        obj.castShadow = true
+      }
+    })
+
     const box = new THREE.Box3().setFromObject(ref.current)
     const size = new THREE.Vector3()
     const center = new THREE.Vector3()
