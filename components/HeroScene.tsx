@@ -1,82 +1,81 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import Spline from '@splinetool/react-spline'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Application } from '@splinetool/runtime'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const SCENE_URL = 'https://prod.spline.design/QAlR1Wa5GlWwyKQs/scene.splinecode'
 
+// End position — captured manually from the live tracker
+const END = {
+  pos: { x: -6,  y: 80,  z: 107 },
+  rot: { x: -6.9 * (Math.PI / 180), y: 0.6 * (Math.PI / 180), z: 0.1 * (Math.PI / 180) },
+}
+
 export default function HeroScene() {
-  const [pos, setPos] = useState({ x: 0, y: 0, z: 0 })
-  const [rot, setRot] = useState({ x: 0, y: 0, z: 0 })
-  const rafRef = useRef<number>(0)
+  const sectionRef = useRef<HTMLElement>(null)
 
   function onLoad(spline: Application) {
-    // Try every known way to reach the Three.js camera
     const app = spline as any
+
+    // Find the Three.js camera
     let cam: any = null
-
-    // Method 1: direct _camera property
     if (app._camera) cam = app._camera
-
-    // Method 2: traverse internal scene
     if (!cam) {
       const scene = app._scene || app.scene
       if (scene) {
         scene.traverse((obj: any) => {
-          if (!cam && (obj.isCamera || obj.isOrthographicCamera || obj.isPerspectiveCamera)) {
-            cam = obj
-          }
+          if (!cam && (obj.isPerspectiveCamera || obj.isCamera)) cam = obj
         })
       }
     }
+    if (!cam) { console.warn('Camera not found'); return }
 
-    // Method 3: named object
-    if (!cam) cam = spline.findObjectByName('Camera')
-
-    if (!cam) {
-      console.warn('Camera not found — logging all spline keys:', Object.keys(app))
-      return
+    // Capture start position (Spline's default)
+    const START = {
+      pos: { x: cam.position.x, y: cam.position.y, z: cam.position.z },
+      rot: { x: cam.rotation.x, y: cam.rotation.y, z: cam.rotation.z },
     }
 
-    console.log('Camera found:', cam.type, cam.name)
+    console.log('Start pos:', START)
 
-    // Poll camera position every frame and show it on screen
-    const tick = () => {
-      setPos({
-        x: Math.round(cam.position.x),
-        y: Math.round(cam.position.y),
-        z: Math.round(cam.position.z),
-      })
-      setRot({
-        x: parseFloat((cam.rotation.x * (180 / Math.PI)).toFixed(1)),
-        y: parseFloat((cam.rotation.y * (180 / Math.PI)).toFixed(1)),
-        z: parseFloat((cam.rotation.z * (180 / Math.PI)).toFixed(1)),
-      })
-      rafRef.current = requestAnimationFrame(tick)
-    }
-    tick()
+    // Proxy object GSAP will tween
+    const t = { value: 0 }
+
+    gsap.to(t, {
+      value: 1,
+      ease: 'power2.inOut',
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: 'top top',
+        end: '+=200%',
+        scrub: 2,
+        pin: true,
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          const p = self.progress
+          cam.position.x = gsap.utils.interpolate(START.pos.x, END.pos.x, p)
+          cam.position.y = gsap.utils.interpolate(START.pos.y, END.pos.y, p)
+          cam.position.z = gsap.utils.interpolate(START.pos.z, END.pos.z, p)
+          cam.rotation.x = gsap.utils.interpolate(START.rot.x, END.rot.x, p)
+          cam.rotation.y = gsap.utils.interpolate(START.rot.y, END.rot.y, p)
+          cam.rotation.z = gsap.utils.interpolate(START.rot.z, END.rot.z, p)
+        },
+      },
+    })
   }
 
   return (
-    <section className="relative h-screen w-full">
+    <section ref={sectionRef} className="relative h-screen w-full">
       <Spline
         scene={SCENE_URL}
         onLoad={onLoad}
         style={{ width: '100%', height: '100%' }}
       />
-
-      {/* Live coordinate overlay */}
-      <div className="absolute bottom-6 left-6 bg-black/80 text-white font-mono text-xs rounded-xl px-4 py-3 space-y-1 pointer-events-none">
-        <div className="text-neutral-400 text-[10px] mb-1 uppercase tracking-widest">Camera position</div>
-        <div>x: <span className="text-green-400">{pos.x}</span></div>
-        <div>y: <span className="text-green-400">{pos.y}</span></div>
-        <div>z: <span className="text-green-400">{pos.z}</span></div>
-        <div className="text-neutral-400 text-[10px] mt-2 mb-1 uppercase tracking-widest">Rotation (deg)</div>
-        <div>rx: <span className="text-blue-400">{rot.x}</span></div>
-        <div>ry: <span className="text-blue-400">{rot.y}</span></div>
-        <div>rz: <span className="text-blue-400">{rot.z}</span></div>
-      </div>
     </section>
   )
 }
