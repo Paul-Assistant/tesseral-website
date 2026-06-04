@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF, OrbitControls } from '@react-three/drei'
+import { useGLTF, OrbitControls, Environment, Stage } from '@react-three/drei'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import * as THREE from 'three'
@@ -77,10 +77,14 @@ export default function HeroScene() {
         style={{ width: '100%', height: '100%' }}
         gl={{ antialias: true, alpha: false }}
       >
-        {/* Lighting */}
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[1000, 1000, 1000]} intensity={1.2} />
-        <directionalLight position={[-500, 500, -500]} intensity={0.4} />
+        {/* Background */}
+        <color attach="background" args={['#EFEFED']} />
+
+        {/* PBR environment — required for metalness/roughness materials */}
+        <Environment preset="studio" />
+        <ambientLight intensity={1.5} />
+        <directionalLight position={[1000, 1000, 1000]} intensity={2} />
+        <directionalLight position={[-500, 500, -500]} intensity={1} />
 
         <Suspense fallback={null}>
           <Monitor />
