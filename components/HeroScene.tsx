@@ -100,8 +100,8 @@ export default function HeroScene() {
           <Monitor />
         </Suspense>
 
-        <CameraRig progress={progress} />
-        <OrbitControls />
+        {/* <CameraRig progress={progress} /> */}
+        <OrbitControls makeDefault />
         <axesHelper args={[500]} />
       </Canvas>
     </section>
