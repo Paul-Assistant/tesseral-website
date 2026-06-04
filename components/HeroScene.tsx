@@ -11,10 +11,11 @@ gsap.registerPlugin(ScrollTrigger)
 
 // ─── Camera positions ────────────────────────────────────────────────────────
 // Tune these once you see the model. Start = angled, End = front-facing zoomed in.
-const CAM_START = { x: 800,  y: 300,  z: 1200 }  // angled view from right/above
-const CAM_END   = { x: 0,    y: 0,    z: 900  }  // dead front, close to screen
+// Model bounds: 630w × 790h × 338d, centered at origin
+const CAM_START = { x: 600,  y: 200,  z: 1800 }  // angled from right/above, full model visible
+const CAM_END   = { x: 0,    y: 50,   z: 650  }  // dead front, screen fills frame
 
-const TARGET    = { x: 0,    y: 0,    z: 0    }  // model sits at origin
+const TARGET    = { x: 0,    y: 0,    z: 0    }  // model at origin
 
 // ─── Model ───────────────────────────────────────────────────────────────────
 function Monitor() {
@@ -72,7 +73,7 @@ export default function HeroScene() {
   return (
     <section ref={sectionRef} className="relative h-screen w-full bg-[#EFEFED]">
       <Canvas
-        camera={{ fov: 45, near: 10, far: 200000 }}
+        camera={{ fov: 45, near: 50, far: 10000 }}
         style={{ width: '100%', height: '100%' }}
         gl={{ antialias: true, alpha: false }}
       >
