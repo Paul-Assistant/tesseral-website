@@ -10,10 +10,16 @@ gsap.registerPlugin(ScrollTrigger)
 
 const SCENE_URL = 'https://prod.spline.design/QAlR1Wa5GlWwyKQs/scene.splinecode'
 
-// End position — captured manually from the live tracker
+const D = Math.PI / 180
+
+const START = {
+  pos: { x: 196,  y: -6,  z: 208 },
+  rot: { x: 21 * D,  y: 44.1 * D,  z: -15 * D },
+}
+
 const END = {
   pos: { x: -6,  y: 80,  z: 107 },
-  rot: { x: -6.9 * (Math.PI / 180), y: 0.6 * (Math.PI / 180), z: 0.1 * (Math.PI / 180) },
+  rot: { x: -6.9 * D,  y: 0.6 * D,  z: 0.1 * D },
 }
 
 export default function HeroScene() {
@@ -22,7 +28,7 @@ export default function HeroScene() {
   function onLoad(spline: Application) {
     const app = spline as any
 
-    // Find the Three.js camera
+    // Find the active Three.js camera
     let cam: any = null
     if (app._camera) cam = app._camera
     if (!cam) {
@@ -35,15 +41,10 @@ export default function HeroScene() {
     }
     if (!cam) { console.warn('Camera not found'); return }
 
-    // Capture start position (Spline's default)
-    const START = {
-      pos: { x: cam.position.x, y: cam.position.y, z: cam.position.z },
-      rot: { x: cam.rotation.x, y: cam.rotation.y, z: cam.rotation.z },
-    }
+    // Snap to start
+    cam.position.set(START.pos.x, START.pos.y, START.pos.z)
+    cam.rotation.set(START.rot.x, START.rot.y, START.rot.z)
 
-    console.log('Start pos:', START)
-
-    // Proxy object GSAP will tween
     const t = { value: 0 }
 
     gsap.to(t, {
