@@ -8,7 +8,7 @@ import type { Application } from '@splinetool/runtime'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SCENE_URL = 'https://prod.spline.design/QAlR1Wa5GlWwyKQs/scene.splinecode'
+const SCENE_BASE = 'https://prod.spline.design/QAlR1Wa5GlWwyKQs/scene.splinecode'
 
 const D = Math.PI / 180
 
@@ -24,6 +24,7 @@ const END = {
 
 export default function HeroScene() {
   const sectionRef = useRef<HTMLElement>(null)
+  const sceneUrl = useRef(`${SCENE_BASE}?cb=${Date.now()}`)
 
   function onLoad(spline: Application) {
     const app = spline as any
@@ -81,7 +82,7 @@ export default function HeroScene() {
   return (
     <section ref={sectionRef} className="relative h-screen w-full" style={{ background: '#ffffff' }}>
       <Spline
-        scene={SCENE_URL}
+        scene={sceneUrl.current}
         onLoad={onLoad}
         style={{ width: '100%', height: '100%' }}
       />
