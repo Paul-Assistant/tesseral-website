@@ -75,7 +75,7 @@ export default function HeroScene() {
   }
 
   return (
-    <section ref={sectionRef} className="relative h-screen w-full">
+    <section ref={sectionRef} className="relative h-screen w-full" style={{ background: '#ffffff' }}>
       <Spline
         scene={SCENE_URL}
         onLoad={onLoad}
