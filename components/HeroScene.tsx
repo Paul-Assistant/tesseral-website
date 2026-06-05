@@ -41,6 +41,10 @@ export default function HeroScene() {
     }
     if (!cam) { console.warn('Camera not found'); return }
 
+    // Disable Spline's built-in orbit controls so the user can't drag the scene
+    const canvas = sectionRef.current?.querySelector('canvas')
+    if (canvas) (canvas as HTMLElement).style.pointerEvents = 'none'
+
     // Snap to start
     cam.position.set(START.pos.x, START.pos.y, START.pos.z)
     cam.rotation.set(START.rot.x, START.rot.y, START.rot.z)
