@@ -45,6 +45,10 @@ export default function HeroScene() {
     const canvas = sectionRef.current?.querySelector('canvas')
     if (canvas) (canvas as HTMLElement).style.pointerEvents = 'none'
 
+    // Set WebGL clear color to white
+    const renderer = app._renderer || app.renderer
+    if (renderer) renderer.setClearColor(0xffffff, 1)
+
     // Snap to start
     cam.position.set(START.pos.x, START.pos.y, START.pos.z)
     cam.rotation.set(START.rot.x, START.rot.y, START.rot.z)
