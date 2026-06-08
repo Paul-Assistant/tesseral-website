@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOL Signal Dashboard</title>
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #080b12;
+      --surface: #0e1420;
+      --surface2: #131b2e;
+      --border: #1e2d45;
+      --text: #c8d8f0;
+      --muted: #4a6080;
+      --green: #00e676;
+      --red: #ff1744;
+      --yellow: #ffd600;
+      --blue: #448aff;
+      --purple: #e040fb;
+      --orange: #ff9100;
+      --green-dim: rgba(0,230,118,0.12);
+      --red-dim: rgba(255,23,68,0.12);
+      --yellow-dim: rgba(255,214,0,0.12);
+      --orange-dim: rgba(255,145,0,0.12);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Mono', 'Consolas', 'Courier New', monospace;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* ── TOOLTIP SYSTEM ── */
+    .has-tip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .info-icon {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: help;
+      line-height: 1;
+      user-select: none;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .info-icon:hover { color: var(--blue); }
+
+    /* Positioned icon for cards (top-right corner) */
+    .card-tip {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: help;
+      z-index: 2;
+      transition: color 0.15s;
+    }
+    .card-tip:hover { color: var(--blue); }
+
+    /* Tooltip bubble */
+    .tip {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      background: #0a0f1c;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--text);
+      z-index: 9999;
+      transition: opacity 0.15s;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .tip::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px; height: 10px;
+      background: #0a0f1c;
+      border-left: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    /* Card tips anchored to top-right — flip tooltip left */
+    .card-tip .tip {
+      left: auto;
+      right: 0;
+      transform: none;
+      top: calc(100% + 6px);
+    }
+    .card-tip .tip::before {
+      left: auto;
+      right: 8px;
+      transform: rotate(45deg);
+    }
+
+    /* Flip left if near right edge */
+    .tip-left .tip {
+      left: auto;
+      right: 0;
+      transform: none;
+    }
+    .tip-left .tip::before {
+      left: auto;
+      right: 10px;
+      transform: rotate(45deg);
+    }
+
+    .has-tip:hover .tip,
+    .card-tip:hover .tip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding: 18px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      gap: 16px;
+    }
+    .header-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .pair { font-size: 13px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .price { font-size: 36px; font-weight: 700; color: #fff; letter-spacing: -1px; }
+    .price-change { font-size: 15px; padding: 4px 10px; border-radius: 6px; font-weight: 600; }
+    .price-change.up { background: var(--green-dim); color: var(--green); }
+    .price-change.down { background: var(--red-dim); color: var(--red); }
+
+    .market-condition {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .market-condition.trending-up { color: var(--green); border-color: var(--green); background: var(--green-dim); }
+    .market-condition.trending-down { color: var(--red); border-color: var(--red); background: var(--red-dim); }
+    .market-condition.choppy { color: var(--yellow); border-color: var(--yellow); background: var(--yellow-dim); }
+    .market-condition.squeeze { color: var(--orange); border-color: var(--orange); background: var(--orange-dim); }
+    .market-condition.neutral { color: var(--muted); border-color: var(--border); background: var(--surface2); }
+
+    .header-right { text-align: right; flex-shrink: 0; }
+    .refresh-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .refresh-bar-wrap { width: 120px; height: 3px; background: var(--border); border-radius: 2px; margin-left: auto; }
+    .refresh-bar { height: 100%; background: var(--blue); border-radius: 2px; transition: width 1s linear; }
+    .last-update { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+    /* ── MAIN GRID ── */
+    /* ── COMMAND CENTER ── */
+    .command-center {
+      display: grid;
+      grid-template-columns: 36% 64%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: visible;
+      position: relative;
+    }
+    .cc-signal {
+      padding: 28px 24px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 300px;
+      position: relative;
+      overflow: visible;
+    }
+    .cc-signal::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px 0 0 12px;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .cc-signal.sell::before { background: radial-gradient(circle at 50% 0%, rgba(255,23,68,0.08), transparent 70%); opacity: 1; }
+    .cc-signal.buy::before  { background: radial-gradient(circle at 50% 0%, rgba(0,230,118,0.08), transparent 70%); opacity: 1; }
+    .cc-signal.hold::before { background: radial-gradient(circle at 50% 0%, rgba(255,214,0,0.05), transparent 70%); opacity: 1; }
+    .cc-trade {
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      overflow: visible;
+    }
+    .chart-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .trade-log-divider { border-top: 1px solid var(--border); margin: 14px 0 12px; }
+    .trade-log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .trade-log-title { font-size: 10px; color: var(--muted); letter-spacing: 2px; }
+    .position-wrap { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+    .position-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: inherit; font-size: 11px; padding: 3px 6px; width: 60px; text-align: right; }
+    .position-input:focus { outline: none; border-color: var(--blue); }
+    .trade-log-form { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+    .trade-log-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: inherit; font-size: 11px; padding: 5px 7px; width: 85px; }
+    .trade-log-input:focus { outline: none; border-color: var(--blue); }
+    .trade-log-arrow { color: var(--muted); font-size: 11px; }
+    .log-btn { background: var(--blue); border: none; border-radius: 6px; color: #fff; font-family: inherit; font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 5px 11px; cursor: pointer; transition: opacity 0.15s; }
+    .log-btn:hover { opacity: 0.85; }
+    .trade-log-entry { display: flex; align-items: center; gap: 5px; font-size: 10px; margin-bottom: 4px; }
+    .trade-log-prices { color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .trade-log-pnl { color: var(--green); font-weight: 700; min-width: 58px; text-align: right; }
+    .trade-log-pnl.neg { color: var(--red); }
+    .trade-log-time { color: var(--muted); min-width: 52px; font-size: 9px; }
+    .trade-log-del { background: none; border: none; color: var(--muted); cursor: pointer; padding: 0 2px; font-size: 11px; }
+    .trade-log-del:hover { color: var(--red); }
+    .trade-log-total { margin-top: 5px; font-size: 11px; font-weight: 600; color: var(--green); border-top: 1px solid var(--border); padding-top: 5px; }
+    .trade-log-empty { font-size: 10px; color: var(--muted); }
+
+    /* ── SIGNAL CARD ── */
+    .signal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 280px;
+      position: relative;
+      overflow: visible;
+    }
+    .signal-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .signal-card.sell::before { background: radial-gradient(circle at 50% 0%, rgba(255,23,68,0.08), transparent 70%); opacity: 1; }
+    .signal-card.buy::before  { background: radial-gradient(circle at 50% 0%, rgba(0,230,118,0.08), transparent 70%); opacity: 1; }
+    .signal-card.hold::before { background: radial-gradient(circle at 50% 0%, rgba(255,214,0,0.06), transparent 70%); opacity: 1; }
+
+    .signal-label { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+    .signal-icon { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+    .signal-text { font-size: 22px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; }
+    .signal-text.sell { color: var(--red); }
+    .signal-text.buy  { color: var(--green); }
+    .signal-text.hold { color: var(--yellow); }
+    .signal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+
+    /* Score bar */
+    .score-wrap { width: 100%; }
+    .score-track {
+      position: relative;
+      width: 100%;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      margin-bottom: 8px;
+      overflow: visible;
+    }
+    .score-fill {
+      position: absolute;
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease, left 0.5s ease, background 0.5s;
+    }
+    .score-center {
+      position: absolute;
+      left: 50%;
+      top: -3px;
+      width: 2px;
+      height: 14px;
+      background: var(--muted);
+      transform: translateX(-50%);
+    }
+    .score-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+    .score-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .confidence-text { font-size: 13px; color: var(--muted); margin-top: 10px; }
+    .confidence-text span { color: var(--text); font-weight: 600; }
+
+    .bull-count {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: var(--surface2);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bull-count b { color: var(--text); }
+
+    /* Squeeze warning */
+    .squeeze-badge {
+      display: none;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--orange);
+      background: var(--orange-dim);
+      border: 1px solid var(--orange);
+      border-radius: 6px;
+      padding: 5px 10px;
+      width: 100%;
+      text-align: center;
+      animation: pulse 2s infinite;
+    }
+    .squeeze-badge.show { display: block; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+
+    .window-note {
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 7px 12px;
+      background: var(--surface2);
+      border-radius: 6px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ── CHART ── */
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: visible;
+    }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .chart-title-wrap { display: flex; align-items: center; gap: 8px; }
+    .chart-title { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+    .chart-tabs { display: flex; gap: 4px; }
+    .tab {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .tab.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .ema-legend {
+      display: flex;
+      gap: 12px;
+      font-size: 10px;
+      align-items: center;
+    }
+    .ema-legend-item { display: flex; align-items: center; gap: 4px; color: var(--muted); }
+    .ema-dot { width: 16px; height: 2px; border-radius: 1px; }
+    #chart { flex: 1; min-height: 230px; }
+
+    /* ── INDICATORS ROW ── */
+    .indicators-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .indicators-row-2 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .ind-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+      overflow: visible;
+    }
+    .ind-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 0 0 10px 10px;
+    }
+    .ind-card.bull::after { background: var(--green); }
+    .ind-card.bear::after { background: var(--red); }
+    .ind-card.neut::after { background: var(--yellow); }
+    .ind-card.squeeze-ind::after { background: var(--orange); }
+
+    .ind-name { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; padding-right: 20px; }
+    .ind-value { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1; }
+    .ind-signal { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+    .ind-signal.bull { background: var(--green-dim); color: var(--green); }
+    .ind-signal.bear { background: var(--red-dim); color: var(--red); }
+    .ind-signal.neut { background: var(--yellow-dim); color: var(--yellow); }
+    .ind-signal.squeeze-sig { background: var(--orange-dim); color: var(--orange); }
+    .ind-detail { font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+    /* RSI segmented zone bar */
+    .rsi-zones-bar { position: relative; display: flex; width: 100%; height: 14px; border-radius: 3px; margin: 8px 0 6px; overflow: visible; }
+    .rsi-zone { display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; }
+    .rsi-zone-left  { width: 30%; background: rgba(255,23,68,0.22); border-radius: 3px 0 0 3px; color: var(--red); }
+    .rsi-zone-mid   { width: 40%; background: rgba(255,255,255,0.04); color: var(--muted); font-size: 7px; }
+    .rsi-zone-right { width: 30%; background: rgba(255,23,68,0.22); border-radius: 0 3px 3px 0; color: var(--red); }
+    .rsi-marker { position: absolute; width: 10px; height: 10px; border-radius: 50%; top: 2px; transform: translateX(-50%); transition: left 0.5s; border: 2px solid var(--bg); z-index: 2; pointer-events: none; }
+    .rsi-zones { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); }
+
+    /* Stoch RSI dual line */
+    .stoch-bar-wrap { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin: 8px 0 4px; position: relative; }
+    .stoch-k-bar { height: 100%; border-radius: 2px; transition: width 0.5s; }
+
+    /* BB position */
+    .bb-track { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin: 8px 0 4px; position: relative; }
+    .bb-dot { position: absolute; width: 10px; height: 10px; border-radius: 50%; top: -3px; transform: translateX(-50%); transition: left 0.5s; border: 2px solid var(--bg); }
+    /* BB price labels */
+    .bb-price-labels { display: flex; justify-content: space-between; font-size: 10px; margin-top: 5px; font-family: 'SF Mono', 'Consolas', 'Courier New', monospace; }
+    .bb-lbl-lower { color: var(--green); text-align: left; }
+    .bb-lbl-mid   { color: var(--muted); text-align: center; }
+    .bb-lbl-upper { color: var(--red);   text-align: right; }
+
+    /* ── BOTTOM ROW ── */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    /* ── TRADE SETUP CARD ── */
+    .trade-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      position: relative;
+      overflow: visible;
+    }
+    .trade-title { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+    .trade-action {
+      font-size: 15px;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .trade-action.sell-action { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
+    .trade-action.buy-action  { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+    .trade-action.hold-action { background: var(--yellow-dim); color: var(--yellow); border: 1px solid var(--yellow); }
+    .trade-rows { display: flex; flex-direction: column; gap: 7px; }
+    .trade-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; }
+    .trade-row-label { color: var(--muted); font-size: 10px; letter-spacing: 1px; }
+    .trade-row-val { color: var(--text); font-weight: 600; }
+    .trade-row-val.green { color: var(--green); }
+    .trade-row-val.red   { color: var(--red); }
+    .trade-row-val.yellow { color: var(--yellow); }
+    .trade-rule {
+      margin-top: 12px;
+      font-size: 10px;
+      color: var(--muted);
+      padding: 7px 10px;
+      background: var(--surface2);
+      border-radius: 5px;
+      line-height: 1.5;
+    }
+
+    /* ── TRADE MODE TOGGLE ── */
+    .trade-mode-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .trade-mode-btn {
+      flex: 1;
+      padding: 7px 6px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+    .trade-mode-btn.sell-mode.active {
+      background: #ff1744;
+      border-color: #ff1744;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255,23,68,0.4);
+    }
+    .trade-mode-btn.buy-mode.active {
+      background: #00e676;
+      border-color: #00e676;
+      color: #041a0d;
+      box-shadow: 0 0 10px rgba(0,230,118,0.4);
+    }
+    .trade-card.mode-sell { border-color: rgba(255,23,68,0.35); }
+    .trade-card.mode-buy  { border-color: rgba(0,230,118,0.35); }
+    .trade-signal-align {
+      margin-top: 10px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.5;
+    }
+    .trade-signal-align.confirm { color: var(--green); }
+    .trade-signal-align.disagree { color: var(--yellow); }
+    .trade-signal-align.neutral { color: var(--muted); }
+
+    /* ── S/R CARD ── */
+    .sr-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      position: relative;
+      overflow: visible;
+    }
+    .sr-title { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .sr-levels { display: flex; flex-direction: column; gap: 7px; }
+    .sr-level { display: flex; justify-content: space-between; align-items: center; }
+    .sr-level-label { font-size: 11px; color: var(--muted); }
+    .sr-level-price { font-size: 14px; font-weight: 600; }
+    .sr-level-price.res { color: var(--red); }
+    .sr-level-price.sup { color: var(--green); }
+    .sr-dist { font-size: 10px; color: var(--muted); }
+    .sr-strength { font-size: 9px; color: var(--muted); display: flex; gap: 2px; margin-top: 1px; }
+    .sr-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+    /* ── LOADING ── */
+    .loading {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 100;
+      transition: opacity 0.4s;
+    }
+    .loading.hide { opacity: 0; pointer-events: none; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 12px; color: var(--muted); letter-spacing: 2px; }
+
+    .error-banner {
+      display: none;
+      background: var(--red-dim);
+      border: 1px solid var(--red);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 1100px) {
+      .command-center { grid-template-columns: 1fr; }
+      .cc-signal { border-right: none; border-bottom: 1px solid var(--border); }
+      .indicators-row, .indicators-row-2 { grid-template-columns: repeat(2, 1fr); }
+      .bottom-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">LOADING SOL DATA...</div>
+</div>
+
+<div class="error-banner" id="errorBanner"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div>
+      <div class="pair">SOL / USDT</div>
+      <div class="price" id="price">—</div>
+    </div>
+    <div class="price-change" id="priceChange">—</div>
+    <div class="has-tip" id="marketConditionWrap">
+      <div class="market-condition neutral" id="marketCondition">LOADING</div>
+      <span class="info-icon" style="margin-left:4px">ⓘ
+        <div class="tip">Shows the overall market state right now. <b>TRENDING UP/DOWN</b> = clear direction, good for trading. <b>CHOPPY</b> = EMAs are tangled, no clear direction — avoid new entries. <b>SQUEEZE</b> = Bollinger Bands are tightening, a big move is coming soon — watch for the breakout direction with volume.</div>
+      </span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="refresh-label">NEXT REFRESH</div>
+    <div class="refresh-bar-wrap"><div class="refresh-bar" id="refreshBar" style="width:100%"></div></div>
+    <div class="last-update" id="lastUpdate">—</div>
+  </div>
+</div>
+
+<!-- MAIN: Signal + Chart -->
+<div class="command-center">
+
+  <!-- LEFT: SIGNAL -->
+  <div class="cc-signal hold" id="signalCard">
+    <span class="card-tip">ⓘ<div class="tip">The composite score combines all 8 indicators with weighted importance. Score above +3 = majority of indicators say price is rising — good time to sell. Score below -3 = majority say price is falling — potential rebuy zone. A strong signal means 6+ indicators agree on direction.</div></span>
+    <div class="signal-label">12-Hour Signal</div>
+    <div class="signal-icon" id="signalIcon">⏳</div>
+    <div class="signal-text hold" id="signalText">LOADING</div>
+    <div class="signal-sub" id="signalSub">Calculating indicators...</div>
+
+    <div class="score-wrap">
+      <div class="score-header">
+        <div class="has-tip">
+          <span style="font-size:11px;color:var(--muted)">COMPOSITE SCORE</span>
+          <span class="info-icon" style="margin-left:5px">ⓘ
+            <div class="tip">The score bar runs from -10 (fully bearish / price falling) to +10 (fully bullish / price rising). The further it goes right, the more indicators say price is going up — consider selling. Further left = price dropping — consider buying back. Center (0) = market is undecided, hold.</div>
+          </span>
+        </div>
+      </div>
+      <div class="score-track">
+        <div class="score-center"></div>
+        <div class="score-fill" id="scoreFill"></div>
+      </div>
+      <div class="score-labels"><span>PRICE ↓</span><span>NEUTRAL</span><span>PRICE ↑</span></div>
+    </div>
+
+    <div class="confidence-text">Score: <span id="scoreDisplay">—</span> / 10</div>
+
+    <div class="bull-count has-tip" id="bullCountWrap">
+      <b id="bullCount">—</b>/8 indicators say price going UP
+      <span class="info-icon" style="margin-left:2px">ⓘ
+        <div class="tip tip-left">Counts how many of the 8 indicators are currently giving a bullish (price-rising) reading. <b>6–8 bullish</b> = strong sell conditions — price is likely near a peak. <b>2–4</b> = mixed/neutral — hold. <b>0–2</b> = bearish conditions — potential rebuy zone.</div>
+      </span>
+    </div>
+
+    <div class="squeeze-badge" id="squeezeBadge">⚡ BB SQUEEZE — Big move imminent</div>
+
+    <div class="window-note" style="margin-top:10px">Signal: <b style="color:var(--blue)">1H candles</b> · 8 indicators</div>
+  </div>
+
+  <!-- RIGHT: TRADE SETUP + LOG -->
+  <div class="cc-trade">
+    <span class="card-tip">ⓘ<div class="tip">Based on current signals, this shows a suggested trade plan. Sell Zone: where to take profit. Rebuy At: where to buy back. Stop Loss: exit if wrong (1.5× ATR). PROFIT calculates your full position gain.</div></span>
+    <div class="trade-mode-toggle">
+      <button class="trade-mode-btn sell-mode active" id="sellModeBtn" onclick="setTradeMode('sell')">WAITING TO SELL</button>
+      <button class="trade-mode-btn buy-mode" id="buyModeBtn" onclick="setTradeMode('buy')">WAITING TO BUY</button>
+    </div>
+    <div class="trade-title" id="tradeTitle">SELL SETUP</div>
+    <div class="trade-action hold-action" id="tradeAction">HOLD — NO CLEAR SETUP</div>
+    <div class="trade-rows" id="tradeRows">
+      <div class="trade-row"><span class="trade-row-label">WATCH FOR</span><span class="trade-row-val">Loading...</span></div>
+    </div>
+    <div class="trade-rule" id="tradeRule">Waiting for signal...</div>
+    <div class="trade-signal-align neutral" id="tradeSignalAlign">— Signal neutral — wait for confirmation</div>
+    <div class="trade-log-divider"></div>
+    <div class="trade-log-header">
+      <div class="trade-log-title">TRADE LOG</div>
+      <div class="position-wrap">Position: <input type="number" class="position-input" id="positionInput" value="1000" min="1" onchange="savePosition()"> SOL</div>
+    </div>
+    <div class="trade-log-form">
+      <input type="number" class="trade-log-input" id="soldInput" placeholder="Sold at $" step="0.01">
+      <span class="trade-log-arrow">→</span>
+      <input type="number" class="trade-log-input" id="reboughtInput" placeholder="Rebought $" step="0.01">
+      <span class="trade-log-arrow">→</span>
+      <input type="number" class="trade-log-input" id="profitInput" placeholder="Profit at $" step="0.01">
+      <button class="log-btn" onclick="logTrade()">+ LOG</button>
+    </div>
+    <div id="tradeLogList"><div class="trade-log-empty">No trades logged yet</div></div>
+  </div>
+
+</div>
+
+<!-- CHART -->
+<div class="chart-wrap">
+  <div class="chart-header">
+    <div class="chart-title-wrap">
+      <div class="chart-title">PRICE CHART</div>
+      <div class="has-tip"><span class="info-icon">ⓘ<div class="tip">Yellow = EMA 9. Blue = EMA 21. Purple = EMA 50. White dashed = VWAP. EMAs stacked 9→21→50 with price above = ideal sell zone. Price below all = rebuy zone.</div></span></div>
+      <div class="ema-legend">
+        <div class="ema-legend-item"><div class="ema-dot" style="background:#ffd600"></div>EMA9</div>
+        <div class="ema-legend-item"><div class="ema-dot" style="background:#448aff"></div>EMA21</div>
+        <div class="ema-legend-item"><div class="ema-dot" style="background:#e040fb"></div>EMA50</div>
+        <div class="ema-legend-item"><div class="ema-dot" style="background:rgba(255,255,255,0.5)"></div>VWAP</div>
+      </div>
+    </div>
+    <div class="chart-tabs">
+      <button class="tab active" onclick="switchInterval('1h',this)" title="Signal source">1H ●</button>
+      <button class="tab" onclick="switchInterval('4h',this)">4H</button>
+      <button class="tab" onclick="switchInterval('15m',this)">15M</button>
+    </div>
+  </div>
+  <div id="chart"></div>
+</div>
+
+<!-- INDICATORS ROW 1 -->
+<div class="indicators-row">
+
+  <div class="ind-card" id="card-rsi">
+    <span class="card-tip">ⓘ<div class="tip">Relative Strength Index. Measures momentum on a 0–100 scale. <b>Below 30</b> = oversold (price may bounce — rebuy zone). <b>Above 70</b> = overbought (price may fall — sell zone). We use period 7 for faster signals on 1H charts.</div></span>
+    <div class="ind-name">RSI (7)</div>
+    <div class="ind-value" id="rsi-val">—</div>
+    <div class="rsi-zones-bar">
+      <div class="rsi-zone rsi-zone-left">OVERSOLD</div>
+      <div class="rsi-zone rsi-zone-mid">NEUTRAL</div>
+      <div class="rsi-zone rsi-zone-right">OVERBOUGHT</div>
+      <div class="rsi-marker" id="rsi-marker"></div>
+    </div>
+    <div class="ind-signal" id="rsi-sig">—</div>
+    <div class="ind-detail" id="rsi-detail">—</div>
+  </div>
+
+  <div class="ind-card" id="card-stoch">
+    <span class="card-tip">ⓘ<div class="tip">Stochastic RSI is RSI applied to itself — even more sensitive. <b>K below 20</b> = oversold (rebuy zone). <b>Above 80</b> = overbought (sell zone). When K crosses above D = bullish signal (price may rise). When K crosses below D = bearish signal (price may fall).</div></span>
+    <div class="ind-name">Stoch RSI</div>
+    <div class="ind-value" id="stoch-val">—</div>
+    <div class="stoch-bar-wrap"><div class="stoch-k-bar" id="stoch-bar"></div></div>
+    <div class="rsi-zones"><span>0</span><span>20</span><span>50</span><span>80</span><span>100</span></div>
+    <div class="ind-signal" id="stoch-sig">—</div>
+    <div class="ind-detail" id="stoch-detail">—</div>
+  </div>
+
+  <div class="ind-card" id="card-macd">
+    <span class="card-tip">ⓘ<div class="tip">Moving Average Convergence Divergence. Compares two EMAs (12 and 26 period). When MACD crosses above the signal line = bullish (price rising — sell zone). Histogram growing = momentum building. A fresh crossover is the strongest signal.</div></span>
+    <div class="ind-name">MACD (12/26/9)</div>
+    <div class="ind-value" id="macd-val">—</div>
+    <div class="ind-signal" id="macd-sig">—</div>
+    <div class="ind-detail" id="macd-detail">—</div>
+  </div>
+
+  <div class="ind-card" id="card-bb">
+    <span class="card-tip">ⓘ<div class="tip">Volatility bands around a 20-period moving average. <b>Price near upper band</b> = potentially overbought (sell zone). <b>Near lower band</b> = potentially oversold (rebuy zone). When the bands <b>squeeze tight</b> = a big move is coming. The direction of the breakout determines whether to sell or buy.</div></span>
+    <div class="ind-name">Bollinger Bands</div>
+    <div class="ind-value" id="bb-val">—</div>
+    <div class="bb-track"><div class="bb-dot" id="bb-dot"></div></div>
+    <div class="bb-price-labels">
+      <span class="bb-lbl-lower" id="bb-label-lower">$—</span>
+      <span class="bb-lbl-mid"   id="bb-label-mid">$—</span>
+      <span class="bb-lbl-upper" id="bb-label-upper">$—</span>
+    </div>
+    <div class="ind-signal" id="bb-sig">—</div>
+    <div class="ind-detail" id="bb-detail">—</div>
+  </div>
+
+</div>
+
+<!-- INDICATORS ROW 2 -->
+<div class="indicators-row-2">
+
+  <div class="ind-card" id="card-ema">
+    <span class="card-tip">ⓘ<div class="tip">Exponential Moving Averages give more weight to recent prices. <b>EMA9 > EMA21 > EMA50</b> = strong uptrend — ideal sell zone. All three aligned = high confidence. When a faster EMA crosses a slower one = trend change. Price below all EMAs = potential rebuy zone.</div></span>
+    <div class="ind-name">EMA 9 / 21 / 50</div>
+    <div class="ind-value" id="ema-val">—</div>
+    <div class="ind-signal" id="ema-sig">—</div>
+    <div class="ind-detail" id="ema-detail">—</div>
+  </div>
+
+  <div class="ind-card" id="card-vwap">
+    <span class="card-tip">ⓘ<div class="tip">Volume Weighted Average Price — the true average price weighted by volume. <b>Price above VWAP</b> = market is bullish (potential sell zone). <b>Below VWAP</b> = bearish (potential rebuy zone). Professional traders use VWAP as the key support/resistance level of the session.</div></span>
+    <div class="ind-name">VWAP (24-candle)</div>
+    <div class="ind-value" id="vwap-val">—</div>
+    <div class="ind-signal" id="vwap-sig">—</div>
+    <div class="ind-detail" id="vwap-detail">—</div>
+  </div>
+
+  <div class="ind-card" id="card-atr">
+    <span class="card-tip">ⓘ<div class="tip">Average True Range measures volatility — how much SOL typically moves per candle. <b>High ATR</b> = big moves, wider stops needed. <b>Low ATR</b> = quiet market. We use 1.5× ATR to set stop losses at logical levels — if you rebuy, this tells you where to cut the loss.</div></span>
+    <div class="ind-name">ATR (14)</div>
+    <div class="ind-value" id="atr-val">—</div>
+    <div class="ind-signal" id="atr-sig">—</div>
+    <div class="ind-detail" id="atr-detail">—</div>
+  </div>
+
+  <div class="ind-card" id="card-vol">
+    <span class="card-tip">ⓘ<div class="tip">How many SOL coins were traded this candle vs the 20-candle average. <b>A price move on high volume</b> = strong, confirmed move. <b>A move on low volume</b> = weak, likely to reverse. Never act on a breakout — sell or rebuy — without volume confirmation.</div></span>
+    <div class="ind-name">Volume</div>
+    <div class="ind-value" id="vol-val">—</div>
+    <div class="ind-signal" id="vol-sig">—</div>
+    <div class="ind-detail" id="vol-detail">—</div>
+  </div>
+
+</div>
+
+<!-- BOTTOM ROW: Trade Setup + S/R -->
+<div class="bottom-row">
+
+  <!-- RESISTANCE -->
+  <div class="sr-card">
+    <span class="card-tip">ⓘ<div class="tip">Price levels where selling pressure historically stopped a rally. If price approaches resistance and stalls, it's a <b>potential sell / take-profit zone</b>. <b>R1</b> is the nearest level above current price — a common first profit target for your SOL.</div></span>
+    <div class="sr-title">RESISTANCE LEVELS</div>
+    <div class="sr-levels" id="resistance-levels">
+      <div class="sr-level"><span class="sr-level-label">Loading...</span></div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="sr-card">
+    <span class="card-tip">ⓘ<div class="tip">Price levels where buying pressure historically stepped in and stopped a fall. If price drops to a support level and holds, it's a <b>potential rebuy zone</b>. <b>S1</b> is the nearest level below current price — a common rebuy target for your SOL.</div></span>
+    <div class="sr-title">SUPPORT LEVELS</div>
+    <div class="sr-levels" id="support-levels">
+      <div class="sr-level"><span class="sr-level-label">Loading...</span></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── CONFIG ──
+const SYMBOL = 'SOLUSDT';
+const REFRESH_INTERVAL = 60;
+let currentInterval = '1h';
+const SIGNAL_INTERVAL = '1h';
+let chart, candleSeries, volumeSeries;
+let ema9Series, ema21Series, ema50Series, vwapSeries;
+let refreshCountdown;
+let currentPrice = 0;
+let currentATR = 0;
+let lastPrice = 0, lastATR = 0, lastSupports = [], lastResistances = [], lastScore = 0, lastCandles = [];
+let tradeMode = 'sell';
+let positionSize = 1000;
+
+function savePosition() {
+  const v = parseInt(document.getElementById('positionInput').value) || 1000;
+  positionSize = v;
+  localStorage.setItem('sol-position-size', v);
+  renderTradeSetup();
+}
+function getTradeLog() { try { return JSON.parse(localStorage.getItem('sol-trade-log') || '[]'); } catch { return []; } }
+function saveTradeLog(log) { localStorage.setItem('sol-trade-log', JSON.stringify(log)); }
+function logTrade() {
+  const soldAt = parseFloat(document.getElementById('soldInput').value) || null;
+  const reboughtAt = parseFloat(document.getElementById('reboughtInput').value) || null;
+  const profitAt = parseFloat(document.getElementById('profitInput').value) || null;
+  if (!soldAt && !reboughtAt && !profitAt) return;
+  const pnl = (profitAt && reboughtAt) ? (profitAt - reboughtAt) * positionSize : null;
+  const log = getTradeLog();
+  log.unshift({ id: Date.now(), soldAt, reboughtAt, profitAt, timestamp: new Date().toISOString(), pnl });
+  if (log.length > 20) log.pop();
+  saveTradeLog(log);
+  ['soldInput','reboughtInput','profitInput'].forEach(id => document.getElementById(id).value = '');
+  renderTradeLog();
+}
+function deleteTrade(id) { saveTradeLog(getTradeLog().filter(e => e.id !== id)); renderTradeLog(); }
+function renderTradeLog() {
+  const log = getTradeLog();
+  const el = document.getElementById('tradeLogList');
+  if (!log.length) { el.innerHTML = '<div class="trade-log-empty">No trades logged yet</div>'; return; }
+  const fp = n => n != null ? '$' + parseFloat(n).toFixed(2) : '—';
+  const fd = s => { const d = new Date(s); return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+(d.getMinutes()+'').padStart(2,'0'); };
+  const rows = log.slice(0,6).map(e => {
+    const parts = [e.soldAt && ('Sold '+fp(e.soldAt)), e.reboughtAt && ('→ '+fp(e.reboughtAt)), e.profitAt && ('→ '+fp(e.profitAt))].filter(Boolean).join(' ');
+    const pnlHtml = e.pnl != null ? `<span class="trade-log-pnl${e.pnl<0?' neg':''}">${e.pnl>=0?'+':''}$${Math.abs(e.pnl).toLocaleString('en',{maximumFractionDigits:0})}</span>` : '<span class="trade-log-pnl">—</span>';
+    return `<div class="trade-log-entry"><span class="trade-log-time">${fd(e.timestamp)}</span><span class="trade-log-prices">${parts}</span>${pnlHtml}<button class="trade-log-del" onclick="deleteTrade(${e.id})">×</button></div>`;
+  }).join('');
+  const done = log.filter(e => e.pnl != null);
+  const total = done.reduce((s,e) => s+e.pnl, 0);
+  const totRow = done.length >= 2 ? `<div class="trade-log-total">Total logged: ${total>=0?'+':''}$${Math.abs(total).toLocaleString('en',{maximumFractionDigits:0})}</div>` : '';
+  el.innerHTML = rows + totRow;
+}
+
+
+// ── MATH HELPERS ──
+
+function calcEMAArray(data, period) {
+  const k = 2 / (period + 1);
+  const result = new Array(data.length).fill(0);
+  result[0] = data[0];
+  for (let i = 1; i < data.length; i++) {
+    result[i] = data[i] * k + result[i - 1] * (1 - k);
+  }
+  return result;
+}
+
+function calcSMAArray(data, period) {
+  const result = new Array(data.length).fill(null);
+  for (let i = period - 1; i < data.length; i++) {
+    const slice = data.slice(i - period + 1, i + 1);
+    result[i] = slice.reduce((a, b) => a + b, 0) / period;
+  }
+  return result;
+}
+
+function calcRSI(closes, period = 7) {
+  if (closes.length < period + 1) return 50;
+  let gains = 0, losses = 0;
+  const start = Math.max(1, closes.length - period * 3);
+  const initial = closes.slice(start, start + period);
+  let avgGain = 0, avgLoss = 0;
+  for (let i = 1; i < initial.length; i++) {
+    const diff = initial[i] - initial[i - 1];
+    if (diff > 0) avgGain += diff; else avgLoss += Math.abs(diff);
+  }
+  avgGain /= (period - 1); avgLoss /= (period - 1);
+  for (let i = start + period; i < closes.length; i++) {
+    const diff = closes[i] - closes[i - 1];
+    avgGain = (avgGain * (period - 1) + Math.max(0, diff)) / period;
+    avgLoss = (avgLoss * (period - 1) + Math.max(0, -diff)) / period;
+  }
+  if (avgLoss === 0) return 100;
+  return 100 - (100 / (1 + avgGain / avgLoss));
+}
+
+function calcRSIArray(closes, period = 7) {
+  const result = new Array(closes.length).fill(50);
+  if (closes.length < period + 1) return result;
+  for (let i = period; i < closes.length; i++) {
+    const slice = closes.slice(0, i + 1);
+    result[i] = calcRSI(slice, period);
+  }
+  return result;
+}
+
+function calcStochRSI(closes, rsiPeriod = 14, stochPeriod = 14, kSmooth = 3, dSmooth = 3) {
+  const rsiArr = calcRSIArray(closes, rsiPeriod);
+  const rawK = new Array(rsiArr.length).fill(50);
+  for (let i = stochPeriod - 1; i < rsiArr.length; i++) {
+    const slice = rsiArr.slice(i - stochPeriod + 1, i + 1);
+    const minRSI = Math.min(...slice);
+    const maxRSI = Math.max(...slice);
+    rawK[i] = maxRSI === minRSI ? 50 : ((rsiArr[i] - minRSI) / (maxRSI - minRSI)) * 100;
+  }
+  const kLine = calcSMAArray(rawK, kSmooth);
+  const dLine = calcSMAArray(kLine.map(v => v === null ? 50 : v), dSmooth);
+  const lastK = kLine[kLine.length - 1] ?? 50;
+  const lastD = dLine[dLine.length - 1] ?? 50;
+  const prevK = kLine[kLine.length - 2] ?? 50;
+  const prevD = dLine[dLine.length - 2] ?? 50;
+  const crossed = prevK < prevD && lastK > lastD ? 'bullish' :
+                  prevK > prevD && lastK < lastD ? 'bearish' : null;
+  return { k: lastK, d: lastD, prevK, prevD, crossed };
+}
+
+function calcMACD(closes) {
+  if (closes.length < 35) return { macd: 0, signal: 0, histogram: 0, prevHistogram: 0, crossed: null };
+  const ema12 = calcEMAArray(closes, 12);
+  const ema26 = calcEMAArray(closes, 26);
+  const macdLine = ema12.map((v, i) => v - ema26[i]);
+  const macdSlice = macdLine.slice(26);
+  const signalLine = calcEMAArray(macdSlice, 9);
+  const lastMACD = macdLine[macdLine.length - 1];
+  const lastSignal = signalLine[signalLine.length - 1];
+  const prevMACD = macdLine[macdLine.length - 2];
+  const prevSignal = signalLine[signalLine.length - 2];
+  return {
+    macd: lastMACD, signal: lastSignal,
+    histogram: lastMACD - lastSignal,
+    prevHistogram: prevMACD - prevSignal,
+    crossed: prevMACD < prevSignal && lastMACD > lastSignal ? 'bullish' :
+             prevMACD > prevSignal && lastMACD < lastSignal ? 'bearish' : null
+  };
+}
+
+function calcBB(closes, period = 20, mult = 2) {
+  if (closes.length < period) return { upper: 0, middle: 0, lower: 0, position: 0.5, bandwidth: 5, squeeze: false };
+  const slice = closes.slice(-period);
+  const mean = slice.reduce((a, b) => a + b, 0) / period;
+  const variance = slice.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / period;
+  const std = Math.sqrt(variance);
+  const upper = mean + mult * std;
+  const lower = mean - mult * std;
+  const current = closes[closes.length - 1];
+  const position = Math.max(0, Math.min(1, (current - lower) / (upper - lower)));
+  const bandwidth = (upper - lower) / mean * 100;
+
+  // Squeeze detection: bandwidth declining 3+ candles AND < 5% of price
+  let squeeze = false;
+  if (closes.length >= period + 3) {
+    const bws = [];
+    for (let back = 3; back >= 0; back--) {
+      const s = closes.slice(-period - back, closes.length - back || undefined);
+      const m = s.reduce((a, b) => a + b, 0) / period;
+      const v2 = s.reduce((a, b) => a + Math.pow(b - m, 2), 0) / period;
+      const sd = Math.sqrt(v2);
+      bws.push(((m + mult * sd) - (m - mult * sd)) / m * 100);
+    }
+    squeeze = bws[1] < bws[0] && bws[2] < bws[1] && bws[3] < bws[2] && bandwidth < 5;
+  }
+  return { upper, middle: mean, lower, position, bandwidth, squeeze };
+}
+
+function calcATR(candles, period = 14) {
+  if (candles.length < period + 1) return 1;
+  const trs = [];
+  for (let i = 1; i < candles.length; i++) {
+    const hl = candles[i].high - candles[i].low;
+    const hc = Math.abs(candles[i].high - candles[i - 1].close);
+    const lc = Math.abs(candles[i].low - candles[i - 1].close);
+    trs.push(Math.max(hl, hc, lc));
+  }
+  const slice = trs.slice(-period);
+  return slice.reduce((a, b) => a + b, 0) / period;
+}
+
+function calcVWAP(candles, sessionLen = 24) {
+  const slice = candles.slice(-sessionLen);
+  let cumTPV = 0, cumVol = 0;
+  for (const c of slice) {
+    const tp = (c.high + c.low + c.close) / 3;
+    cumTPV += tp * c.volume;
+    cumVol += c.volume;
+  }
+  return cumVol > 0 ? cumTPV / cumVol : candles[candles.length - 1].close;
+}
+
+function calcSR(candles) {
+  const highs = candles.map(c => c.high);
+  const lows  = candles.map(c => c.low);
+  const price = candles[candles.length - 1].close;
+  const resistances = [], supports = [];
+
+  // Pivot-based with strength count (how many touches)
+  const pivots = { res: {}, sup: {} };
+  const tolerance = price * 0.005; // 0.5% cluster tolerance
+
+  for (let i = 3; i < candles.length - 3; i++) {
+    if (highs[i] > highs[i-1] && highs[i] > highs[i-2] && highs[i] > highs[i-3] &&
+        highs[i] > highs[i+1] && highs[i] > highs[i+2] && highs[i] > highs[i+3]) {
+      // Cluster nearby pivots
+      const h = highs[i];
+      const existing = Object.keys(pivots.res).find(k => Math.abs(k - h) < tolerance);
+      if (existing) pivots.res[existing]++;
+      else pivots.res[h] = 1;
+    }
+    if (lows[i] < lows[i-1] && lows[i] < lows[i-2] && lows[i] < lows[i-3] &&
+        lows[i] < lows[i+1] && lows[i] < lows[i+2] && lows[i] < lows[i+3]) {
+      const l = lows[i];
+      const existing = Object.keys(pivots.sup).find(k => Math.abs(k - l) < tolerance);
+      if (existing) pivots.sup[existing]++;
+      else pivots.sup[l] = 1;
+    }
+  }
+
+  const resAbove = Object.entries(pivots.res)
+    .filter(([k]) => parseFloat(k) > price)
+    .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
+    .slice(0, 3)
+    .map(([k, v]) => ({ price: parseFloat(k), strength: v }));
+
+  const supBelow = Object.entries(pivots.sup)
+    .filter(([k]) => parseFloat(k) < price)
+    .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]))
+    .slice(0, 3)
+    .map(([k, v]) => ({ price: parseFloat(k), strength: v }));
+
+  return { resistances: resAbove, supports: supBelow };
+}
+
+// ── SCORING ──
+
+function scoreIndicators(closes, candles) {
+  const volumes = candles.map(c => c.volume);
+  const price = closes[closes.length - 1];
+
+  const rsi = calcRSI(closes, 7);
+  const stoch = calcStochRSI(closes, 14, 14, 3, 3);
+  const macd = calcMACD(closes);
+  const bb = calcBB(closes);
+  const atr = calcATR(candles);
+
+  const ema9arr  = calcEMAArray(closes, 9);
+  const ema21arr = calcEMAArray(closes, 21);
+  const ema50arr = calcEMAArray(closes, 50);
+  const ema9  = ema9arr[ema9arr.length - 1];
+  const ema21 = ema21arr[ema21arr.length - 1];
+  const ema50 = ema50arr[ema50arr.length - 1];
+  const prevEma9  = ema9arr[ema9arr.length - 2];
+  const prevEma21 = ema21arr[ema21arr.length - 2];
+
+  const vwap = calcVWAP(candles);
+
+  const volSlice = volumes.slice(-20);
+  const avgVol = volSlice.reduce((a, b) => a + b, 0) / volSlice.length;
+  const currentVol = volumes[volumes.length - 1];
+  const volRatio = currentVol / (avgVol || 1);
+  const priceChange = closes[closes.length - 1] - closes[closes.length - 2];
+
+  const scores = {};
+
+  // RSI(7) — weight 18%
+  if (rsi >= 70)      scores.rsi = -2;
+  else if (rsi >= 60) scores.rsi = -1;
+  else if (rsi >= 50) scores.rsi = 0.5;
+  else if (rsi >= 40) scores.rsi = 0;
+  else if (rsi >= 30) scores.rsi = 1;
+  else                scores.rsi = 2;
+
+  // Stoch RSI — weight 12%
+  if (stoch.k < 20 && stoch.k > stoch.prevK)       scores.stoch = 2;
+  else if (stoch.k > 80 && stoch.k < stoch.prevK)  scores.stoch = -2;
+  else if (stoch.crossed === 'bullish')             scores.stoch = 1;
+  else if (stoch.crossed === 'bearish')             scores.stoch = -1;
+  else scores.stoch = ((stoch.k - 50) / 50) * -1; // proportional: high K = bear, low K = bull
+
+  // MACD — weight 18%
+  if (macd.crossed === 'bullish')                                                  scores.macd = 2;
+  else if (macd.crossed === 'bearish')                                             scores.macd = -2;
+  else if (macd.histogram > 0 && macd.histogram > macd.prevHistogram)             scores.macd = 1;
+  else if (macd.histogram > 0 && macd.histogram <= macd.prevHistogram)            scores.macd = 0.5;
+  else if (macd.histogram < 0 && macd.histogram < macd.prevHistogram)             scores.macd = -1;
+  else                                                                             scores.macd = -0.5;
+
+  // Bollinger Bands — weight 12%
+  if (bb.squeeze) {
+    scores.bb = 0; // neutral during squeeze
+  } else {
+    if (bb.position > 0.85)      scores.bb = -2;
+    else if (bb.position > 0.65) scores.bb = -1;
+    else if (bb.position > 0.40) scores.bb = 0;
+    else if (bb.position > 0.20) scores.bb = 1;
+    else                         scores.bb = 2;
+  }
+
+  // EMA alignment — weight 15%
+  const emaDiff = Math.abs(ema9 - ema21) / ema21;
+  const freshCross9 = prevEma9 < prevEma21 && ema9 > ema21 ? 'bull' :
+                      prevEma9 > prevEma21 && ema9 < ema21 ? 'bear' : null;
+
+  if (emaDiff < 0.0015) {
+    scores.ema = 0; // choppy
+  } else if (freshCross9 === 'bull') {
+    scores.ema = 2;
+  } else if (freshCross9 === 'bear') {
+    scores.ema = -2;
+  } else if (ema9 > ema21 && ema21 > ema50 && price > ema9) {
+    scores.ema = 2;
+  } else if (ema9 < ema21 && ema21 < ema50) {
+    scores.ema = -2;
+  } else if (ema9 > ema21) {
+    scores.ema = 1;
+  } else {
+    scores.ema = -1;
+  }
+
+  // VWAP — weight 15%
+  const vwapDiff = (price - vwap) / vwap * 100;
+  if (vwapDiff > 1)       scores.vwap = -2;
+  else if (vwapDiff > 0.3) scores.vwap = -1;
+  else if (vwapDiff >= -0.3) scores.vwap = 0;
+  else if (vwapDiff >= -1) scores.vwap = 1;
+  else                     scores.vwap = 2;
+
+  // Volume — weight 10%
+  if (volRatio > 1.5 && priceChange > 0)      scores.vol = -1.5; // high vol up = price rising = sell signal
+  else if (volRatio > 1.5 && priceChange < 0)  scores.vol = 1.5;  // high vol down = price falling = buy signal
+  else if (volRatio > 1.2 && priceChange > 0)  scores.vol = -0.8;
+  else if (volRatio > 1.2 && priceChange < 0)  scores.vol = 0.8;
+  else                                          scores.vol = 0;
+
+  // ATR (informational only, not scored)
+  const weights = { rsi: 0.18, stoch: 0.12, macd: 0.18, bb: 0.12, ema: 0.15, vwap: 0.15, vol: 0.10 };
+  const rawScore = Object.keys(weights).reduce((sum, k) => sum + (scores[k] || 0) * weights[k], 0);
+  const compositeScore = rawScore * 5;
+
+  // Count bullish indicators
+  const bullCount = Object.values(scores).filter(v => v > 0).length;
+
+  return { scores, compositeScore, bullCount, rsi, stoch, macd, bb, ema9, ema21, ema50, vwap, volRatio, price, atr, volumes };
+}
+
+// ── SIGNAL LOGIC (Tom is a holder, wants to sell high / rebuy low) ──
+
+function getSignalLabel(score) {
+  if (score > 5)       return { cls: 'sell', icon: '🔴', text: 'SELL NOW', sub: 'Price near peak — strong time to take profit on your SOL' };
+  if (score > 3)       return { cls: 'sell', icon: '🔴', text: 'PREPARE TO SELL', sub: 'Price trending up — good time to take profit on your SOL' };
+  if (score > 1)       return { cls: 'sell', icon: '🟡', text: 'CONSIDER SELLING', sub: 'Mild upside signal — consider taking partial profits' };
+  if (score >= -1)     return { cls: 'hold', icon: '⚪', text: 'HOLD', sub: 'No clear move — hold your position and wait' };
+  if (score >= -3)     return { cls: 'hold', icon: '🟡', text: 'WATCH', sub: 'Price softening — rebuy zone may be forming' };
+  if (score >= -5)     return { cls: 'buy',  icon: '🟢', text: 'PREPARE TO BUY', sub: 'Price pulling back — potential rebuy zone forming' };
+  return               { cls: 'buy',  icon: '🟢', text: 'BUY NOW', sub: 'Price near bottom — strong rebuy opportunity for your SOL' };
+}
+
+function getMarketCondition(scores, bb, ema9, ema21) {
+  const emaDiff = Math.abs(ema9 - ema21) / ema21;
+  if (bb.squeeze) return { cls: 'squeeze', label: '⚡ SQUEEZE' };
+  if (emaDiff < 0.0015) return { cls: 'choppy', label: '〰 CHOPPY' };
+  const composite = scores.ema;
+  if (composite >= 1.5) return { cls: 'trending-up', label: '↑ TRENDING UP' };
+  if (composite <= -1.5) return { cls: 'trending-down', label: '↓ TRENDING DOWN' };
+  return { cls: 'neutral', label: '◌ NEUTRAL' };
+}
+
+const SVG_CHECK = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const SVG_WARN  = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12.5 11H1.5L7 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M7 6v2.5M7 10v.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
+
+function setTradeMode(mode) {
+  tradeMode = mode;
+  localStorage.setItem('sol-trade-mode', mode);
+  document.getElementById('sellModeBtn').classList.toggle('active', mode === 'sell');
+  document.getElementById('buyModeBtn').classList.toggle('active', mode === 'buy');
+  renderTradeSetup();
+}
+
+function estHours(distance, candles) {
+  if (!candles.length || distance <= 0) return '?';
+  const recent = candles.slice(-6);
+  const vels = [];
+  for (let i = 1; i < recent.length; i++) vels.push(Math.abs(recent[i].close - recent[i-1].close));
+  const avgVel = vels.length ? vels.reduce((a,b)=>a+b,0)/vels.length : 0.5;
+  const raw = avgVel > 0 ? distance / avgVel : 24;
+  const lo = Math.max(1, Math.round(raw * 0.7));
+  const hi = Math.min(48, Math.round(raw * 1.4));
+  return lo === hi ? lo+'h' : lo+'–'+hi+'h';
+}
+function heatLabel(dist, atr) {
+  const x = dist / (atr||1);
+  if (x < 0.5) return 'small move';
+  if (x < 1.5) return 'moderate (~'+x.toFixed(1)+'× ATR)';
+  if (x < 3)   return 'large (~'+x.toFixed(1)+'× ATR) — be patient';
+  return 'very large — high risk';
+}
+
+function renderTradeSetup() {
+  const price = lastPrice;
+  const atr   = lastATR;
+  const score = lastScore;
+  const supports    = lastSupports;
+  const resistances = lastResistances;
+  const candles     = lastCandles;
+
+  const actionEl = document.getElementById('tradeAction');
+  const rowsEl   = document.getElementById('tradeRows');
+  const ruleEl   = document.getElementById('tradeRule');
+  const titleEl  = document.getElementById('tradeTitle');
+  const alignEl  = document.getElementById('tradeSignalAlign');
+
+  if (!price || !atr) return;
+
+  const fmtN = (n, d = 2) => parseFloat(n).toFixed(d);
+  const fmtProfit = n => (n >= 0 ? '+' : '') + '$' + Math.abs(n * positionSize).toLocaleString('en', {maximumFractionDigits:0});
+
+  if (tradeMode === 'sell') {
+    titleEl.textContent = 'SELL SETUP';
+    const sellHigh = price + 0.3 * atr;
+    const rebuyAt  = supports[0] ? supports[0].price : price - atr;
+    const moveDist = price - rebuyAt;
+    const estTime  = estHours(moveDist, candles);
+    const heat     = heatLabel(moveDist, atr);
+
+    actionEl.className = 'trade-action sell-action';
+    actionEl.textContent = 'SELL / TAKE PROFIT';
+    rowsEl.innerHTML = `
+      <div class="trade-row"><span class="trade-row-label">SELL ZONE</span><span class="trade-row-val red">$${fmtN(price)} – $${fmtN(sellHigh)}</span></div>
+      <div class="trade-row"><span class="trade-row-label">REBUY AT</span><span class="trade-row-val green">$${fmtN(rebuyAt)}</span></div>
+      <div class="trade-row"><span class="trade-row-label">MOVE SIZE</span><span class="trade-row-val yellow">~$${fmtN(moveDist)} — ${heat}</span></div>
+      <div class="trade-row"><span class="trade-row-label">EST. TIME</span><span class="trade-row-val">~${estTime} to bounce</span></div>
+      <div class="trade-row"><span class="trade-row-label">PROFIT (${positionSize} SOL)</span><span class="trade-row-val green">${fmtProfit(price - rebuyAt)}</span></div>
+    `;
+    ruleEl.textContent = '⚠ Wait for red candle close before selling';
+
+  } else {
+    titleEl.textContent = 'BUY SETUP';
+    const entry    = price;
+    const stopLoss = entry - 1.5 * atr;
+    const target   = resistances[0] ? resistances[0].price : price + atr * 2;
+    const reward   = target - entry;
+    const risk     = entry - stopLoss;
+    const rr       = (reward / risk).toFixed(1);
+    const estTime  = estHours(reward, candles);
+    const heat     = heatLabel(reward, atr);
+
+    actionEl.className = 'trade-action buy-action';
+    actionEl.textContent = 'BUY BACK — PRICE DROPPING';
+    rowsEl.innerHTML = `
+      <div class="trade-row"><span class="trade-row-label">ENTRY</span><span class="trade-row-val green">$${fmtN(entry)}</span></div>
+      <div class="trade-row"><span class="trade-row-label">STOP LOSS</span><span class="trade-row-val red">$${fmtN(stopLoss)}</span></div>
+      <div class="trade-row"><span class="trade-row-label">TARGET</span><span class="trade-row-val green">$${fmtN(target)}</span></div>
+      <div class="trade-row"><span class="trade-row-label">MOVE SIZE</span><span class="trade-row-val yellow">~$${fmtN(reward)} — ${heat}</span></div>
+      <div class="trade-row"><span class="trade-row-label">EST. TIME</span><span class="trade-row-val">~${estTime} to target</span></div>
+      <div class="trade-row"><span class="trade-row-label">PROFIT (${positionSize} SOL)</span><span class="trade-row-val green">${fmtProfit(reward)}</span></div>
+      <div class="trade-row"><span class="trade-row-label">R:R RATIO</span><span class="trade-row-val yellow">1 : ${rr}</span></div>
+    `;
+    ruleEl.textContent = '⚠ Wait for green candle close before buying';
+  }
+
+  // Signal alignment
+  if (tradeMode === 'sell' && score > 1) {
+    alignEl.className = 'trade-signal-align confirm';
+    alignEl.innerHTML = SVG_CHECK + ' Signal confirms — good time to sell';
+  } else if (tradeMode === 'sell' && score < -1) {
+    alignEl.className = 'trade-signal-align disagree';
+    alignEl.innerHTML = SVG_WARN + ' Price already falling — sell zone passed, wait for next peak';
+  } else if (tradeMode === 'buy' && score < -1) {
+    alignEl.className = 'trade-signal-align confirm';
+    alignEl.innerHTML = SVG_CHECK + ' Signal confirms — good time to buy';
+  } else if (tradeMode === 'buy' && score > 1) {
+    alignEl.className = 'trade-signal-align disagree';
+    alignEl.innerHTML = SVG_WARN + ' Price may be rising — rebuy zone passed, wait for next dip';
+  } else {
+    alignEl.className = 'trade-signal-align neutral';
+    alignEl.innerHTML = '— Signal neutral — wait for confirmation';
+  }
+}
+
+function buildTradeSetup(compositeScore, price, atr, sr, candles) {
+  lastPrice       = price;
+  lastATR         = atr;
+  lastScore       = compositeScore;
+  lastSupports    = sr.supports    || [];
+  lastResistances = sr.resistances || [];
+  lastCandles     = candles        || [];
+  renderTradeSetup();
+}
+
+// ── UI HELPERS ──
+
+function fmt(n, d = 2) { return parseFloat(n).toFixed(d); }
+
+function updateSignalCard(compositeScore, bullCount, squeeze) {
+  const { cls, icon, text, sub } = getSignalLabel(compositeScore);
+  const card = document.getElementById('signalCard');
+  card.className = 'cc-signal ' + cls;
+  document.getElementById('signalIcon').textContent = icon;
+  const textEl = document.getElementById('signalText');
+  textEl.className = 'signal-text ' + cls;
+  textEl.textContent = text;
+  document.getElementById('signalSub').textContent = sub;
+
+  const pct = ((compositeScore + 10) / 20) * 100;
+  const fill = document.getElementById('scoreFill');
+  const center = 50;
+  if (pct >= center) {
+    fill.style.left  = center + '%';
+    fill.style.width = (pct - center) + '%';
+    fill.style.background = 'var(--red)'; // high score = price rising = red (sell)
+  } else {
+    fill.style.left  = pct + '%';
+    fill.style.width = (center - pct) + '%';
+    fill.style.background = 'var(--green)'; // low score = price falling = green (buy)
+  }
+
+  document.getElementById('scoreDisplay').textContent = (compositeScore >= 0 ? '+' : '') + fmt(compositeScore, 1);
+  document.getElementById('bullCount').textContent = bullCount;
+  document.getElementById('squeezeBadge').classList.toggle('show', squeeze);
+}
+
+function setIndCard(cardId, valId, sigId, detId, value, sigText, detail, cls) {
+  const card = document.getElementById(cardId);
+  card.className = 'ind-card ' + cls;
+  document.getElementById(valId).textContent = value;
+  const sigEl = document.getElementById(sigId);
+  sigEl.className = 'ind-signal ' + cls;
+  sigEl.textContent = sigText;
+  const detEl = document.getElementById(detId);
+  if (detEl) detEl.innerHTML = detail;
+}
+
+function updateRSICard(rsi) {
+  const marker = document.getElementById('rsi-marker');
+  marker.style.left = rsi + '%';
+  marker.style.background = rsi >= 70 ? 'var(--red)' : rsi <= 30 ? 'var(--green)' : 'var(--blue)';
+  const cls = rsi >= 70 ? 'bear' : rsi <= 30 ? 'bull' : 'neut';
+  const sig = rsi >= 70 ? 'OVERBOUGHT — SELL' : rsi <= 30 ? 'OVERSOLD — REBUY' : rsi >= 55 ? 'SLIGHTLY HIGH' : rsi <= 45 ? 'SLIGHTLY LOW' : 'NEUTRAL';
+  setIndCard('card-rsi', 'rsi-val', 'rsi-sig', 'rsi-detail', fmt(rsi, 1), sig, `Overbought >70 · Oversold <30<br>Current: <b>${fmt(rsi, 1)}</b>`, cls);
+}
+
+function updateStochCard(stoch) {
+  const bar = document.getElementById('stoch-bar');
+  bar.style.width = stoch.k + '%';
+  bar.style.background = stoch.k >= 80 ? 'var(--red)' : stoch.k <= 20 ? 'var(--green)' : 'var(--blue)';
+  const cls = stoch.k >= 80 ? 'bear' : stoch.k <= 20 ? 'bull' : stoch.crossed === 'bullish' ? 'bull' : stoch.crossed === 'bearish' ? 'bear' : 'neut';
+  const sig = stoch.crossed === 'bullish' ? 'K CROSS UP' : stoch.crossed === 'bearish' ? 'K CROSS DOWN' :
+              stoch.k >= 80 ? 'OVERBOUGHT' : stoch.k <= 20 ? 'OVERSOLD' : 'NEUTRAL';
+  setIndCard('card-stoch', 'stoch-val', 'stoch-sig', 'stoch-detail',
+    'K:' + fmt(stoch.k, 0), sig,
+    `K: ${fmt(stoch.k, 1)} · D: ${fmt(stoch.d, 1)}<br>Overbought >80 · Oversold <20`, cls);
+}
+
+function updateMACDCard(macd) {
+  const hist = macd.histogram;
+  const cls = macd.crossed === 'bullish' || hist > 0 ? 'bull' : macd.crossed === 'bearish' || hist < 0 ? 'bear' : 'neut';
+  const sig = macd.crossed === 'bullish' ? 'BULL CROSS ↑' : macd.crossed === 'bearish' ? 'BEAR CROSS ↓' :
+              hist > 0 ? 'BULLISH' : hist < 0 ? 'BEARISH' : 'NEUTRAL';
+  setIndCard('card-macd', 'macd-val', 'macd-sig', 'macd-detail',
+    (hist >= 0 ? '+' : '') + fmt(hist, 3), sig,
+    `MACD: ${fmt(macd.macd, 3)}<br>Signal: ${fmt(macd.signal, 3)}<br>Hist: ${(hist >= 0 ? '+' : '') + fmt(hist, 3)}`, cls);
+}
+
+function updateBBCard(bb, price) {
+  const dot = document.getElementById('bb-dot');
+  dot.style.left = (bb.position * 100) + '%';
+  dot.style.background = bb.squeeze ? 'var(--orange)' : bb.position > 0.8 ? 'var(--red)' : bb.position < 0.2 ? 'var(--green)' : 'var(--blue)';
+  const cls = bb.squeeze ? 'squeeze-ind' : bb.position > 0.8 ? 'bear' : bb.position < 0.2 ? 'bull' : 'neut';
+  const sig = bb.squeeze ? '⚡ SQUEEZE' : bb.position > 0.8 ? 'NEAR UPPER' : bb.position < 0.2 ? 'NEAR LOWER' : 'MID RANGE';
+  document.getElementById('bb-label-lower').textContent = '$' + fmt(bb.lower);
+  document.getElementById('bb-label-mid').textContent   = '$' + fmt(bb.middle);
+  document.getElementById('bb-label-upper').textContent = '$' + fmt(bb.upper);
+  setIndCard('card-bb', 'bb-val', 'bb-sig', 'bb-detail',
+    fmt(bb.position * 100, 0) + '%', sig,
+    `Upper: $${fmt(bb.upper)}<br>Mid: $${fmt(bb.middle)}<br>Lower: $${fmt(bb.lower)}<br>BW: ${fmt(bb.bandwidth, 1)}%`, cls);
+}
+
+function updateEMACard(ema9, ema21, ema50, price) {
+  const isFullBull = ema9 > ema21 && ema21 > ema50 && price > ema9;
+  const isFullBear = ema9 < ema21 && ema21 < ema50;
+  const diff = ema9 - ema21;
+  const emaDiff = Math.abs(diff) / ema21;
+  const choppy = emaDiff < 0.0015;
+  const cls = choppy ? 'neut' : isFullBull ? 'bear' : isFullBear ? 'bull' : diff > 0 ? 'bear' : 'bull';
+  // Note: bear class = price rising (sell signal for Tom); bull class = price falling (buy signal)
+  const sig = choppy ? 'CHOPPY' : isFullBull ? 'FULL BULL STACK' : isFullBear ? 'FULL BEAR STACK' : diff > 0 ? 'BULL ALIGNED' : 'BEAR ALIGNED';
+  setIndCard('card-ema', 'ema-val', 'ema-sig', 'ema-detail',
+    '$' + fmt(ema9), sig,
+    `EMA9: $${fmt(ema9)}<br>EMA21: $${fmt(ema21)}<br>EMA50: $${fmt(ema50)}`, cls);
+}
+
+function updateVWAPCard(vwap, price) {
+  const diff = (price - vwap) / vwap * 100;
+  const cls = diff > 0.3 ? 'bear' : diff < -0.3 ? 'bull' : 'neut';
+  const sig = diff > 1 ? 'FAR ABOVE' : diff > 0.3 ? 'ABOVE VWAP' : diff < -1 ? 'FAR BELOW' : diff < -0.3 ? 'BELOW VWAP' : 'AT VWAP';
+  setIndCard('card-vwap', 'vwap-val', 'vwap-sig', 'vwap-detail',
+    '$' + fmt(vwap), sig,
+    `VWAP: $${fmt(vwap)}<br>Price: $${fmt(price)}<br>Diff: ${(diff >= 0 ? '+' : '') + fmt(diff, 2)}%`, cls);
+}
+
+function updateATRCard(atr, price) {
+  const atrPct = atr / price * 100;
+  const cls = atrPct > 2 ? 'bear' : atrPct < 0.8 ? 'bull' : 'neut';
+  const sig = atrPct > 2 ? 'HIGH VOL' : atrPct < 0.8 ? 'LOW VOL' : 'NORMAL';
+  setIndCard('card-atr', 'atr-val', 'atr-sig', 'atr-detail',
+    '$' + fmt(atr), sig,
+    `ATR: $${fmt(atr)}<br>As % price: ${fmt(atrPct, 2)}%<br>1.5×ATR: $${fmt(atr * 1.5)}`, cls);
+}
+
+function updateVolumeCard(volRatio, currentVol) {
+  const pct = fmt((volRatio - 1) * 100, 0);
+  const cls = volRatio > 1.5 ? 'bear' : volRatio < 0.7 ? 'bull' : 'neut';
+  const sig = volRatio > 1.5 ? 'HIGH' : volRatio > 1.2 ? 'ABOVE AVG' : volRatio < 0.7 ? 'LOW' : 'NORMAL';
+  const volK = (currentVol / 1000).toFixed(0) + 'K';
+  setIndCard('card-vol', 'vol-val', 'vol-sig', 'vol-detail',
+    volRatio.toFixed(2) + 'x', sig,
+    `Vol: ${volK}<br>vs 20-avg: ${pct >= 0 ? '+' : ''}${pct}%`, cls);
+}
+
+function updateSRLevels(sr, price) {
+  const resEl = document.getElementById('resistance-levels');
+  const supEl = document.getElementById('support-levels');
+
+  const dots = (n) => Array(Math.min(n, 5)).fill('<span class="sr-dot" style="background:var(--muted)"></span>').join('');
+
+  resEl.innerHTML = sr.resistances.length
+    ? sr.resistances.map((r, i) => `
+        <div class="sr-level">
+          <span class="sr-level-label">R${i + 1}</span>
+          <div>
+            <div class="sr-level-price res">$${fmt(r.price)}</div>
+            <div class="sr-strength">${dots(r.strength)}</div>
+          </div>
+          <span class="sr-dist">+${fmt(r.price - price, 2)}</span>
+        </div>`).join('')
+    : '<div class="sr-level"><span class="sr-level-label" style="color:var(--muted)">No clear levels</span></div>';
+
+  supEl.innerHTML = sr.supports.length
+    ? sr.supports.map((s, i) => `
+        <div class="sr-level">
+          <span class="sr-level-label">S${i + 1}</span>
+          <div>
+            <div class="sr-level-price sup">$${fmt(s.price)}</div>
+            <div class="sr-strength">${dots(s.strength)}</div>
+          </div>
+          <span class="sr-dist">${fmt(s.price - price, 2)}</span>
+        </div>`).join('')
+    : '<div class="sr-level"><span class="sr-level-label" style="color:var(--muted)">No clear levels</span></div>';
+}
+
+// ── CHART ──
+
+function initChart() {
+  const container = document.getElementById('chart');
+  chart = LightweightCharts.createChart(container, {
+    width: container.clientWidth,
+    height: 230,
+    layout: { background: { color: 'transparent' }, textColor: '#4a6080' },
+    grid: { vertLines: { color: '#1e2d45' }, horzLines: { color: '#1e2d45' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: '#1e2d45', scaleMargins: { top: 0.1, bottom: 0.2 } },
+    timeScale: { borderColor: '#1e2d45', timeVisible: true },
+  });
+
+  candleSeries = chart.addCandlestickSeries({
+    upColor: '#00e676', downColor: '#ff1744',
+    borderUpColor: '#00e676', borderDownColor: '#ff1744',
+    wickUpColor: '#00e676', wickDownColor: '#ff1744',
+  });
+
+  volumeSeries = chart.addHistogramSeries({
+    color: '#2196f330',
+    priceFormat: { type: 'volume' },
+    priceScaleId: 'vol',
+  });
+  chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+
+  ema9Series = chart.addLineSeries({ color: '#ffd600', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+  ema21Series = chart.addLineSeries({ color: '#448aff', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+  ema50Series = chart.addLineSeries({ color: '#e040fb', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+  vwapSeries  = chart.addLineSeries({ color: 'rgba(255,255,255,0.45)', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false });
+
+  window.addEventListener('resize', () => {
+    chart.applyOptions({ width: container.clientWidth });
+  });
+}
+
+function updateChart(klines) {
+  const closes  = klines.map(k => parseFloat(k[4]));
+  const candles = klines.map(k => ({
+    time: k[0] / 1000,
+    open: parseFloat(k[1]), high: parseFloat(k[2]),
+    low:  parseFloat(k[3]), close: parseFloat(k[4]),
+    volume: parseFloat(k[5]),
+  }));
+  const volumes = klines.map(k => ({
+    time: k[0] / 1000,
+    value: parseFloat(k[5]),
+    color: parseFloat(k[4]) >= parseFloat(k[1]) ? '#00e67620' : '#ff174420',
+  }));
+
+  candleSeries.setData(candles);
+  volumeSeries.setData(volumes);
+
+  const e9  = calcEMAArray(closes, 9);
+  const e21 = calcEMAArray(closes, 21);
+  const e50 = calcEMAArray(closes, 50);
+
+  const toSeries = (arr) => klines.map((k, i) => ({ time: k[0] / 1000, value: arr[i] }));
+  ema9Series.setData(toSeries(e9));
+  ema21Series.setData(toSeries(e21));
+  ema50Series.setData(toSeries(e50));
+
+  // VWAP rolling 24-candle
+  const vwapData = klines.map((k, i) => {
+    const start = Math.max(0, i - 23);
+    const slice = candles.slice(start, i + 1);
+    let cumTPV = 0, cumVol = 0;
+    for (const c of slice) {
+      const tp = (c.high + c.low + c.close) / 3;
+      cumTPV += tp * c.volume;
+      cumVol += c.volume;
+    }
+    return { time: k[0] / 1000, value: cumVol > 0 ? cumTPV / cumVol : candles[i].close };
+  });
+  vwapSeries.setData(vwapData);
+
+  chart.timeScale().fitContent();
+}
+
+// ── FETCH ──
+
+async function fetchData(interval) {
+  const base = 'https://api.binance.com/api/v3';
+  const chartLimit = interval === '15m' ? 200 : 120;
+  const fetches = [
+    fetch(`${base}/klines?symbol=${SYMBOL}&interval=${SIGNAL_INTERVAL}&limit=150`),
+    fetch(`${base}/ticker/24hr?symbol=${SYMBOL}`),
+  ];
+  if (interval !== SIGNAL_INTERVAL) {
+    fetches.push(fetch(`${base}/klines?symbol=${SYMBOL}&interval=${interval}&limit=${chartLimit}`));
+  }
+  const results = await Promise.all(fetches);
+  if (results.some(r => !r.ok)) throw new Error('Binance API error');
+  const signalKlines = await results[0].json();
+  const ticker       = await results[1].json();
+  const chartKlines  = interval !== SIGNAL_INTERVAL ? await results[2].json() : signalKlines;
+  return { signalKlines, chartKlines, ticker };
+}
+
+async function refresh() {
+  try {
+    const { signalKlines, chartKlines, ticker } = await fetchData(currentInterval);
+
+    const closes  = signalKlines.map(k => parseFloat(k[4]));
+    const candles = signalKlines.map(k => ({
+      open: parseFloat(k[1]), high: parseFloat(k[2]),
+      low:  parseFloat(k[3]), close: parseFloat(k[4]),
+      volume: parseFloat(k[5]),
+    }));
+
+    currentPrice = parseFloat(ticker.lastPrice);
+    const change24h = parseFloat(ticker.priceChangePercent);
+
+    document.getElementById('price').textContent = '$' + fmt(currentPrice);
+    const chEl = document.getElementById('priceChange');
+    chEl.textContent = (change24h >= 0 ? '+' : '') + fmt(change24h, 2) + '%';
+    chEl.className = 'price-change ' + (change24h >= 0 ? 'up' : 'down');
+
+    updateChart(chartKlines);
+
+    const result = scoreIndicators(closes, candles);
+    const { compositeScore, bullCount, rsi, stoch, macd, bb, ema9, ema21, ema50, vwap, volRatio, atr } = result;
+
+    currentATR = atr;
+
+    // Market condition
+    const mc = getMarketCondition(result.scores, bb, ema9, ema21);
+    const mcEl = document.getElementById('marketCondition');
+    mcEl.className = 'market-condition ' + mc.cls;
+    mcEl.textContent = mc.label;
+
+    updateSignalCard(compositeScore, bullCount, bb.squeeze);
+    updateRSICard(rsi);
+    updateStochCard(stoch);
+    updateMACDCard(macd);
+    updateBBCard(bb, currentPrice);
+    updateEMACard(ema9, ema21, ema50, currentPrice);
+    updateVWAPCard(vwap, currentPrice);
+    updateATRCard(atr, currentPrice);
+    updateVolumeCard(volRatio, result.volumes[result.volumes.length - 1]);
+
+    const sr = calcSR(candles);
+    updateSRLevels(sr, currentPrice);
+    buildTradeSetup(compositeScore, currentPrice, atr, sr, candles);
+
+    document.getElementById('lastUpdate').textContent = 'Updated ' + new Date().toLocaleTimeString();
+    document.getElementById('errorBanner').style.display = 'none';
+    document.getElementById('loading').classList.add('hide');
+
+  } catch (e) {
+    const eb = document.getElementById('errorBanner');
+    eb.style.display = 'block';
+    eb.textContent = '⚠️ API error: ' + e.message + ' — retrying next cycle';
+    document.getElementById('loading').classList.add('hide');
+  }
+}
+
+function switchInterval(interval, btn) {
+  currentInterval = interval;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  refresh();
+}
+
+function startRefreshTimer() {
+  let elapsed = 0;
+  clearInterval(refreshCountdown);
+  refreshCountdown = setInterval(() => {
+    elapsed++;
+    const pct = ((REFRESH_INTERVAL - elapsed) / REFRESH_INTERVAL) * 100;
+    document.getElementById('refreshBar').style.width = pct + '%';
+    if (elapsed >= REFRESH_INTERVAL) { elapsed = 0; refresh(); }
+  }, 1000);
+}
+
+// Init
+tradeMode = localStorage.getItem('sol-trade-mode') || 'sell';
+positionSize = parseInt(localStorage.getItem('sol-position-size') || '1000');
+document.getElementById('positionInput').value = positionSize;
+setTradeMode(tradeMode);
+renderTradeLog();
+
+initChart();
+refresh();
+startRefreshTimer();
+</script>
+</body>
+</html>
