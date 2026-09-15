@@ -56,7 +56,7 @@ export default function HeroHeader() {
         const incoming = rows[next].querySelectorAll('.rotating-char')
         transition = gsap.timeline({ onComplete: () => {
           current = next
-          timer = gsap.delayedCall(3, rotate)
+          timer = gsap.delayedCall(1.4, rotate)
         } })
         transition.set(rows[next], { visibility: 'visible' })
           .set(incoming, { yPercent: 110, rotateX: -70, opacity: 0 })
@@ -70,7 +70,7 @@ export default function HeroHeader() {
       document.fonts.ready.then(() => {
         if (!alive) return
         slot.style.width = `${rows[0].scrollWidth}px`
-        timer = gsap.delayedCall(3.4, rotate)
+        timer = gsap.delayedCall(2.4, rotate)
       })
       const resize = () => {
         transition?.progress(1)
@@ -82,7 +82,7 @@ export default function HeroHeader() {
       // The exported spray includes Figma's exact noise and blur. A feathered
       // mask sweeps across it, revealing pigment without stretching the texture.
       const reveal = gsap.fromTo('.hero-spray__paint', { '--spray-reveal': '-18%' }, {
-        '--spray-reveal': '118%', duration: 1.6, delay: .8, ease: 'power2.inOut',
+        '--spray-reveal': '118%', duration: 1.05, delay: .65, ease: 'power2.inOut',
       })
       let frame = 0
       const scroll = () => {
@@ -138,7 +138,7 @@ export default function HeroHeader() {
     <div className="hero-content">
       <div className="hero-title-area">
         <h1 className="hero-heading" aria-label="The creative studio of the future runs on tesseral">
-          <span aria-hidden="true">
+          <span className="hero-heading-reveal" aria-hidden="true">
             <span className="hero-first-line">The <span className="rotating-slot">
               {WORDS.map((word, i) => <span className={`rotating-word rotating-word--${i}`} key={word}>
                 {Array.from(word).map((char, j) => <span className="rotating-char" key={j}>{char === ' ' ? '\u00a0' : char}</span>)}

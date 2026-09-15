@@ -165,6 +165,7 @@ export default function ShaderBackground() {
         zIndex: 0,
         display: 'block',
         pointerEvents: 'none',
+        transform: 'translate3d(var(--spray-shake-x, 0px), var(--spray-shake-y, 0px), 0) scale(1.025)',
       }}
     />
   )
