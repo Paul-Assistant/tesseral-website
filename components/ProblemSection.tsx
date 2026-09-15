@@ -93,7 +93,7 @@ export default function ProblemSection() {
     const board = section.querySelector<HTMLElement>('.problem-board')!
     const fit = () => {
       const narrow = window.matchMedia('(max-width: 767px)').matches
-      const scale = Math.min(1, (stage.clientWidth - (narrow ? 32 : 80)) / (narrow ? 354 : 1262.318), (stage.clientHeight - 64) / (narrow ? 650 : 656.098))
+      const scale = Math.min(1, (stage.clientWidth - (narrow ? 32 : 80)) / (narrow ? 354 : 1262.318), (stage.clientHeight - (narrow ? 208 : 144)) / (narrow ? 650 : 656.098))
       board.style.setProperty('--board-scale', String(Math.max(.35, scale)))
     }
     const observer = new ResizeObserver(fit)

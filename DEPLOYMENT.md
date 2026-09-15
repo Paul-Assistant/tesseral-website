@@ -18,3 +18,6 @@ alternating sweeps of the exported Figma spray. A brief horizontal shake accompa
 the paint. The title changes and five solution cards enter above the paint with
 Figma's stronger 30px glass blur. Scrolling back reverses the sequence. Reduced
 motion shows both sets as readable static lists, with no spray or shake.
+
+The logo, four-icon glass menu and Signup remain fixed at the top. The pinned
+story reserves space beneath that navigation on desktop and mobile.

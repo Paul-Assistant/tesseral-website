@@ -1,7 +1,7 @@
 .problem { position: relative; color: #201e18; font-family: var(--font-soft), sans-serif; }
 .problem-stage { position: sticky; top: 0; height: 100svh; min-height: 440px; overflow: clip; }
 .problem-scene { position: absolute; inset: 0; transform: translate3d(var(--spray-shake-x, 0px), var(--spray-shake-y, 0px), 0); }
-.problem-board { --board-scale: .8; position: absolute; width: 1262.318px; height: 656.098px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(var(--board-scale)); }
+.problem-board { --board-scale: .8; position: absolute; width: 1262.318px; height: 656.098px; left: 50%; top: calc(50% + 40px); transform: translate(-50%, -50%) scale(var(--board-scale)); }
 .problem h2 { position: absolute; top: 0; left: 313px; width: 617px; color: #403a2f; font: 500 42.503px/1 var(--font-ginger), sans-serif; letter-spacing: -1.7001px; text-align: center; }
 .problem-cards { list-style: none; }
 .problem-title-wrap { position: absolute; inset: 0; pointer-events: none; }
@@ -27,7 +27,7 @@
   .problem { height: 1360svh; }
 }
 @media (max-width: 767px) {
-  .problem-board { width: 354px; height: 650px; }
+  .problem-board { width: 354px; height: 650px; top: calc(50% + 72px); }
   .problem h2 { left: 0; width: 354px; font-size: 32px; letter-spacing: -1.28px; }
   .problem-desktop-break { display: none; }
   .problem-card-position { left: calc(8px + var(--card-index) * 4px); top: calc(145px + var(--card-index) * 25px); }
