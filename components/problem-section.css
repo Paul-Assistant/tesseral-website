@@ -1,0 +1,40 @@
+.problem { position: relative; color: #201e18; font-family: var(--font-soft), sans-serif; }
+.problem-stage { position: sticky; top: 0; height: 100svh; min-height: 440px; overflow: clip; }
+.problem-board { --board-scale: .8; position: absolute; width: 1262.318px; height: 656.098px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(var(--board-scale)); }
+.problem h2 { position: absolute; top: 0; left: 313px; width: 617px; color: #403a2f; font: 500 42.503px/1 var(--font-ginger), sans-serif; letter-spacing: -1.7001px; text-align: center; }
+.problem-cards { list-style: none; }
+.problem-card-position { position: absolute; left: var(--card-x); top: var(--card-y); width: 322px; height: 400px; z-index: calc(var(--card-index) + 1); }
+.problem-card { position: relative; width: 322px; height: 400px; padding: 32px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 24px; transform: rotate(var(--card-rotation)); transform-origin: top left; background: rgba(243, 242, 241, .2); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); box-shadow: inset 1px 1px 1px #ffffffcc, inset -1px -1px 1px #ffffff55, inset 4px 4px 16px #ffffff12, inset -4px -4px 16px #ffffff26; }
+.problem-card::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; border: 1px solid transparent; background: linear-gradient(135deg, #ffffffb8, #ffffff00 32%, #ffffff00 68%, #ffffff8a) border-box; mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); mask-composite: exclude; }
+.problem-card-top { height: 85px; display: flex; align-items: flex-start; justify-content: space-between; }
+.problem-card-number { font: 300 120px/1.4 var(--font-mono), monospace; letter-spacing: -12px; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
+.problem-card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 15px; font: 400 12px/1 var(--font-mono), monospace; letter-spacing: .6px; text-transform: uppercase; color: #000; }
+.problem-card-meta > span { width: 86px; }
+.problem-card-meta > span > span { display: inline-block; margin-top: 8px; white-space: nowrap; }
+.problem-card-copy { width: 252px; font-size: 12px; line-height: 1.4; letter-spacing: -.24px; color: #645f52; }
+.problem-card-copy strong { font: 700 12px/1.4 var(--font-mono), monospace; overflow-wrap: anywhere; }
+.problem-card h3 { font: 500 14px/1.4 var(--font-soft), sans-serif; letter-spacing: -.28px; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
+@media (prefers-reduced-motion: no-preference) {
+  .problem { height: 600svh; }
+}
+@media (max-width: 767px) {
+  .problem-board { width: 354px; height: 650px; }
+  .problem h2 { left: 0; width: 354px; font-size: 32px; letter-spacing: -1.28px; }
+  .problem-desktop-break { display: none; }
+  .problem-card-position { left: calc(8px + var(--card-index) * 4px); top: calc(145px + var(--card-index) * 25px); }
+  .problem-card { background: rgba(243, 242, 241, .65); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+}
+/* Keep every card readable without scroll choreography or JavaScript. */
+.problem:not([data-animated]) { height: auto; padding: 80px 24px; }
+.problem:not([data-animated]) .problem-stage { position: relative; height: auto; min-height: 0; overflow: visible; }
+.problem:not([data-animated]) .problem-board { position: relative; top: auto; left: auto; width: 100%; height: auto; transform: none; }
+.problem:not([data-animated]) h2 { position: relative; left: auto; width: min(100%, 617px); margin: 0 auto 72px; }
+.problem:not([data-animated]) .problem-cards { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; }
+.problem:not([data-animated]) .problem-card-position { position: relative; top: auto; left: auto; }
+.problem:not([data-animated]) .problem-card { transform: none; }
+@media (max-width: 370px) {
+  .problem:not([data-animated]) { padding-inline: 12px; }
+  .problem:not([data-animated]) :is(.problem-card-position, .problem-card) { width: 100%; }
+  .problem:not([data-animated]) .problem-card { padding: 24px; }
+  .problem:not([data-animated]) .problem-card-copy { width: 100%; }
+}

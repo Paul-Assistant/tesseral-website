@@ -4,6 +4,7 @@ import "./globals.css";
 
 const ginger = localFont({ src: './fonts/RestartGinger-Medium.otf', variable: '--font-ginger', weight: '500', display: 'swap' });
 const soft = localFont({ src: [{ path: './fonts/RestartSoft-Regular.otf', weight: '400' }, { path: './fonts/RestartSoft-Medium.otf', weight: '500' }], variable: '--font-soft', display: 'swap' });
+const mono = localFont({ src: [{ path: './fonts/RaptorMono-Light.otf', weight: '300' }, { path: './fonts/RaptorMono-Regular.otf', weight: '400' }, { path: './fonts/RaptorMono-Bold.otf', weight: '700' }], variable: '--font-mono', display: 'swap' });
 
 export const metadata: Metadata = {
   title: "Tesseral — The creative studio of the future",
@@ -18,7 +19,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${ginger.variable} ${soft.variable} h-full antialiased`}
+      className={`${ginger.variable} ${soft.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

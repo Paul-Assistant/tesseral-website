@@ -7,7 +7,7 @@ import './hero-header.css'
 const WORDS = ['creative studio', 'brand']
 const SECTIONS = [
   { id: 'home', label: 'Overview' },
-  { id: 'features', label: 'Features' },
+  { id: 'problem', label: 'The problem' },
   { id: 'how-it-works', label: 'How it works' },
   { id: 'pricing', label: 'Pricing' },
 ]
