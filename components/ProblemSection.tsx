@@ -64,8 +64,10 @@ export default function ProblemSection() {
         },
       })
       cards.forEach((card, i) => {
-        sequence.fromTo(card, { y: () => stage.clientHeight / Number(board.style.getPropertyValue('--board-scale')), autoAlpha: 0 }, {
-          y: 0, autoAlpha: 1, duration: .7, ease: 'power2.out',
+        // Ancestor opacity creates a backdrop root and prevents the glass from
+        // sampling earlier cards. Keep full opacity throughout the slide.
+        sequence.fromTo(card, { y: () => stage.clientHeight / Number(board.style.getPropertyValue('--board-scale')) }, {
+          y: 0, duration: .7, ease: 'power2.out',
         }, i)
       })
       // Leave time to see the complete arrangement before the next section.
