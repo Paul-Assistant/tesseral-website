@@ -119,7 +119,7 @@ export default function ProblemSection() {
       }, i * .045))
       const sequence = gsap.timeline({
         scrollTrigger: {
-          trigger: section, start: 'top top', end: 'bottom bottom', scrub: .55,
+          trigger: section, start: 'top top', end: () => `+=${section.offsetHeight - stage.clientHeight * 2}`, scrub: .55,
           invalidateOnRefresh: true,
         },
       })
@@ -137,7 +137,9 @@ export default function ProblemSection() {
       passes.forEach((pass, i) => sequence.fromTo(pass, { strokeDashoffset: 1 }, {
         strokeDashoffset: 0, autoRound: false, duration: .7, ease: 'power1.inOut',
       }, 5.2 + i * .48))
-      sequence.to('.problem-cards--past', { opacity: .5, duration: .45, ease: 'power1.inOut' }, 6.45)
+      // Dim the old copy, keeping the glass ancestors at full opacity. Crossing
+      // opacity=1 on their container changes the backdrop root abruptly.
+      sequence.to('.problem-cards--past :is(.problem-card-copy, h3)', { opacity: .5, duration: .45, ease: 'power1.inOut' }, 6.45)
       sequence.to(document.documentElement, {
         keyframes: [
           { '--spray-shake-x': '-5px', '--spray-shake-y': '1px' },

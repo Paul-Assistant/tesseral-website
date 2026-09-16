@@ -20,9 +20,58 @@ function ActionButton({ children, compact = false }: { children: React.ReactNode
   </a>
 }
 
+function scrollToAnchor(event: React.MouseEvent<HTMLAnchorElement>, id: string, animation: { current: number }) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  const target = document.getElementById(id)
+  if (!target) return
+  event.preventDefault()
+  cancelAnimationFrame(animation.current)
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    target.scrollIntoView()
+    history.replaceState(null, '', `#${id}`)
+    return
+  }
+  const start = window.scrollY
+  const destination = Math.max(0, start + target.getBoundingClientRect().top)
+  const distance = destination - start
+  const duration = Math.min(1100, Math.max(520, Math.abs(distance) * .55))
+  const started = performance.now()
+  const ease = (value: number) => 1 - Math.pow(1 - value, 4)
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - started) / duration)
+    window.scrollTo(0, start + distance * ease(progress))
+    if (progress < 1) animation.current = requestAnimationFrame(frame)
+    else {
+      animation.current = 0
+      history.replaceState(null, '', `#${id}`)
+      target.focus({ preventScroll: true })
+    }
+  }
+  animation.current = requestAnimationFrame(frame)
+}
+
 export default function HeroHeader() {
   const root = useRef<HTMLElement>(null)
+  const navigationFrame = useRef(0)
   const [active, setActive] = useState('home')
+
+  useEffect(() => {
+    const cancel = () => { cancelAnimationFrame(navigationFrame.current); navigationFrame.current = 0 }
+    const onKey = (event: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) cancel()
+    }
+    window.addEventListener('wheel', cancel, { passive: true })
+    window.addEventListener('touchstart', cancel, { passive: true })
+    window.addEventListener('pointerdown', cancel, { passive: true })
+    window.addEventListener('keydown', onKey)
+    return () => {
+      cancel()
+      window.removeEventListener('wheel', cancel)
+      window.removeEventListener('touchstart', cancel)
+      window.removeEventListener('pointerdown', cancel)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [])
 
   useEffect(() => {
     const update = () => {
@@ -30,7 +79,8 @@ export default function HeroHeader() {
         const element = document.getElementById(id)
         return element && element.getBoundingClientRect().top <= window.innerHeight * .35
       }).at(-1)
-      setActive(section?.id ?? 'home')
+      const next = section?.id ?? 'home'
+      setActive(current => current === next ? current : next)
     }
     window.addEventListener('scroll', update, { passive: true })
     update()
@@ -72,7 +122,12 @@ export default function HeroHeader() {
         slot.style.width = `${rows[0].scrollWidth}px`
         timer = gsap.delayedCall(2.4, rotate)
       })
+      let headingWidth = heading.clientWidth
       const resize = () => {
+        // Phrase wrapping changes height during the animation. Only a real
+        // available-width change should finish and remeasure that animation.
+        if (heading.clientWidth === headingWidth) return
+        headingWidth = heading.clientWidth
         transition?.progress(1)
         gsap.set(slot, { width: rows[current].scrollWidth })
       }
@@ -122,13 +177,13 @@ export default function HeroHeader() {
 
   return <section className="hero" ref={root} id="home" aria-label="Tesseral introduction">
     <header className="hero-nav">
-      <a className="hero-logo" href="#home" aria-label="Tesseral home">
+      <a className="hero-logo" href="#home" onClick={event => scrollToAnchor(event, 'home', navigationFrame)} aria-label="Tesseral home">
         <img src="/header/logo.png" width="29" height="29" alt="" />
         <img src="/header/wordmark.svg" width="54" height="13" alt="tesseral" />
       </a>
       <nav className="hero-menu" aria-label="Main navigation">
         {SECTIONS.map(({ id, label }, i) =>
-          <a href={`#${id}`} key={id} className="hero-menu__item" aria-label={label} aria-current={active === id ? 'location' : undefined} title={label}>
+          <a href={`#${id}`} onClick={event => scrollToAnchor(event, id, navigationFrame)} key={id} className="hero-menu__item" aria-label={label} aria-current={active === id ? 'location' : undefined} title={label}>
             <img src={i === 0 ? "/header/globe.svg" : `/header/nav-${i + 1}.svg`} className={i === 0 ? "hero-menu__globe" : undefined} width="43.2" height="43.2" alt="" />
           </a>)}
       </nav>

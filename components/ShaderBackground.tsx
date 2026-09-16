@@ -117,9 +117,11 @@ export default function ShaderBackground() {
 
     // Resize
     const resize = () => {
+      if (canvas.width === window.innerWidth && canvas.height === window.innerHeight) return
       canvas.width  = window.innerWidth
       canvas.height = window.innerHeight
       gl.viewport(0, 0, canvas.width, canvas.height)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
     }
     resize()
     window.addEventListener('resize', resize)
@@ -134,10 +136,20 @@ export default function ShaderBackground() {
     window.addEventListener('mousemove', onMove)
 
     // Render loop
-    let raf: number
+    let raf = 0
     const start = performance.now()
-    const render = () => {
-      const t = (performance.now() - start) / 1000
+    let lastFrame = 0
+    const render = (now: number) => {
+      raf = 0
+      if (document.hidden || document.documentElement.dataset.journeyCovered === 'true') return
+      // Keep the atmospheric background smooth while avoiding needless
+      // backdrop-filter re-rasterization on every display refresh.
+      if (now - lastFrame < 33) {
+        raf = requestAnimationFrame(render)
+        return
+      }
+      lastFrame = now
+      const t = (now - start) / 1000
       smx += (mx - smx) * 0.035
       smy += (my - smy) * 0.035
       gl.uniform1f(uTime, t)
@@ -145,12 +157,24 @@ export default function ShaderBackground() {
       gl.drawArrays(gl.TRIANGLES, 0, 6)
       raf = requestAnimationFrame(render)
     }
-    render()
+    render(0)
+    const visibility = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(render)
+    }
+    document.addEventListener('visibilitychange', visibility)
+    window.addEventListener('journey-visibility', visibility)
 
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', onMove)
+      document.removeEventListener('visibilitychange', visibility)
+      window.removeEventListener('journey-visibility', visibility)
+      gl.deleteBuffer(buf)
+      gl.deleteProgram(prog)
+      gl.deleteShader(vert)
+      gl.deleteShader(frag)
     }
   }, [])
 

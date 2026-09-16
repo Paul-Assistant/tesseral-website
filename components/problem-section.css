@@ -1,6 +1,6 @@
 .problem { position: relative; color: #201e18; font-family: var(--font-soft), sans-serif; }
 .problem-stage { position: sticky; top: 0; height: 100svh; min-height: 440px; overflow: clip; }
-.problem-scene { position: absolute; inset: 0; transform: translate3d(var(--spray-shake-x, 0px), var(--spray-shake-y, 0px), 0); }
+.problem-scene { position: absolute; inset: 0; transform: translate3d(var(--spray-shake-x, 0px), var(--spray-shake-y, 0px), 0); will-change: transform; backface-visibility: hidden; }
 .problem-board { --board-scale: .8; position: absolute; width: 1262.318px; height: 656.098px; left: 50%; top: calc(50% + 40px); transform: translate(-50%, -50%) scale(var(--board-scale)); }
 .problem h2 { position: absolute; top: 0; left: 313px; width: 617px; color: #403a2f; font: 500 42.503px/1 var(--font-ginger), sans-serif; letter-spacing: -1.7001px; text-align: center; }
 .problem-cards { list-style: none; }
@@ -13,7 +13,7 @@
 .problem-scramble-size { visibility: hidden; }
 .problem-scramble-text { position: absolute; inset: 0; overflow: clip; }
 .problem-card-position { position: absolute; left: var(--card-x); top: var(--card-y); width: 322px; height: 400px; z-index: calc(var(--card-index) + 1); }
-.problem-card { position: relative; width: 322px; height: 400px; padding: 32px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 24px; transform: rotate(var(--card-rotation)); transform-origin: top left; background: rgba(243, 242, 241, .2); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); box-shadow: inset 1px 1px 1px #ffffffcc, inset -1px -1px 1px #ffffff55, inset 4px 4px 16px #ffffff12, inset -4px -4px 16px #ffffff26; }
+.problem-card { position: relative; width: 322px; height: 400px; padding: 32px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 24px; transform: rotate(var(--card-rotation)); transform-origin: top left; background: rgba(243, 242, 241, .2); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); box-shadow: inset 1px 1px 1px #ffffffcc, inset -1px -1px 1px #ffffff55, inset 4px 4px 16px #ffffff12, inset -4px -4px 16px #ffffff26; backface-visibility: hidden; }
 .problem-card::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; border: 1px solid transparent; background: linear-gradient(135deg, #ffffffb8, #ffffff00 32%, #ffffff00 68%, #ffffff8a) border-box; mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); mask-composite: exclude; }
 .problem-card-top { height: 85px; display: flex; align-items: flex-start; justify-content: space-between; }
 .problem-card-number { font: 300 120px/1.4 var(--font-mono), monospace; letter-spacing: -12px; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
@@ -24,7 +24,7 @@
 .problem-card-copy strong { font: 700 12px/1.4 var(--font-mono), monospace; overflow-wrap: anywhere; }
 .problem-card h3 { font: 500 14px/1.4 var(--font-soft), sans-serif; letter-spacing: -.28px; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
 @media (prefers-reduced-motion: no-preference) {
-  .problem { height: 1360svh; }
+  .problem { height: 1460svh; }
 }
 @media (max-width: 767px) {
   .problem-board { width: 354px; height: 650px; top: calc(50% + 72px); }
