@@ -2,7 +2,7 @@
 .spline-viewport { position: relative; }
 .spline-portal { display: none; }
 .spline-slide { position: relative; background: #ebeae7; }
-.spline-journey[data-animated] { height: calc(440svh + var(--slide-overflow, 0px)); margin-top: -200svh; pointer-events: none; }
+.spline-journey[data-animated] { height: var(--journey-height, 910svh); margin-top: -200svh; pointer-events: none; }
 .spline-journey[data-animated] .spline-viewport { position: sticky; top: 0; height: 100svh; overflow: clip; }
 .spline-journey[data-animated] .spline-portal { display: block; position: absolute; inset: 0; overflow: hidden; background: white; transform-origin: center; }
 .spline-journey[data-animated] .spline-slide { position: absolute; top: 0; left: 0; right: 0; min-height: 100svh; pointer-events: auto; transform-origin: center; }
@@ -15,7 +15,7 @@
 .how-step-top { display: flex; align-items: flex-start; justify-content: space-between; }
 .how-step-number { font: 300 clamp(76px, 8.33vw, 120px)/1 var(--font-mono), monospace; letter-spacing: -.1em; }
 .how-step-meta { padding-top: 8px; font: 12px/1.8 var(--font-mono), monospace; letter-spacing: .6px; text-transform: uppercase; }
-.how-step-copy { margin-top: clamp(64px, 25svh, 280px); max-width: 339px; padding-bottom: 40px; }
+.how-step-copy { margin-top: clamp(40px, 17svh, 180px); max-width: 339px; padding-bottom: 24px; }
 .how-step h2 { font-size: clamp(24px, 2.22vw, 32px); font-weight: 500; line-height: 1.4; letter-spacing: -.02em; margin-bottom: 32px; }
 .how-step p { font: 12px/1.4 var(--font-mono), monospace; letter-spacing: -.36px; color: #645f52; margin-top: 16px; }
 .how-demo { padding-right: clamp(16px, 8.6vw, 124px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 30px; }
@@ -40,16 +40,69 @@
 .how-knowledge-meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 12px; color: #645f52; font: 8px/1.4 var(--font-mono), monospace; letter-spacing: -.16px; }
 .how-chevron { align-self: center; }
 .how-slide a:focus-visible { outline: 2px solid #403a2f; outline-offset: 4px; }
+.how-preview { min-width: 0; align-self: start; }
+.how-research-preview { display: block; width: min(100%, 834px); height: auto; max-height: calc(100svh - 104px); object-fit: contain; }
+.how-slide--3 { gap: 28px; }
+.how-network { position: relative; width: 100%; aspect-ratio: 953 / 760; container-type: inline-size; }
+.how-network h3 { font-size: 1.26cqw; font-weight: 500; line-height: 1.4; }
+.how-network p { font-size: 1.05cqw; line-height: 1.4; color: #645f52; margin-top: .84cqw; }
+.how-client { position: absolute; left: 25.5%; top: 38.7%; width: 14.17%; height: 17.76%; padding: 1.68cqw; border-radius: 4.72cqw; background: #e4fd7b; display: flex; flex-direction: column; justify-content: space-between; font-size: 1.26cqw; }
+.how-client > img { width: 3.78cqw; height: 3.78cqw; }
+.how-client small { display: block; margin-top: .6cqw; font: .84cqw/1.4 var(--font-mono), monospace; color: #645f52; white-space: nowrap; }
+.how-node { position: absolute; width: 20.78%; padding: 1.26cqw; border: 1px solid #ffffff80; border-radius: 1.26cqw; background: #ffffff99; }
+.how-node--questionnaire { left: 47.22%; top: 12.24%; }
+.how-node--guidelines { left: 46.69%; top: 51.18%; }
+.how-node--mood { left: 0; top: 51.32%; }
+.how-node--research { left: 11.86%; top: 16.32%; }
+.how-node-icons { display: flex; justify-content: space-between; align-items: center; margin-bottom: .84cqw; }
+.how-node-icons img:first-child { width: 2.52cqw; height: 2.52cqw; }
+.how-node-icons img:last-child { width: 1.47cqw; height: 1.47cqw; }
+.how-node-meta { display: flex; justify-content: space-between; margin-top: 1.26cqw; font: .84cqw/1.4 var(--font-mono), monospace; color: #645f52; }
+.how-mood { display: block; width: 100%; aspect-ratio: 174 / 112; object-fit: cover; margin-top: 1.26cqw; border-radius: .5cqw; }
+.how-network-plus { position: absolute; left: 33.47%; top: 76.84%; width: 4.15%; }
+.how-meeting { position: absolute; right: 0; top: 0; width: 35.78%; height: 100%; padding: 2.52cqw; border-radius: 2.52cqw; background: #f3f2f1bb; backdrop-filter: blur(6px); display: flex; flex-direction: column; }
+.how-meeting p { font: .945cqw/1.4 var(--font-mono), monospace; }
+.how-meeting-input { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding: .42cqw .42cqw .42cqw 1.26cqw; border: 1px solid #ffffff80; border-radius: 1.26cqw; background: #ffffff66; color: #645f52; font-size: 1.26cqw; }
+.how-meeting-input img { width: 4.2cqw; height: 4.2cqw; }
+.how-line { position: absolute; left: 32.63%; top: 47.9%; height: .5px; background: #b9b6ab; transform-origin: left center; }
+.how-line--questionnaire { width: 29%; transform: rotate(-44deg); }
+.how-line--guidelines { width: 27%; transform: rotate(16deg); }
+.how-line--mood { width: 25%; transform: rotate(152deg); }
+.how-line--research { width: 23%; transform: rotate(-119deg); }
+.how-line--plus { width: 25%; transform: rotate(83deg); }
 @media (max-width: 1100px) {
   .how-slide { gap: 24px; grid-template-columns: minmax(230px, 29%) 1fr; }
   .how-demo { padding-right: 16px; gap: 16px; }
   .how-panel { padding: 18px; }
 }
 @media (max-width: 767px) {
-  .how-slide { display: block; padding: 152px 16px 24px; }
+  .how-slide { display: flex; flex-direction: column; gap: 16px; padding: 144px 16px 24px; }
+  .how-preview { order: -1; width: 100%; }
   .how-step { min-height: 0; padding: 20px; }
-  .how-step-copy { margin-top: 32px; padding-bottom: 0; max-width: none; }
-  .how-step h2 { margin-bottom: 20px; }
-  .how-demo { margin-top: 16px; padding: 0; grid-template-columns: 1fr; }
+  .how-step-number { font-size: 48px; }
+  .how-step-copy { margin-top: 20px; padding-bottom: 0; max-width: none; }
+  .how-step h2 { margin-bottom: 18px; line-height: 1.15; }
+  .how-step p { font-size: 12px; line-height: 1.55; }
+  .how-demo { margin: 0; padding: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .how-panel { padding: 10px; border-radius: 14px; }
+  .how-panel h3 { font-size: 9px; }
+  .how-field { gap: 6px; }
+  .how-field + .how-field { margin-top: 12px; }
+  .how-dropzone { min-height: 76px; gap: 5px; }
+  .how-dropzone img { width: 24px; height: 24px; }
+  .how-dropzone span { font-size: 7px; }
+  .how-file-types { font-size: 6px; }
+  .how-input { min-height: 28px; padding: 6px; font-size: 8px; border-radius: 7px; }
+  .how-textarea { height: 48px; padding: 7px; font-size: 8px; border-radius: 7px; }
+  .how-add { font-size: 7px; gap: 6px; border-radius: 7px; }
+  .how-add img { width: 24px; height: 24px; }
+  .how-knowledge { padding: 7px; gap: 5px; border-radius: 8px; }
+  .how-knowledge > img:first-child { width: 16px; height: 16px; }
+  .how-knowledge h4, .how-knowledge p { font-size: 7px; }
+  .how-knowledge p { margin-top: 4px; }
+  .how-knowledge-meta { font-size: 5px; gap: 3px; margin-top: 6px; }
+  .how-chevron { width: 8px; height: 8px; }
+  .how-research-preview { width: 100%; height: min(72vw, 280px); max-height: none; }
+  .how-network { max-width: 390px; margin-inline: auto; }
   .how-step-meta { font-size: 11px; }
 }
