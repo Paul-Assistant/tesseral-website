@@ -141,8 +141,9 @@ export default function SplineJourney() {
           scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 1, invalidateOnRefresh: true },
           onUpdate: updatePlayback,
         })
-        timeline.fromTo(portal, { scale: .08, borderRadius: 80 }, { scale: 1, borderRadius: 0, duration: .8, ease: 'power2.inOut' }, 0)
-        timeline.fromTo(portal, { autoAlpha: 0 }, { autoAlpha: 1, duration: .12, ease: 'none' }, 0)
+        // The small window enters in normal flow below the departing cards.
+        // Expansion starts only when this section reaches the viewport top.
+        timeline.fromTo(portal, { scale: .18, borderRadius: 80, autoAlpha: 1 }, { scale: 1, borderRadius: 0, duration: .8, ease: 'power2.inOut' }, 0)
         // The tweened value, not raw ScrollTrigger.progress, drives the camera.
         timeline.to(pose, { progress: 1, duration: 1.85, ease: 'power2.inOut' }, .8)
         timeline.to(pose, { push: 1, duration: .35, ease: 'power2.in' }, 2.65)

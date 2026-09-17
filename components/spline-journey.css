@@ -2,7 +2,7 @@
 .spline-viewport { position: relative; }
 .spline-portal { display: none; }
 .spline-slide { position: relative; background: #ebeae7; }
-.spline-journey[data-animated] { height: var(--journey-height, 910svh); margin-top: -200svh; pointer-events: none; }
+.spline-journey[data-animated] { height: var(--journey-height, 910svh); pointer-events: none; }
 .spline-journey[data-animated] .spline-viewport { position: sticky; top: 0; height: 100svh; overflow: clip; }
 .spline-journey[data-animated] .spline-portal { display: block; position: absolute; inset: 0; overflow: hidden; background: white; transform-origin: center; }
 .spline-journey[data-animated] .spline-slide { position: absolute; top: 0; left: 0; right: 0; min-height: 100svh; pointer-events: auto; transform-origin: center; }

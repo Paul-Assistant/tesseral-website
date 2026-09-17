@@ -119,7 +119,7 @@ export default function ProblemSection() {
       }, i * .045))
       const sequence = gsap.timeline({
         scrollTrigger: {
-          trigger: section, start: 'top top', end: () => `+=${section.offsetHeight - stage.clientHeight * 2}`, scrub: .55,
+          trigger: section, start: 'top top', end: () => `+=${section.offsetHeight - stage.clientHeight}`, scrub: .55,
           invalidateOnRefresh: true,
         },
       })
