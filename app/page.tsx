@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import HeroHeader from '@/components/HeroHeader'
 import ProblemSection from '@/components/ProblemSection'
 import SplineJourney from '@/components/SplineJourney'
+import TesseralFor from '@/components/TesseralFor'
 
 const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), { ssr: false })
 
@@ -17,7 +18,7 @@ export default function Home() {
     window.addEventListener('wheel', cancel, { passive: true })
     window.addEventListener('touchstart', cancel, { passive: true })
     window.addEventListener('pointerdown', cancel, { passive: true })
-    // Both animated sections establish their height after hydration. Resolve a
+    // Animated sections establish their height after hydration. Resolve a
     // direct hash only once those heights and the local font metrics are ready.
     void document.fonts.ready.then(() => {
       frame = requestAnimationFrame(() => {
@@ -42,6 +43,7 @@ export default function Home() {
         <HeroHeader />
         <ProblemSection />
         <SplineJourney />
+        <TesseralFor />
       </main>
     </>
   )
