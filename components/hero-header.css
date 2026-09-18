@@ -69,3 +69,15 @@
 }
 
 .section-transition { position:fixed; inset:0; width:100%; height:100%; z-index:90; pointer-events:none; fill:#e6e5df; }
+
+/* Fixed navigation lives outside the clipped hero so touch scrolling does not
+   depend on a fixed descendant of an overflow-clipped container on mobile. */
+.hero-nav { pointer-events:none; }
+.hero-nav > a, .hero-menu { pointer-events:auto; }
+.hero-nav :is(a,button):focus-visible { outline:2px solid #403a2f; outline-offset:5px; }
+@media(max-width:767px) {
+ .hero { overflow:visible; touch-action:pan-y pinch-zoom; }
+ .hero-title-area { overflow:clip; overflow-clip-margin:60px; }
+ .hero-heading { will-change:auto; transform:none !important; }
+ .hero-menu { touch-action:pan-y pinch-zoom; }
+}

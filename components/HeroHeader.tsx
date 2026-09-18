@@ -146,7 +146,7 @@ export default function HeroHeader() {
     return () => mm.revert()
   }, [])
 
-  return <section className="hero" ref={root} id="home" aria-label="Tesseral introduction">
+  return <>
     <header className="hero-nav">
       <a className="hero-logo" href="#home" onClick={event => navigateToSection(event, 'home', navigationFrame)} aria-label="Tesseral home">
         <img src="/header/logo.png" width="29" height="29" alt="" />
@@ -160,7 +160,7 @@ export default function HeroHeader() {
       </nav>
       <ActionButton compact>Get started</ActionButton>
     </header>
-
+    <section className="hero" ref={root} id="home" aria-label="Tesseral introduction">
     <div className="hero-content">
       <div className="hero-title-area">
         <h1 className="hero-heading" aria-label="Everything you know about your clients. Ready to work with.">
@@ -179,4 +179,5 @@ export default function HeroHeader() {
       <div className="hero-actions"><ActionButton>Create your Tesseral</ActionButton><a className="hero-secondary" href="#how-it-works" onClick={event => navigateToSection(event, 'how-it-works', navigationFrame)}><span className="hero-secondary__fill" aria-hidden="true" /><span className="hero-secondary__label">How it works</span><span className="hero-secondary__icon"><img src="/header/question.svg" width="16" height="15" alt="" /></span></a></div>
     </div>
   </section>
+  </>
 }
