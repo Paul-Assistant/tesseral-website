@@ -7,9 +7,7 @@ export default function Footer() {
   const root = useRef<HTMLElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   const [failed, setFailed] = useState(false)
-  const [playing, setPlaying] = useState(false)
   const [ready, setReady] = useState(false)
-  const pausedByUser = useRef(false)
 
   useEffect(() => {
     const element = root.current
@@ -21,7 +19,7 @@ export default function Footer() {
         media.pause()
         return
       }
-      if (reducedMotion.matches || pausedByUser.current) return
+      if (reducedMotion.matches) return
       if (!media.getAttribute('src')) media.src = '/footer/scene-loop.mp4'
       void media.play().catch(() => setFailed(true))
     }, { threshold: 0.15 })
@@ -33,8 +31,8 @@ export default function Footer() {
     <img className="site-footer__background" src="/footer/poster.png" alt="" loading="lazy" />
     <video ref={video} className={`site-footer__background site-footer__video${ready ? ' site-footer__video--ready' : ''}${failed ? ' site-footer__video--failed' : ''}`}
       muted playsInline loop preload="none" poster="/footer/poster.png" aria-hidden="true"
-      onError={() => { setFailed(true); setPlaying(false) }}
-      onPlaying={() => { setReady(true); setPlaying(true) }} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} />
+      onError={() => setFailed(true)}
+      onPlaying={() => setReady(true)} />
     <a className="footer-cta" href="https://app.tesseral.design">
       <span>Create your Tesseral</span><img src="/footer/plus.svg" width="66" height="66" alt="" />
     </a>
@@ -43,6 +41,5 @@ export default function Footer() {
       <span className="footer-credit__label">Made by</span>
       <a href="https://garcy.studio/" aria-label="Garcy Studio"><img src="/footer/garcy-studio.svg" width="89" height="16" alt="Garcy Studio" /></a>
     </div>
-    {playing && !failed && <button className="footer-pause" onClick={() => { pausedByUser.current = true; video.current?.pause() }} aria-label="Pause footer video">Pause motion</button>}
   </footer>
 }
