@@ -57,7 +57,7 @@ export default function Integrations() {
       <button className="integration-pause" type="button" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? 'Resume rotation' : 'Pause rotation'}</button>
     </div>
     <ul className="integration-stage" aria-label="Supported integrations">{INTEGRATIONS.map(item => <li className="integration-card" key={item.name}>
-      <div className={`integration-icons integration-icons--${item.images.length}`}>{item.images.map(number => <img key={number} src={`/integrations/${number}.png`} width="119" height="119" alt="" />)}</div>
+      <div className={`integration-icons integration-icons--${item.images.length}`}>{item.images.map(number => <img key={number} src={`/integrations/${number}.webp`} width="119" height="119" alt="" loading="lazy" decoding="async" />)}</div>
       <h3>{item.name}</h3><p>{item.copy}</p>
     </li>)}</ul>
   </section>

@@ -40,6 +40,8 @@ export default function TesseralFor() {
             filter: `blur(${5 * (1 - focus)}px)`,
           })
           row.dataset.active = String(index === active)
+          row.setAttribute('aria-hidden', String(index !== active))
+          row.inert = index !== active
         })
       }
       const measure = () => {
@@ -62,7 +64,7 @@ export default function TesseralFor() {
         timeline.scrollTrigger?.kill()
         timeline.kill()
         gsap.set(rows, { clearProps: 'all' })
-        rows.forEach(row => { delete row.dataset.active })
+        rows.forEach(row => { delete row.dataset.active; row.removeAttribute('aria-hidden'); row.inert = false })
         delete section.dataset.animated
       }
     })

@@ -88,7 +88,9 @@ export default function ShaderBackground() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const gl = canvas.getContext('webgl')
+    const mobile = window.matchMedia('(max-width: 767px), (pointer: coarse)').matches
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const gl = canvas.getContext('webgl', { antialias: false, depth: false, stencil: false, powerPreference: 'low-power' })
     if (!gl) return
 
     // Compile shaders
@@ -117,9 +119,12 @@ export default function ShaderBackground() {
 
     // Resize
     const resize = () => {
-      if (canvas.width === window.innerWidth && canvas.height === window.innerHeight) return
-      canvas.width  = window.innerWidth
-      canvas.height = window.innerHeight
+      const scale = Math.min(mobile ? .5 : .75, 960 / window.innerWidth)
+      const width = Math.round(window.innerWidth * scale)
+      const height = Math.round(window.innerHeight * scale)
+      if (canvas.width === width && canvas.height === height) return
+      canvas.width = width
+      canvas.height = height
       gl.viewport(0, 0, canvas.width, canvas.height)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
     }
@@ -144,7 +149,7 @@ export default function ShaderBackground() {
       if (document.hidden || document.documentElement.dataset.journeyCovered === 'true') return
       // Keep the atmospheric background smooth while avoiding needless
       // backdrop-filter re-rasterization on every display refresh.
-      if (now - lastFrame < 33) {
+      if (now - lastFrame < (mobile ? 66 : 33)) {
         raf = requestAnimationFrame(render)
         return
       }
@@ -155,9 +160,9 @@ export default function ShaderBackground() {
       gl.uniform1f(uTime, t)
       gl.uniform2f(uMouse, smx, smy)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
-      raf = requestAnimationFrame(render)
+      if (!reducedMotion) raf = requestAnimationFrame(render)
     }
-    render(0)
+    render(100)
     const visibility = () => {
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(render)
@@ -181,6 +186,7 @@ export default function ShaderBackground() {
   return (
     <canvas
       ref={canvasRef}
+      aria-hidden="true"
       style={{
         position: 'fixed',
         inset: 0,

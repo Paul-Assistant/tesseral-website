@@ -112,7 +112,7 @@ export default function ProblemSection() {
       const titleReveal = gsap.timeline({
         scrollTrigger: { trigger: title, start: 'top 90%', once: true },
       })
-      titleReveal.fromTo(title, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .45, ease: 'power2.out' })
+      titleReveal.fromTo(title, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' })
       words.forEach((word, i) => titleReveal.to(word, {
         duration: .75, scrambleText: { text: word.dataset.text!, chars: 'abcdefghijklmnopqrstuvwxyz', speed: .65, revealDelay: .1, tweenLength: false },
       }, i * .045))
@@ -152,7 +152,7 @@ export default function ProblemSection() {
         ], duration: 1.4, ease: 'none',
       }, 5.25)
       // Animate the heading wrapper so the independent scramble reveal can finish.
-      sequence.to('.problem-title-wrap', { autoAlpha: 0, y: -15, duration: .35 }, 6.4)
+      sequence.to('.problem-title-wrap', { opacity: 0, y: -15, duration: .35 }, 6.4)
       sequence.fromTo('#solution-title', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .45 }, 6.75)
       solutions.forEach((card, i) => sequence.fromTo(card, {
         y: () => stage.clientHeight / Number(board.style.getPropertyValue('--board-scale')),
