@@ -4,6 +4,7 @@ import WaitlistButton from './WaitlistButton'
 
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
+import Image from 'next/image'
 import { navigateToSection } from './section-navigation'
 import './hero-header.css'
 
@@ -107,11 +108,6 @@ export default function HeroHeader() {
       const observer = new ResizeObserver(resize)
       observer.observe(heading)
 
-      // The exported spray includes Figma's exact noise and blur. A feathered
-      // mask sweeps across it, revealing pigment without stretching the texture.
-      const reveal = gsap.fromTo('.hero-spray__paint', { '--spray-reveal': '-18%' }, {
-        '--spray-reveal': '118%', duration: .45, delay: 0, ease: 'power2.inOut',
-      })
       let frame = 0
       const scroll = () => {
         if (frame) return
@@ -138,7 +134,6 @@ export default function HeroHeader() {
         heroVisibility.disconnect()
         timer?.kill()
         transition?.kill()
-        reveal.kill()
         cancelAnimationFrame(frame)
         window.removeEventListener('scroll', scroll)
         document.removeEventListener('visibilitychange', visibility)
@@ -178,7 +173,7 @@ export default function HeroHeader() {
             <span className="hero-second-line">Ready to work with.</span>
           </span>
         </h1>
-        <div className="hero-spray" aria-hidden="true"><img className="hero-spray__paint" src="/header/spray.webp" width="590" height="163" alt="" /></div>
+        <div className="hero-spray" aria-hidden="true"><Image className="hero-spray__paint" src="/header/spray.webp" width={590} height={163} sizes="(max-width: 600px) 92vw, (max-width: 1000px) 59vw, 590px" preload alt="" /></div>
       </div>
       <p className="hero-description">Bring your files, links, and brand assets into one shared brain that stays up to date.<br />Ask questions, explore ideas, and create with the context your team needs.</p>
       <div className="hero-actions"><ActionButton>Create your Tesseral</ActionButton><a className="hero-secondary" href="#how-it-works" onClick={event => navigateToSection(event, 'how-it-works', navigationFrame)}><span className="hero-secondary__fill" aria-hidden="true" /><span className="hero-secondary__label">How it works</span><span className="hero-secondary__icon"><img src="/header/question.svg" width="16" height="15" alt="" /></span></a></div>

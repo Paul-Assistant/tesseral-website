@@ -31,7 +31,7 @@ export default function Integrations() {
           const angle = (index / cards.length - phase) * Math.PI * 2
           const front = (Math.cos(angle) + 1) / 2
           const radius = Math.min(235, stage.clientWidth * .29)
-          gsap.set(card, { x: Math.sin(angle) * radius, z: -190 * (1 - front), rotationY: -Math.sin(angle) * 18, scale: .72 + .28 * front, opacity: .32 + .68 * front, zIndex: Math.round(front * 100) })
+          gsap.set(card, { x: Math.sin(angle) * radius, z: -190 * (1 - front), rotationY: -Math.sin(angle) * 18, scale: .72 + .28 * front, opacity: 1, zIndex: Math.round(front * 100) })
         })
       }
       const tick = (_time: number, delta: number) => {
