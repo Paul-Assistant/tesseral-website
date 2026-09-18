@@ -73,7 +73,7 @@
 /* Fixed navigation lives outside the clipped hero so touch scrolling does not
    depend on a fixed descendant of an overflow-clipped container on mobile. */
 .hero-nav { pointer-events:none; }
-.hero-nav > a, .hero-menu { pointer-events:auto; }
+.hero-nav > a, .hero-nav > button, .hero-menu { pointer-events:auto; }
 .hero-nav :is(a,button):focus-visible { outline:2px solid #403a2f; outline-offset:5px; }
 @media(max-width:767px) {
  .hero { overflow:visible; touch-action:pan-y pinch-zoom; }

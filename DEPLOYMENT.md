@@ -21,3 +21,15 @@ motion shows both sets as readable static lists, with no spray or shake.
 
 The logo, four-icon glass menu and Signup remain fixed at the top. The pinned
 story reserves space beneath that navigation on desktop and mobile.
+
+## Launch waitlist
+
+Signup CTAs open the shared email-only modal. The server route `/api/waitlist`
+writes normalized emails to `public.launch_waitlist` in the existing Tesseral
+Supabase project. Apply `supabase/migrations/20260918120000_launch_waitlist.sql`
+to that project, then configure `SUPABASE_URL` and `SUPABASE_SECRET_KEY`
+(or the legacy `SUPABASE_SERVICE_ROLE_KEY`) in Vercel's Preview environment.
+Never use a `NEXT_PUBLIC_` prefix for the secret. Duplicate emails are ignored.
+The table has RLS enabled and no anonymous or authenticated client access.
+The form reports success only after Supabase accepts the write; missing
+configuration or delivery failures show a retry message.

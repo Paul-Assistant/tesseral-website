@@ -1,5 +1,7 @@
 'use client'
 
+import WaitlistButton from './WaitlistButton'
+
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { navigateToSection } from './section-navigation'
@@ -14,11 +16,11 @@ const SECTIONS = [
 ]
 
 function ActionButton({ children, compact = false }: { children: React.ReactNode; compact?: boolean }) {
-  return <a href="https://app.tesseral.design" className={`hero-button${compact ? ' hero-button--compact' : ''}`}>
+  return <WaitlistButton className={`hero-button${compact ? ' hero-button--compact' : ''}`}>
     <span className="hero-button__fill" aria-hidden="true" />
     <span className="hero-button__label">{children}</span>
     <img className="hero-button__icon" src="/header/button.svg" width="40" height="40" alt="" />
-  </a>
+  </WaitlistButton>
 }
 
 export default function HeroHeader() {
