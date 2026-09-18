@@ -47,7 +47,7 @@ export default function Pricing() {
         <span className="pricing-value"><span className="pricing-sr">${plan[billing]} per month, billed {billing}</span><RollingPrice value={plan[billing]} revision={revision} /><span aria-hidden="true">/mo</span></span>
       </div>
       <p className="pricing-total">{billing === 'yearly' ? `$${(plan.yearly * 12).toLocaleString('en-US')} billed yearly` : `$${plan.monthly} billed monthly`}</p>
-      <a className="pricing-subscribe" href="https://app.tesseral.design">Subscribe to {plan.name}<img src={`/pricing/${plan.name.toLowerCase()}.svg`} width="40" height="40" alt="" /></a>
+      <a className="pricing-subscribe" href="https://app.tesseral.design"><span>Subscribe to {plan.name}</span><img src={`/pricing/${plan.name.toLowerCase()}.svg`} width="40" height="40" alt="" /></a>
     </article>)}</div>
   </section>
 }

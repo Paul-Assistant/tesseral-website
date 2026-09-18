@@ -52,7 +52,7 @@ export default function Integrations() {
     <div className="integrations-copy">
       <h2 id="integrations-title">What Tesseral already integrates with</h2>
       <p>Tesseral can read contents of multiple file types and external links to feed the brain. If you make a change in the document, Tesseral already knows.<br />More are coming soon.</p>
-      <a className="integration-request" href="https://app.tesseral.design">Request integration<img src="/problem/card-icon.svg" width="40" height="40" alt="" /></a>
+      <a className="integration-request" href="https://app.tesseral.design"><span>Request integration</span><img src="/problem/card-icon.svg" width="40" height="40" alt="" /></a>
       <button className="integration-pause" type="button" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? 'Resume rotation' : 'Pause rotation'}</button>
     </div>
     <ul className="integration-stage" aria-label="Supported integrations">{INTEGRATIONS.map(item => <li className="integration-card" key={item.name}>

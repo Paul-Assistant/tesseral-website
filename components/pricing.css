@@ -5,7 +5,7 @@
 .billing-switch button[aria-pressed="true"] { background: #201e18; color: white; }
 .billing-note { text-align: center; font: 10px var(--font-mono), monospace; color: #645f52; margin: 14px 0 32px; }
 .pricing-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1170px; margin: auto; gap: clamp(16px, 3.1vw, 45px); }
-.pricing-card { min-width: 0; border-radius: 24px; padding: 32px; background: #ffffff33; border: 1px solid #ffffff66; box-shadow: inset 1px 1px 16px #ffffff33; }
+.pricing-card { position: relative; min-width: 0; border-radius: 24px; padding: 32px; background: #ffffff33; border: 1px solid #ffffff66; box-shadow: inset 1px 1px 16px #ffffff33; transition: scale .3s ease-out, box-shadow .3s ease-out, border-color .3s ease-out; }
 .pricing-card--studio { background: #c5ff0033; }.pricing-card--agency { background: #9c9c9c33; }
 .pricing-audience { font: 12px var(--font-mono), monospace; text-transform: uppercase; margin-top: 15px; letter-spacing: -.24px; }
 .pricing-card h3 { font-size: 32px; font-weight: 500; line-height: 1.1; margin: 40px 0 24px; letter-spacing: -.64px; }
@@ -27,3 +27,14 @@
 @media(max-width: 1000px) { .pricing-card { padding: 24px 18px; }.pricing-audience { font-size: 10px; } }
 @media(max-width: 767px) { .pricing { padding: 90px 24px 64px; }.pricing-cards { grid-template-columns: 1fr; max-width: 420px; gap: 20px; }.pricing-card { padding: 32px; }.pricing-audience { font-size: 12px; } }
 @media(prefers-reduced-motion: reduce) { .price-reel { animation: none; } }
+/* Individual scale composes with the scroll tween's translate transform. */
+@media (hover: hover) and (pointer: fine) {
+ .pricing-card:hover { scale: 1.025 !important; z-index: 1; border-color: #ffffffcc; box-shadow: inset 1px 1px 16px #ffffff66, 0 0 36px #d2ff5633, 0 12px 30px #201e1809; }
+}
+.pricing-card:focus-within { border-color: #ffffffcc; box-shadow: inset 1px 1px 16px #ffffff66, 0 0 36px #d2ff5633; }
+.pricing-subscribe, .integration-request { position: relative; isolation: isolate; transition: color .3s ease-out, filter .3s ease-out; }
+.pricing-subscribe::before, .integration-request::before { content: ''; position: absolute; z-index: 0; top: 4px; right: 4px; bottom: 4px; width: 40px; border-radius: 8px; background: #d2ff56; transition: width .3s ease-out; }
+.pricing-subscribe > *, .integration-request > * { position: relative; z-index: 1; }
+.pricing-subscribe:is(:hover, :focus-visible), .integration-request:is(:hover, :focus-visible) { color: #201e18; filter: drop-shadow(0 0 5px #201e1826); }
+.pricing-subscribe:is(:hover, :focus-visible)::before, .integration-request:is(:hover, :focus-visible)::before { width: calc(100% - 8px); }
+@media(prefers-reduced-motion: reduce) { .pricing-card, .pricing-subscribe, .integration-request, .pricing-subscribe::before, .integration-request::before { transition: none; }.pricing-card:hover { scale: none !important; } }
