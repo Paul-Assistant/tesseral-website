@@ -6,10 +6,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './tesseral-for.css'
 
 const AUDIENCES = [
-  { name: 'Studios', copy: "You're managing 5+ clients. Tesseral is your invisible ops layer." },
-  { name: 'Freelancers', copy: 'Work at agency level without agency overhead.' },
-  { name: 'Agencies', copy: 'Your brand knowledge compounds. Never brief from scratch again.' },
-  { name: 'Brands', copy: "Stop spending 40% of your day on things that aren't designing." },
+  { name: 'Studios', copy: 'Keep every client’s files, links, and knowledge together. Give your team the context to keep creating, with fewer questions and interruptions.' },
+  { name: 'Freelancers', copy: 'Go from client knowledge to a stronger pitch, faster. Create presentations and explore ideas with the depth of a team—even when you’re working solo.' },
+  { name: 'Agencies', copy: 'Give your clients more than a handover. Share their Tesseral so they can find answers, create prompts, and build on the brand knowledge you’ve developed together.' },
+  { name: 'Brands', copy: 'Give your team and AI tools one place to understand your brand. Keep assets, answers, and creative direction connected as your brand evolves.' },
 ]
 
 export default function TesseralFor() {
@@ -72,13 +72,13 @@ export default function TesseralFor() {
   return <section ref={root} className="tesseral-for" id="tesseral-for" aria-labelledby="tesseral-for-title">
     <div className="audience-stage">
       <div className="audience-layout">
-        <h2 id="tesseral-for-title">tesseral for</h2>
+        <h2 id="tesseral-for-title">Tesseral for</h2>
         <div className="audience-wheel">
           <div className="audience-glass" aria-hidden="true" />
           <ul className="audience-list">
             {AUDIENCES.map(audience => <li className="audience-row" key={audience.name}>
               <h3>{audience.name}</h3>
-              <div className="audience-description"><span>why having tesseral</span><p>{audience.copy}</p></div>
+              <div className="audience-description"><span>what this means for you</span><p>{audience.copy}</p></div>
             </li>)}
           </ul>
         </div>

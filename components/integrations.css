@@ -14,6 +14,8 @@
 .integration-card h3 { margin: 28px 0 24px; font-size: 16px; font-weight: 500; letter-spacing: -.32px; }
 .integration-card p { font: 12px/1.4 var(--font-mono), monospace; color: #645f52; letter-spacing: -.36px; }
 .integrations[data-animated] .integration-stage { position: relative; display: block; height: 420px; }
-.integrations[data-animated] .integration-card { position: absolute; left: calc(50% - 111.5px); top: 50%; margin-top: -155px; height: 310px; backface-visibility: hidden; will-change: transform; }
+.integrations[data-animated] .integration-card { position: absolute; left: calc(50% - 111.5px); top: 50%; margin-top: -175px; height: 350px; backface-visibility: hidden; will-change: transform; }
 .integration-request:focus-visible, .integration-pause:focus-visible { outline: 2px solid #201e18; outline-offset: 5px; }
 @media(max-width: 767px) { .integrations { grid-template-columns: 1fr; gap: 24px; padding: 100px 24px 40px; }.integrations-copy h2 { max-width: 330px; }.integrations-copy > p { margin: 24px 0; }.integrations[data-animated] .integration-stage { height: 360px; margin-inline: -24px; }.integration-card { width: min(100%, 300px); }.integrations[data-animated] .integration-card { width: 223px; } }
+
+.integration-request { border: 0; font-family: inherit; cursor: pointer; }

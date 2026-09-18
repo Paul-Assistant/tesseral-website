@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import './hero-header.css'
 
-const WORDS = ['creative studio', 'brand']
+const WORDS = ['your clients', 'your brand']
 const SECTIONS = [
   { id: 'home', label: 'Overview' },
   { id: 'problem', label: 'The problem' },
@@ -180,7 +180,7 @@ export default function HeroHeader() {
     <header className="hero-nav">
       <a className="hero-logo" href="#home" onClick={event => scrollToAnchor(event, 'home', navigationFrame)} aria-label="Tesseral home">
         <img src="/header/logo.png" width="29" height="29" alt="" />
-        <img src="/header/wordmark.svg" width="54" height="13" alt="tesseral" />
+        <img src="/header/wordmark.svg" width="54" height="13" alt="Tesseral" />
       </a>
       <nav className="hero-menu" aria-label="Main navigation">
         {SECTIONS.map(({ id, label }, i) =>
@@ -188,25 +188,25 @@ export default function HeroHeader() {
             <img src={i === 0 ? "/header/globe.svg" : `/header/nav-${i + 1}.svg`} className={i === 0 ? "hero-menu__globe" : undefined} width="43.2" height="43.2" alt="" />
           </a>)}
       </nav>
-      <ActionButton compact>Signup</ActionButton>
+      <ActionButton compact>Get started</ActionButton>
     </header>
 
     <div className="hero-content">
       <div className="hero-title-area">
-        <h1 className="hero-heading" aria-label="The creative studio of the future runs on tesseral">
+        <h1 className="hero-heading" aria-label="Everything you know about your clients. Ready to work with.">
           <span className="hero-heading-reveal" aria-hidden="true">
-            <span className="hero-first-line">The <span className="rotating-slot">
+            <span className="hero-first-line">Everything you know about<br /><span className="rotating-slot">
               {WORDS.map((word, i) => <span className={`rotating-word rotating-word--${i}`} key={word}>
                 {Array.from(word).map((char, j) => <span className="rotating-char" key={j}>{char === ' ' ? '\u00a0' : char}</span>)}
               </span>)}
-            </span> of the future</span>
-            <span className="hero-second-line">runs on tesseral</span>
+            </span>.</span>
+            <span className="hero-second-line">Ready to work with.</span>
           </span>
         </h1>
         <div className="hero-spray" aria-hidden="true"><img className="hero-spray__paint" src="/header/spray.svg" width="590" height="163" alt="" /></div>
       </div>
-      <p className="hero-description">A living knowledge system for creative teams &amp; brands.<br />All in one place, always on, always learning, never leaving.</p>
-      <ActionButton>Start using</ActionButton>
+      <p className="hero-description">Bring your files, links, and brand assets into one shared brain that stays up to date. Ask questions, explore ideas, and create with the context your team needs—already there.</p>
+      <div className="hero-actions"><ActionButton>Create your Tesseral</ActionButton><a className="hero-secondary" href="#how-it-works" onClick={event => scrollToAnchor(event, 'how-it-works', navigationFrame)}><span className="hero-secondary__fill" aria-hidden="true" /><span className="hero-secondary__label">How it works</span><span className="hero-secondary__icon"><img src="/header/question.svg" width="16" height="15" alt="" /></span></a></div>
     </div>
   </section>
 }

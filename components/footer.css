@@ -1,0 +1,15 @@
+.site-footer { position:relative; isolation:isolate; width:100%; height:min(66.65vw,1100px); min-height:600px; overflow:hidden; background:#d4d1cb; display:grid; place-items:center; }
+.site-footer__background { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; z-index:-1; }
+.site-footer__video--failed { visibility:hidden; }
+.footer-cta { display:flex; align-items:center; gap:20px; padding:7px 7px 7px 20px; border-radius:20px; background:#201e18; color:#fff; text-decoration:none; font-family:var(--font-soft); font-weight:500; font-size:15px; text-transform:uppercase; transition:background .25s,color .25s,transform .25s,box-shadow .25s; }
+.footer-cta img { transition:transform .3s; }
+.footer-cta:hover,.footer-cta:focus-visible { background:#d2ff56; color:#201e18; transform:scale(1.035); box-shadow:0 0 32px #d2ff5633; }
+.footer-cta:hover img { transform:rotate(90deg); }
+.footer-cta:focus-visible,.footer-credit a:focus-visible,.footer-pause:focus-visible { outline:2px solid #201e18; outline-offset:5px; }
+.footer-credit { width:max-content; max-width:calc(100% - 32px); position:absolute; bottom:7.2%; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.4); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid #ffffff66; box-shadow:inset 0 1px 0 #ffffff80; }
+.footer-credit a { flex-shrink:0; display:flex; align-items:center; gap:7px; border-radius:3px; transition:opacity .2s; }
+.footer-credit a:hover { opacity:.65; }
+.footer-credit__label { background:#d2ff56; border-radius:12px; padding:4px 8px; font-family:var(--font-soft); font-size:9px; font-weight:500; text-transform:uppercase; white-space:nowrap; }
+.footer-pause { position:absolute; right:20px; bottom:20px; background:#ffffff80; border:1px solid #ffffff80; border-radius:20px; padding:7px 12px; color:#201e18; font:11px var(--font-soft); cursor:pointer; backdrop-filter:blur(12px); }
+@media(max-width:600px) { .site-footer { height:80svh; min-height:520px; max-height:800px; } .footer-cta { gap:14px; font-size:13px; padding-left:17px; } .footer-cta img { width:54px; height:54px; } .footer-credit { bottom:60px; gap:10px; } }
+@media(prefers-reduced-motion:reduce) { .footer-cta,.footer-cta img { transition:none; } }

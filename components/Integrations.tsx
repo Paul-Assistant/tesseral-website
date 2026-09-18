@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import './integrations.css'
+import IntegrationRequest from './IntegrationRequest'
 
 const INTEGRATIONS = [
-  { name: 'Figma', images: [1], copy: 'Extracts colors, typography, layout & design principles' },
-  { name: 'Notion', images: [2], copy: 'Read & write databases, pages, update documents & create tasks' },
-  { name: 'Docs, Slides & Sheets', images: [3, 4, 5], copy: 'Reads document contents' },
-  { name: 'Claude, Cursor & Agents', images: [6, 7], copy: 'Direct MCP for AI agents to have one source of truth' },
+  { name: 'Figma', images: [1], copy: 'Bring your colors, typography, and design principles into your brand’s shared knowledge.' },
+  { name: 'Notion', images: [2], copy: 'Read and update your Notion pages and databases. Create tasks directly from Tesseral, without switching tools.' },
+  { name: 'Docs, Slides & Sheets', images: [3, 4, 5], copy: 'Bring briefs, presentations, and spreadsheets into the same shared context.' },
+  { name: 'Claude, Cursor & Agents', images: [6, 7], copy: 'Give your AI tools current project context through MCP.' },
 ]
 
 export default function Integrations() {
@@ -50,9 +51,9 @@ export default function Integrations() {
   }, [])
   return <section id="integrations" className="integrations" ref={root} aria-labelledby="integrations-title">
     <div className="integrations-copy">
-      <h2 id="integrations-title">What Tesseral already integrates with</h2>
-      <p>Tesseral can read contents of multiple file types and external links to feed the brain. If you make a change in the document, Tesseral already knows.<br />More are coming soon.</p>
-      <a className="integration-request" href="https://app.tesseral.design"><span>Request integration</span><img src="/problem/card-icon.svg" width="40" height="40" alt="" /></a>
+      <h2 id="integrations-title">The tools you use. The knowledge you need.</h2>
+      <p>Connect your documents, design files, and links to your Tesseral. All sources sync automatically, and you can refresh them manually whenever you need.</p>
+      <IntegrationRequest />
       <button className="integration-pause" type="button" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? 'Resume rotation' : 'Pause rotation'}</button>
     </div>
     <ul className="integration-stage" aria-label="Supported integrations">{INTEGRATIONS.map(item => <li className="integration-card" key={item.name}>

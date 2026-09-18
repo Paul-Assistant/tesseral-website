@@ -9,6 +9,8 @@ import SplineJourney from '@/components/SplineJourney'
 import TesseralFor from '@/components/TesseralFor'
 import Integrations from '@/components/Integrations'
 import Pricing from '@/components/Pricing'
+import Footer from '@/components/Footer'
+import KnowledgeTools from '@/components/KnowledgeTools'
 
 const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), { ssr: false })
 
@@ -45,9 +47,11 @@ export default function Home() {
         <HeroHeader />
         <ProblemSection />
         <SplineJourney />
+        <KnowledgeTools />
         <TesseralFor />
         <Integrations />
         <Pricing />
+        <Footer />
       </main>
     </>
   )

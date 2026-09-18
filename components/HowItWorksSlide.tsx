@@ -1,22 +1,17 @@
 import Image from 'next/image'
 
 const STEPS = [
-  { title: 'Feed your team', paragraphs: [
-    'Onboarding is customized to you. Tell Tesseral how your studio works, what you value, how you think. It learns your process, your voice, your standards.',
-    'It adapts to you — not the other way around.',
+  { title: 'Bring everything together.', paragraphs: [
+    'Add your client’s files, brand assets, and links to the tools you already use. Your team gets one place to find what matters, with every source connected to the same Tesseral.',
+    'Start with what you already have.',
   ] },
-  { title: 'Add a project. Know everything from day one.', paragraphs: [
-    'Upload every document or link you have. Tesseral automatically researches the client so you walk in informed — brand history, market position, competitors, brand assets — without spending a day on prep.',
-    'Need more? Send your questionnaire directly through the platform. The client answers in one place. No emails. No chasing PDFs. No checking your inbox.',
-    'When they reply, Tesseral already knows — and updates everything automatically.',
-    'One platform. Every question answered. Zero back-and-forth.',
+  { title: 'Give your team the whole picture.', paragraphs: [
+    'Tesseral connects the knowledge across your sources into one shared brain for your client or brand. All sources sync automatically, and you can refresh them manually whenever you need.',
+    'Everyone works from the same current context.',
   ] },
-  { title: 'One source of truth.', paragraphs: [
-    'Ask anything. Update a brief automatically. Get feedback at 2am. Brief a new project in minutes. Onboard a hire without a handover meeting.',
-    'Connect your agent to an MCP server and have a single source of an up-to-date knowledge base.',
-    'Tesseral works like having the most experienced person in your studio — available to everyone, all the time.',
-    'The more your team uses it, the smarter it gets.',
-    'No more scattered emails. No more lost knowledge. No more starting from scratch. Just a studio that runs like it should — from day one.',
+  { title: 'Turn that knowledge into your next idea.', paragraphs: [
+    'Ask a question, brainstorm a direction, or develop a pitch or presentation. Your Tesseral brings the client’s knowledge into the conversation, whenever you need it.',
+    'Keep moving without waiting for a teammate to fill in the gaps.',
   ] },
 ]
 
@@ -27,8 +22,8 @@ export default function HowItWorksSlide({ step = 0 }: { step?: number }) {
     <aside className="how-step">
       <div className="how-step-top"><span className="how-step-number">{number}</span><span className="how-step-meta">Step<br />[ {number} / 03 ]</span></div>
       <div className="how-step-copy">
-        <h2 id={`how-slide-title-${number}`}>{step === 1 ? <>Add a project.<br />Know everything<br />from day one.</> : content.title}</h2>
-        {content.paragraphs.map((paragraph, index) => <p key={paragraph}>{step === 0 && index === 1 ? <strong>{paragraph}</strong> : paragraph}</p>)}
+        <h2 id={`how-slide-title-${number}`}>{content.title}</h2>
+        {content.paragraphs.map((paragraph, index) => <p key={paragraph}>{index === 1 ? <strong>{paragraph}</strong> : paragraph}</p>)}
       </div>
     </aside>
     <div className="how-preview">
