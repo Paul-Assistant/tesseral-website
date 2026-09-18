@@ -29,7 +29,7 @@
   .audience-wheel { --audience-pitch: 240px; perspective-origin: 50% 80px; }
   .audience-row { min-height: 224px; padding: 20px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
   .audience-row h3 { font-size: clamp(34px, 9vw, 54px); line-height: 1; }
-  .audience-description { gap: 8px; }
+  .audience-description { gap: 8px; margin-top: auto; }
   .audience-description p { font-size: 14px; max-width: 330px; }
   .audience-glass, .tesseral-for[data-animated] .audience-row { height: 224px; }
   .tesseral-for[data-animated] .audience-stage { padding-top: max(148px, 20svh); }

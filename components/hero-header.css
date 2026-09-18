@@ -58,3 +58,12 @@
 .hero-secondary:is(:hover,:focus-visible) { text-decoration:none; }
 .hero-secondary:is(:hover,:focus-visible) .hero-secondary__fill { width:calc(100% - 8px); }
 @media(prefers-reduced-motion:reduce) { .hero-secondary__fill { transition:none; } }
+
+@media (max-width: 767px) {
+ .hero-nav { transform: none; animation: none; }
+ .hero-menu { position: fixed; top: auto; bottom: calc(16px + env(safe-area-inset-bottom)); left: 50%; padding: 5px; gap: 6px; border-radius: 20px; background: rgba(243,242,241,.65); }
+ .hero-menu__item { width: 56px; height: 56px; border-radius: 15px; }
+ .hero-menu__item .hero-menu__globe { width: 20px; height: 20px; margin: 18px; }
+ .hero-content { padding-top: 56px; padding-bottom: 110px; }
+ .hero { min-height: 100svh; }
+}

@@ -69,7 +69,7 @@ export default function SplineJourney() {
           driver?.update(pose.progress, pose.push)
         }
         const nextKey = [viewport.clientWidth, viewport.clientHeight, ...slides.map(element => element.scrollHeight)].join(':')
-        if (nextKey === sizeKey || section.dataset.scene === 'fallback') return
+        if (nextKey === sizeKey) return
         sizeKey = nextKey
         cancelAnimationFrame(refreshFrame)
         refreshFrame = requestAnimationFrame(() => { buildTimeline(); ScrollTrigger.refresh() })
@@ -103,16 +103,15 @@ export default function SplineJourney() {
           if (disposed) return
           app?.dispose()
           app = undefined
-          const wasInSection = section.getBoundingClientRect().top < 0 && section.getBoundingClientRect().bottom > 0
-          timeline?.scrollTrigger?.kill()
-          timeline?.kill()
-          gsap.set(slides, { clearProps: 'all' })
-          slides.forEach(element => { element.inert = false; element.removeAttribute('aria-hidden') })
-          delete section.dataset.animated
+          // A late WebGL/network failure must not collapse the long section
+          // above visitors who have already reached the audience or pricing.
+          // Keep the same scroll timeline and substitute a static scene.
+          ready = false
+          playing = false
+          driver = undefined
           section.dataset.scene = 'fallback'
           setStatus('fallback')
-          ScrollTrigger.refresh()
-          if (wasInSection) section.scrollIntoView()
+          updatePlayback()
           console.warn('Spline scene unavailable; showing the product walkthrough.', error)
         }
       }

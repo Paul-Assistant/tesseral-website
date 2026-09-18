@@ -1,5 +1,5 @@
 .knowledge-tools { position: relative; padding: 100px max(24px, 5.3vw); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; max-width: 1340px; margin: auto; color: #201e18; font-family: var(--font-soft), sans-serif; }
-.knowledge-tool { padding: clamp(28px, 4vw, 56px); border-radius: 24px; background: #f3f2f133; border: 1px solid #ffffff80; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: inset 1px 1px 1px #ffffffcc, inset -1px -1px 1px #ffffff55, inset 4px 4px 16px #ffffff12; }
+.knowledge-tool { padding: clamp(28px, 4vw, 56px); border-radius: 24px; background: #c5ff0033; border: 1px solid #ffffff66; box-shadow: inset 1px 1px 16px #ffffff33; }
 .knowledge-tool-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .knowledge-tool-top span { font: 11px var(--font-mono), monospace; text-transform: uppercase; color: #645f52; text-align: right; }
 .knowledge-tool h2 { font-size: clamp(28px, 3vw, 40px); font-weight: 500; line-height: 1.1; letter-spacing: -.03em; margin: 64px 0 24px; max-width: 360px; }

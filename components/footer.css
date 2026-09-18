@@ -13,3 +13,5 @@
 .footer-pause { position:absolute; right:20px; bottom:20px; background:#ffffff80; border:1px solid #ffffff80; border-radius:20px; padding:7px 12px; color:#201e18; font:11px var(--font-soft); cursor:pointer; backdrop-filter:blur(12px); }
 @media(max-width:600px) { .site-footer { height:80svh; min-height:520px; max-height:800px; } .footer-cta { gap:14px; font-size:13px; padding-left:17px; } .footer-cta img { width:54px; height:54px; } .footer-credit { bottom:60px; gap:10px; } }
 @media(prefers-reduced-motion:reduce) { .footer-cta,.footer-cta img { transition:none; } }
+
+@media(max-width:767px) { .footer-credit { bottom:calc(100px + env(safe-area-inset-bottom)); } .footer-pause { bottom:calc(178px + env(safe-area-inset-bottom)); } }
