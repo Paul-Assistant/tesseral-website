@@ -1,5 +1,7 @@
 .site-footer { position:relative; isolation:isolate; width:100%; height:min(66.65vw,1100px); min-height:600px; overflow:hidden; background:#d4d1cb; display:grid; place-items:center; }
 .site-footer__background { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; z-index:-1; }
+.site-footer__video { opacity:0; transition:opacity .9s ease; }
+.site-footer__video--ready { opacity:1; }
 .site-footer__video--failed { visibility:hidden; }
 .footer-cta { display:flex; align-items:center; gap:20px; padding:7px 7px 7px 20px; border-radius:20px; background:#201e18; color:#fff; text-decoration:none; font-family:var(--font-soft); font-weight:500; font-size:15px; text-transform:uppercase; transition:background .25s,color .25s,transform .25s,box-shadow .25s; }
 .footer-cta img { transition:transform .3s; }

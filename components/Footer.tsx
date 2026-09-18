@@ -8,6 +8,7 @@ export default function Footer() {
   const video = useRef<HTMLVideoElement>(null)
   const [failed, setFailed] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [ready, setReady] = useState(false)
   const pausedByUser = useRef(false)
 
   useEffect(() => {
@@ -20,8 +21,8 @@ export default function Footer() {
         media.pause()
         return
       }
-      if (reducedMotion.matches || pausedByUser.current || media.ended) return
-      if (!media.getAttribute('src')) media.src = '/footer/scene.mp4'
+      if (reducedMotion.matches || pausedByUser.current) return
+      if (!media.getAttribute('src')) media.src = '/footer/scene-loop.mp4'
       void media.play().catch(() => setFailed(true))
     }, { threshold: 0.15 })
     observer.observe(element)
@@ -30,10 +31,10 @@ export default function Footer() {
 
   return <footer ref={root} className="site-footer" id="footer" aria-label="Tesseral">
     <img className="site-footer__background" src="/footer/poster.png" alt="" loading="lazy" />
-    <video ref={video} className={`site-footer__background${failed ? ' site-footer__video--failed' : ''}`}
-      muted playsInline preload="none" poster="/footer/poster.png" aria-hidden="true"
+    <video ref={video} className={`site-footer__background site-footer__video${ready ? ' site-footer__video--ready' : ''}${failed ? ' site-footer__video--failed' : ''}`}
+      muted playsInline loop preload="none" poster="/footer/poster.png" aria-hidden="true"
       onError={() => { setFailed(true); setPlaying(false) }}
-      onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} />
+      onPlaying={() => { setReady(true); setPlaying(true) }} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} />
     <a className="footer-cta" href="https://app.tesseral.design">
       <span>Create your Tesseral</span><img src="/footer/plus.svg" width="66" height="66" alt="" />
     </a>
