@@ -80,7 +80,7 @@ export default function HeroHeader() {
         const incoming = rows[next].querySelectorAll('.rotating-char')
         transition = gsap.timeline({ onComplete: () => {
           current = next
-          timer = gsap.delayedCall(1.4, rotate)
+          timer = gsap.delayedCall(3.5, rotate)
         } })
         transition.set(rows[next], { visibility: 'visible' })
           .set(incoming, { yPercent: 110, rotateX: -70, opacity: 0 })

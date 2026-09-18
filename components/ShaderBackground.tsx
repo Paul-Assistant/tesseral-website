@@ -119,7 +119,7 @@ export default function ShaderBackground() {
 
     // Resize
     const resize = () => {
-      const scale = Math.min(mobile ? .5 : .75, 960 / window.innerWidth)
+      const scale = Math.min(mobile ? .5 : .6, 720 / window.innerWidth)
       const width = Math.round(window.innerWidth * scale)
       const height = Math.round(window.innerHeight * scale)
       if (canvas.width === width && canvas.height === height) return
@@ -149,7 +149,7 @@ export default function ShaderBackground() {
       if (document.hidden || document.documentElement.dataset.journeyCovered === 'true') return
       // Keep the atmospheric background smooth while avoiding needless
       // backdrop-filter re-rasterization on every display refresh.
-      if (now - lastFrame < (mobile ? 66 : 33)) {
+      if (now - lastFrame < (mobile ? 100 : 66)) {
         raf = requestAnimationFrame(render)
         return
       }
