@@ -1,5 +1,5 @@
 .problem { position: relative; color: #201e18; font-family: var(--font-soft), sans-serif; }
-.problem-stage { position: sticky; top: 0; height: 100svh; min-height: 440px; overflow: clip; }
+.problem-stage { position: sticky; top: 0; height: calc(var(--story-vh, 1svh) * 100); min-height: 440px; overflow: clip; }
 .problem-scene { position: absolute; inset: 0; transform: translate3d(var(--spray-shake-x, 0px), var(--spray-shake-y, 0px), 0); will-change: transform; backface-visibility: hidden; }
 .problem-board { --board-scale: .8; position: absolute; width: 1262.318px; height: 656.098px; left: 50%; top: calc(50% + 40px); transform: translate(-50%, -50%) scale(var(--board-scale)); }
 .problem h2 { position: absolute; top: 0; left: 313px; width: 617px; color: #403a2f; font: 500 42.503px/1 var(--font-ginger), sans-serif; letter-spacing: -1.7001px; text-align: center; }
@@ -24,7 +24,7 @@
 .problem-card-copy strong { font: 700 12px/1.4 var(--font-mono), monospace; overflow-wrap: anywhere; }
 .problem-card h3 { font: 500 14px/1.4 var(--font-soft), sans-serif; letter-spacing: -.28px; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
 @media (prefers-reduced-motion: no-preference) {
-  .problem { height: 1460svh; }
+  .problem { height: calc(var(--story-vh, 1svh) * 1460); }
 }
 @media (max-width: 767px) {
   .problem-board { width: 354px; height: 650px; top: calc(50% + 72px); }

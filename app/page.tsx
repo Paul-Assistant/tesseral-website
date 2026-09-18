@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import HeroHeader from '@/components/HeroHeader'
 import ProblemSection from '@/components/ProblemSection'
@@ -15,6 +15,27 @@ import KnowledgeTools from '@/components/KnowledgeTools'
 const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), { ssr: false })
 
 export default function Home() {
+  useLayoutEffect(() => {
+    let measuredWidth = -1
+    const measure = () => {
+      const width = window.innerWidth
+      // Mobile browser toolbars resize the viewport during a swipe. Recomputing
+      // thousands of pixels of scroll story on that resize fights the gesture.
+      // Only a width change (rotation/resizing) should establish a new height.
+      if (width === measuredWidth) return
+      measuredWidth = width
+      const mobile = window.matchMedia('(max-width: 767px), (pointer: coarse)').matches
+      if (mobile) document.documentElement.style.setProperty('--story-vh', `${window.innerHeight / 100}px`)
+      else document.documentElement.style.removeProperty('--story-vh')
+    }
+    measure()
+    ScrollTrigger.config({ ignoreMobileResize: true })
+    window.addEventListener('resize', measure, { passive: true })
+    return () => {
+      window.removeEventListener('resize', measure)
+      document.documentElement.style.removeProperty('--story-vh')
+    }
+  }, [])
   useEffect(() => {
     let cancelled = false
     let frame = 0

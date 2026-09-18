@@ -10,8 +10,8 @@
 .audience-description span { color: #645f52; font: 500 8px/1.4 var(--font-mono), monospace; text-transform: uppercase; letter-spacing: -.16px; }
 .audience-description p { font-weight: 500; max-width: 291px; font-size: clamp(14px, 1.25vw, 18px); line-height: 1.2; letter-spacing: -.02em; }
 .audience-glass { display: none; position: absolute; inset: 0 0 auto; height: 230px; border-radius: 24px; background: #ffffff33; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: inset 1px 1px 1px #ffffffcc, inset -1px -1px 1px #ffffff55, inset 4px 4px 16px #ffffff12; pointer-events: none; }
-.tesseral-for[data-animated] { height: 600svh; }
-.tesseral-for[data-animated] .audience-stage { position: sticky; top: 0; height: 100svh; padding-top: clamp(150px, 22svh, 240px); overflow: clip; }
+.tesseral-for[data-animated] { height: calc(var(--story-vh, 1svh) * 600); }
+.tesseral-for[data-animated] .audience-stage { position: sticky; top: 0; height: calc(var(--story-vh, 1svh) * 100); padding-top: clamp(150px, calc(var(--story-vh, 1svh) * 22), 240px); overflow: clip; }
 .tesseral-for[data-animated] .audience-wheel { height: 580px; }
 .tesseral-for[data-animated] .audience-glass { display: block; }
 .tesseral-for[data-animated] .audience-row { position: absolute; inset: 0 0 auto; height: 230px; }
@@ -32,5 +32,5 @@
   .audience-description { gap: 8px; margin-top: auto; }
   .audience-description p { font-size: 14px; max-width: 330px; }
   .audience-glass, .tesseral-for[data-animated] .audience-row { height: 224px; }
-  .tesseral-for[data-animated] .audience-stage { padding-top: max(148px, 20svh); }
+  .tesseral-for[data-animated] .audience-stage { padding-top: max(148px, calc(var(--story-vh, 1svh) * 20)); }
 }
