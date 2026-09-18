@@ -51,7 +51,7 @@ export default function Integrations() {
   }, [])
   return <section id="integrations" className="integrations" ref={root} aria-labelledby="integrations-title">
     <div className="integrations-copy">
-      <h2 id="integrations-title">The tools you use. The knowledge you need.</h2>
+      <h2 id="integrations-title">The tools you use.<br />The knowledge you need.</h2>
       <p>Connect your documents, design files, and links to your Tesseral. All sources sync automatically, and you can refresh them manually whenever you need.</p>
       <IntegrationRequest />
       <button className="integration-pause" type="button" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? 'Resume rotation' : 'Pause rotation'}</button>
