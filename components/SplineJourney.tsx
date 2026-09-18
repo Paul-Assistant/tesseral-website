@@ -158,8 +158,8 @@ export default function SplineJourney() {
           if (index > 0) {
             const transition = desktop ? .85 : .65
             const previous = slides[index - 1]
-            sequence.fromTo(element, { autoAlpha: 1, xPercent: desktop ? 100 : 0, y: desktop ? 0 : viewport.clientHeight }, { xPercent: 0, y: 0, duration: transition, ease: 'power2.inOut', immediateRender: false }, cursor)
-            sequence.to(previous, desktop ? { xPercent: -100, duration: transition, ease: 'power2.inOut' } : { y: -overflow(previous) - viewport.clientHeight, duration: transition, ease: 'power2.inOut' }, cursor)
+            sequence.fromTo(element, { autoAlpha: 1, xPercent: 100, y: 0 }, { xPercent: 0, y: 0, duration: transition, ease: 'power2.inOut', immediateRender: false }, cursor)
+            sequence.to(previous, { xPercent: -100, duration: transition, ease: 'power2.inOut' }, cursor)
             // Keep upcoming slides out of the paint and accessibility trees until
             // their entrance; explicit sets also restore correctly in reverse.
             sequence.set(element, { autoAlpha: 0 }, 0)

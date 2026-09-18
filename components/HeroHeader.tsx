@@ -32,7 +32,8 @@ function scrollToAnchor(event: React.MouseEvent<HTMLAnchorElement>, id: string, 
     return
   }
   const start = window.scrollY
-  const destination = Math.max(0, start + target.getBoundingClientRect().top)
+  const margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0
+  const destination = Math.max(0, start + target.getBoundingClientRect().top - margin)
   const distance = destination - start
   const duration = Math.min(1100, Math.max(520, Math.abs(distance) * .55))
   const started = performance.now()

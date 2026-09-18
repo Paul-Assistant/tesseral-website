@@ -53,3 +53,13 @@
   .problem:not([data-animated]) .problem-card { padding: 24px; }
   .problem:not([data-animated]) .problem-card-copy { width: 100%; }
 }
+
+/* Updated Figma cards: compact header, medium title and checked copy. */
+.problem-card { justify-content: initial; }
+.problem-card-top { flex-shrink: 0; height: 40px; }
+.problem-card h3 { margin-top: 76px; font-size: 18px; line-height: 1.1; letter-spacing: -.36px; }
+.problem-card-copy { margin-top: auto; list-style: none; width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.problem-card-copy li { display: flex; align-items: flex-start; gap: 12px; }
+.problem-card-copy li > img { flex: 0 0 10px; margin-top: 5px; }
+.problem-card-copy li > span { min-width: 0; }
+.problem-card-copy strong { font-size: 11px; }

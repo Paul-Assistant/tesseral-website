@@ -7,6 +7,8 @@ import HeroHeader from '@/components/HeroHeader'
 import ProblemSection from '@/components/ProblemSection'
 import SplineJourney from '@/components/SplineJourney'
 import TesseralFor from '@/components/TesseralFor'
+import Integrations from '@/components/Integrations'
+import Pricing from '@/components/Pricing'
 
 const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), { ssr: false })
 
@@ -44,6 +46,8 @@ export default function Home() {
         <ProblemSection />
         <SplineJourney />
         <TesseralFor />
+        <Integrations />
+        <Pricing />
       </main>
     </>
   )

@@ -28,9 +28,8 @@ export default function TesseralFor() {
       const draw = () => {
         const active = Math.round(pose.step)
         rows.forEach((row, index) => {
-          // The departing row rolls above the glass, disappears behind the
-          // wheel, then rejoins the softened queue at the bottom.
-          const offset = ((index - pose.step + 4.7) % 4) - .7
+          // Earlier audiences leave above the glass; Brands ends the sequence.
+          const offset = index - pose.step
           const focus = Math.max(0, 1 - Math.abs(offset))
           const edge = Math.min(1, Math.max(0, (offset + .7) / .4), Math.max(0, (3.3 - offset) / .4))
           gsap.set(row, {

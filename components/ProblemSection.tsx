@@ -10,27 +10,27 @@ const CARDS = [
   {
     x: 0, y: 174.301, rotation: -.4095,
     title: 'Document everything.',
-    copy: <>Create a brand guidelines doc.<br />Name it <strong>brand_guidelines_FINAL.pdf</strong>.<br />Update it. Name the new one <strong>brand_guidelines_FINAL_v2.pdf</strong>.<br />Repeat until no one knows which is real.</>,
+    copy: ["Create a brand guidelines doc.", "Name it brand_guidelines_FINAL.pdf.", "Update it.", "Name the new one brand_guidelines_FINAL_v2.pdf.", "Repeat until no one knows which is real."],
   },
   {
     x: 197, y: 215.778, rotation: -3.1651,
     title: 'Build a knowledge base.',
-    copy: <>Put Marcus in charge of everything.<br />He knows every client, every preference, every unwritten rule.<br />Don&apos;t document any of it.<br />He&apos;ll never leave.</>,
+    copy: ["Put Marcus in charge of everything.", "He knows every client, every unwritten rule.", "Don’t document any of it.", "He’ll never leave."],
   },
   {
     x: 456.396, y: 251, rotation: .9162,
     title: 'Never reinvent the wheel.',
-    copy: <>Somewhere you have a brief from a similar client. Could be in Drive.<br />Could be Notion.<br />Could be that Slack thread from April.<br />Don&apos;t worry about it.</>,
+    copy: ["Somewhere you have a brief from a similar client.", "Could be in Drive. Could be Notion. Could be that Slack thread from April.", "Don’t worry about it."],
   },
   {
     x: 702, y: 162.305, rotation: -2.012,
     title: 'Always have an answer for the client.',
-    copy: <>When client ask a question, say<br />&quot;I&apos;ll check with Sarah.&quot;<br />Sarah is the only one who knows.<br />Sarah is on holiday.</>,
+    copy: ["When client ask a question, say “I’ll check with Sarah.”", "Sarah is the only one who knows.", "Sarah is on holiday."],
   },
   {
     x: 940.475, y: 225, rotation: 1.7871,
     title: 'Invest in your people.',
-    copy: <>Onboard your new hire.<br />Tell them to &quot;just ask around.&quot;<br />Give it two weeks.</>,
+    copy: ["Onboard your new hire.", "Tell them to “just ask around.”", "Give it two weeks."],
   },
 ]
 
@@ -39,27 +39,27 @@ const SOLUTIONS = [
   {
     x: -12, y: 207.301, rotation: -.4095,
     title: 'One source of truth. Always current.',
-    copy: 'Your brand guidelines live in Tesseral. One version. Always right. Everyone knows where to look.',
+    copy: ["Your brand guidelines live in Tesseral.", "One version. Always right. Real-time.", "Everyone knows where to look.", "Agents & AI reach a single MCP Server"],
   },
   {
     x: 271, y: 231.301, rotation: -.4095,
     title: "Your studio's knowledge stays — even when people don't.",
-    copy: 'Everything Marcus knew is in Tesseral. Every client preference, every unwritten rule, every lesson learned. It stays when he does.',
+    copy: ["Everything Marcus knew is in Tesseral.", "Every client preference, every unwritten rule, every lesson learned.", "It stays when he does not."],
   },
   {
     x: 510, y: 183, rotation: 1.2,
     title: 'Every project builds on everything before it.',
-    copy: "Past briefs, client preferences, what worked, what didn't — Tesseral remembers it all. Nothing starts from scratch.",
+    copy: ["Tesseral remembers it all.", "Past briefs, client preferences, what worked, what didn’t", "Nothing starts from scratch."],
   },
   {
     x: 744, y: 246, rotation: -1.6,
     title: 'The answer is always there. Sarah or no Sarah.',
-    copy: 'Every client question gets answered instantly. Tesseral knows what your studio knows — 24/7, no waiting. Feed whatever agent you’re using with a build-in MCP server.',
+    copy: ["Every client question gets answered instantly.", "Tesseral works 24/7, no waiting, no bottlenecks", "Feed whatever agent you’re using with a built-in MCP/API server."],
   },
   {
     x: 932, y: 213, rotation: 1.1,
     title: 'New hire. Day one. Ready.',
-    copy: 'Tesseral knows how your studio works. Your new hire asks it, it answers. No shadowing. No two-week lag.',
+    copy: ["Tesseral knows how your studio works.", "Your new team member asks it, it answers.", "No shadowing. No two-week lag."],
   },
 ]
 
@@ -70,14 +70,13 @@ function GlassCard({ card, index, solution = false }: { card: typeof CARDS[numbe
   } as CSSProperties}>
     <article className="problem-card" aria-labelledby={id}>
       <div className="problem-card-top" aria-hidden="true">
-        <span className="problem-card-number">0{index + 1}</span>
+        <img src={`/${solution ? 'solution' : 'problem'}/card-icon.svg`} width="39.514" height="39.322" alt="" />
         <div className="problem-card-meta">
-          <img src={`/${solution ? 'solution' : 'problem'}/card-icon.svg`} width="39.514" height="39.322" alt="" />
           <span>Step<br /><span>[ 0{index + 1} / 05 ]</span></span>
         </div>
       </div>
-      <p className="problem-card-copy">{card.copy}</p>
       <h3 id={id}>{card.title}</h3>
+      <ul className="problem-card-copy">{card.copy.map(line => <li key={line}><img src="/problem/check.svg" width="10" height="7" alt="" /><span>{line.split(/(brand_guidelines_FINAL(?:_v2)?\.pdf|MCP Server)/g).map((part, i) => /^(brand_guidelines_|MCP Server)/.test(part) ? <strong key={i}>{part}</strong> : part)}</span></li>)}</ul>
     </article>
   </li>
 }

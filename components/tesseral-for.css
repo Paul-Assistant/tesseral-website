@@ -8,7 +8,7 @@
 .audience-row h3 { font-size: clamp(36px, 5.55vw, 80px); font-weight: 500; line-height: 1.2; letter-spacing: -.02em; white-space: nowrap; }
 .audience-description { display: flex; flex-direction: column; gap: 30px; }
 .audience-description span { color: #645f52; font: 500 8px/1.4 var(--font-mono), monospace; text-transform: uppercase; letter-spacing: -.16px; }
-.audience-description p { max-width: 291px; font-size: clamp(14px, 1.25vw, 18px); line-height: 1.2; letter-spacing: -.02em; }
+.audience-description p { font-weight: 500; max-width: 291px; font-size: clamp(14px, 1.25vw, 18px); line-height: 1.2; letter-spacing: -.02em; }
 .audience-glass { display: none; position: absolute; inset: 0 0 auto; height: 145px; border-radius: 24px; background: #ffffff33; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: inset 1px 1px 1px #ffffffcc, inset -1px -1px 1px #ffffff55, inset 4px 4px 16px #ffffff12; pointer-events: none; }
 .tesseral-for[data-animated] { height: 600svh; }
 .tesseral-for[data-animated] .audience-stage { position: sticky; top: 0; height: 100svh; padding-top: clamp(150px, 22svh, 240px); overflow: clip; }
