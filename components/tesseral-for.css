@@ -1,0 +1,36 @@
+.tesseral-for { position: relative; z-index: 31; color: #201e18; font-family: var(--font-soft), sans-serif; }
+.audience-stage { padding: 140px 5.3vw 100px; }
+.audience-layout { width: 100%; max-width: 1290px; margin: auto; display: grid; grid-template-columns: 30% minmax(0, 1fr); gap: 24px; }
+.audience-layout h2 { margin: 0; height: 230px; display: flex; align-items: center; color: #403a2f; font: 500 clamp(38px, 5.55vw, 80px)/1 var(--font-ginger), sans-serif; letter-spacing: -.04em; white-space: nowrap; }
+.audience-wheel { --audience-pitch: 230px; position: relative; min-width: 0; perspective: 1100px; perspective-origin: 50% 72px; }
+.audience-list { list-style: none; }
+.audience-row { min-height: 230px; padding: 28px 32px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr); align-items: center; gap: clamp(20px, 3vw, 48px); transform-origin: center; backface-visibility: hidden; }
+.audience-row h3 { font-size: clamp(36px, 5.55vw, 80px); font-weight: 500; line-height: 1.2; letter-spacing: -.02em; white-space: nowrap; }
+.audience-description { display: flex; flex-direction: column; gap: 16px; }
+.audience-description span { color: #645f52; font: 500 8px/1.4 var(--font-mono), monospace; text-transform: uppercase; letter-spacing: -.16px; }
+.audience-description p { font-weight: 500; max-width: 291px; font-size: clamp(14px, 1.25vw, 18px); line-height: 1.2; letter-spacing: -.02em; }
+.audience-glass { display: none; position: absolute; inset: 0 0 auto; height: 230px; border-radius: 24px; background: #ffffff33; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: inset 1px 1px 1px #ffffffcc, inset -1px -1px 1px #ffffff55, inset 4px 4px 16px #ffffff12; pointer-events: none; }
+.tesseral-for[data-animated] { height: calc(var(--story-vh, 1svh) * 600); }
+.tesseral-for[data-animated] .audience-stage { position: sticky; top: 0; height: calc(var(--story-vh, 1svh) * 100); padding-top: clamp(150px, calc(var(--story-vh, 1svh) * 22), 240px); overflow: clip; }
+.tesseral-for[data-animated] .audience-wheel { height: 580px; }
+.tesseral-for[data-animated] .audience-glass { display: block; }
+.tesseral-for[data-animated] .audience-row { position: absolute; inset: 0 0 auto; height: 230px; }
+.tesseral-for:not([data-animated]) .audience-row { margin-bottom: 16px; border-radius: 24px; background: #ffffff33; }
+@media (max-width: 1100px) and (min-width: 768px) {
+  .audience-layout { grid-template-columns: 27% minmax(0, 1fr); gap: 16px; }
+  .audience-layout h2 { font-size: 4.5vw; }
+  .audience-row { padding-inline: 20px; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; }
+  .audience-row h3 { font-size: 4.5vw; }
+}
+@media (max-width: 767px) {
+  .audience-stage { padding: 144px 16px 48px; }
+  .audience-layout { display: block; }
+  .audience-layout h2 { height: auto; display: block; margin: 0 0 30px; font-size: clamp(36px, 9vw, 54px); }
+  .audience-wheel { --audience-pitch: 240px; perspective-origin: 50% 80px; }
+  .audience-row { min-height: 224px; padding: 20px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .audience-row h3 { font-size: clamp(34px, 9vw, 54px); line-height: 1; }
+  .audience-description { gap: 8px; margin-top: auto; }
+  .audience-description p { font-size: 14px; max-width: 330px; }
+  .audience-glass, .tesseral-for[data-animated] .audience-row { height: 224px; }
+  .tesseral-for[data-animated] .audience-stage { padding-top: max(148px, calc(var(--story-vh, 1svh) * 20)); }
+}

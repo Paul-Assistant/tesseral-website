@@ -1,0 +1,53 @@
+.pricing { position: relative; padding: 110px max(24px, 5vw) 100px; color: #201e18; font-family: var(--font-soft), sans-serif; scroll-margin-top: 70px; }
+.pricing > h2 { text-align: center; font-size: clamp(28px, 3vw, 42px); font-weight: 500; letter-spacing: -.04em; margin-bottom: 40px; }
+.billing-switch { margin: auto; display: flex; width: max-content; padding: 4px; border-radius: 12px; background: #ffffff66; }
+.billing-switch button { border: 0; border-radius: 9px; padding: 18px 16px; color: #645f52; background: transparent; font: 500 10px var(--font-soft), sans-serif; text-transform: uppercase; cursor: pointer; }
+.billing-switch button[aria-pressed="true"] { background: #201e18; color: white; }
+.billing-note { text-align: center; font: 10px var(--font-mono), monospace; color: #645f52; margin: 14px 0 32px; }
+.pricing-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1170px; margin: auto; gap: clamp(16px, 3.1vw, 45px); }
+.pricing-card { position: relative; min-width: 0; border-radius: 24px; padding: 32px; background: #ffffff33; border: 1px solid #ffffff66; box-shadow: inset 1px 1px 16px #ffffff33; transition: scale .3s ease-out, box-shadow .3s ease-out, border-color .3s ease-out; }
+.pricing-card--studio { background: #c5ff0033; }.pricing-card--agency { background: #9c9c9c33; }
+.pricing-audience { font: 12px var(--font-mono), monospace; text-transform: uppercase; margin-top: 15px; letter-spacing: -.24px; }
+.pricing-card h3 { font-size: 32px; font-weight: 500; line-height: 1.1; margin: 40px 0 24px; letter-spacing: -.64px; }
+.pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.pricing-features li { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: #645f52; }
+.pricing-features strong { font: 700 12px var(--font-mono), monospace; }
+.pricing-amount { min-height: 50px; border-radius: 12px; background: #ffffff66; padding: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pricing-discount { padding: 6px; background: #d2ff56; border-radius: 6px; font: 500 9px var(--font-soft), sans-serif; white-space: nowrap; }
+.pricing-value { display: inline-flex; align-items: baseline; font: 16px var(--font-mono), monospace; white-space: nowrap; }
+.price-digits { display: inline-flex; font: 400 32px/1 var(--font-mono), monospace; letter-spacing: -1.2px; }
+.price-digit { display: inline-block; width: .6em; height: 1em; overflow: hidden; }
+.price-reel { display: flex; flex-direction: column; transform: translateY(calc((var(--digit) + 10) * -1em)); animation: price-roll .75s cubic-bezier(.2,.7,.1,1) both; animation-delay: var(--delay); }
+.price-reel > span { height: 1em; flex: 0 0 1em; }
+@keyframes price-roll { from { transform: translateY(calc(var(--digit) * -1em)); } to { transform: translateY(calc((var(--digit) + 10) * -1em)); } }
+.pricing-total { font: 9px var(--font-mono), monospace; text-align: right; color: #645f52; margin: 10px 0 16px; }
+.pricing-subscribe { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 4px; border-radius: 12px; background: #201e18; color: white; text-decoration: none; font-size: 9px; text-transform: uppercase; }
+.pricing-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.billing-switch button:focus-visible, .pricing-subscribe:focus-visible { outline: 2px solid #201e18; outline-offset: 5px; }
+@media(max-width: 1000px) { .pricing-card { padding: 24px 18px; }.pricing-audience { font-size: 10px; } }
+@media(max-width: 767px) { .pricing { padding: 90px 24px 64px; }.pricing-cards { grid-template-columns: 1fr; max-width: 420px; gap: 20px; }.pricing-card { padding: 32px; }.pricing-audience { font-size: 12px; } }
+@media(prefers-reduced-motion: reduce) { .price-reel { animation: none; } }
+/* Individual scale composes with the scroll tween's translate transform. */
+@media (hover: hover) and (pointer: fine) {
+ .pricing-card:hover { scale: 1.025 !important; z-index: 1; border-color: #ffffffcc; box-shadow: inset 1px 1px 16px #ffffff66, 0 0 36px #d2ff5633, 0 12px 30px #201e1809; }
+}
+.pricing-card:focus-within { border-color: #ffffffcc; box-shadow: inset 1px 1px 16px #ffffff66, 0 0 36px #d2ff5633; }
+.pricing-subscribe, .integration-request { position: relative; isolation: isolate; transition: color .3s ease-out, filter .3s ease-out; }
+.pricing-subscribe::before, .integration-request::before { content: ''; position: absolute; z-index: 0; top: 4px; right: 4px; bottom: 4px; width: 40px; border-radius: 8px; background: #d2ff56; transition: width .3s ease-out; }
+.pricing-subscribe > *, .integration-request > * { position: relative; z-index: 1; }
+.pricing-subscribe:is(:hover, :focus-visible), .integration-request:is(:hover, :focus-visible) { color: #201e18; filter: drop-shadow(0 0 5px #201e1826); }
+.pricing-subscribe:is(:hover, :focus-visible)::before, .integration-request:is(:hover, :focus-visible)::before { width: calc(100% - 8px); }
+@media(prefers-reduced-motion: reduce) { .pricing-card, .pricing-subscribe, .integration-request, .pricing-subscribe::before, .integration-request::before { transition: none; }.pricing-card:hover { scale: none !important; } }
+
+.pricing > h2 { margin-bottom: 16px; }
+.pricing-intro { text-align: center; color: #645f52; font-size: 14px; line-height: 1.5; margin: 0 auto 32px; max-width: 520px; }
+.pricing-audience { min-height: 30px; line-height: 1.4; font-size: 10px; }
+.pricing-feature-label { display: inline-flex; align-items: center; gap: 6px; }
+.credit-info { position: relative; display: inline-flex; }
+.credit-info-button { width: 16px; height: 16px; border: 1px solid #645f5280; border-radius: 50%; background: transparent; color: #645f52; font: 11px/1 var(--font-mono), monospace; cursor: help; }
+.credit-info-button:focus-visible { outline: 2px solid #201e18; outline-offset: 3px; }
+.credit-tooltip { position: absolute; z-index: 5; left: -46px; bottom: calc(100% + 10px); width: 230px; padding: 14px 16px; border-radius: 10px; background: #201e18; color: #fff; box-shadow: 0 8px 30px #201e1826; font: 12px/1.5 var(--font-soft), sans-serif; }
+.credit-tooltip::after { content: ''; position: absolute; top: 100%; left: 49px; border: 5px solid transparent; border-top-color: #201e18; }
+.credit-info::after { content: ''; position: absolute; bottom: 100%; left: -8px; right: -8px; height: 12px; }
+
+@media(max-width:767px) { .pricing > h2 { font-size:32px; line-height:1.1; letter-spacing:-.64px; } }

@@ -1,0 +1,24 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1442.01" height="453.996" viewBox="0 0 1442.01 453.996" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Vector 4 (Stroke)" filter="url(#filter0_fn_0_4)">
+<path d="M575.835 132.537C662.225 119.791 753.746 98.7151 850.426 100.061C944.186 101.367 1048.43 115.883 1126.91 129.366C1166.65 136.195 1200.82 142.944 1225.13 148C1237.29 150.531 1247.02 152.645 1253.79 154.144C1257.17 154.893 1259.81 155.488 1261.64 155.904C1261.92 155.968 1262.18 156.027 1262.42 156.082C1307.86 165.505 1342.01 205.762 1342.01 253.996C1342.01 309.225 1297.24 353.996 1242.01 353.996C1231.8 353.473 1221.13 351.793 1220.57 351.671C1220.36 351.626 1220.06 351.558 1219.96 351.535C1219.8 351.499 1219.66 351.468 1219.64 351.462C1219.55 351.442 1219.45 351.421 1219.41 351.411C1219.3 351.384 1219.16 351.353 1218.98 351.311C1218.61 351.227 1218.06 351.099 1217.31 350.929C1215.81 350.588 1213.53 350.074 1210.53 349.409C1204.52 348.079 1195.64 346.148 1184.39 343.809C1161.87 339.124 1130.04 332.835 1093.04 326.478C1018.02 313.588 925.81 301.131 847.64 300.042C772.39 298.994 713.243 314.429 605.026 330.395C501.255 345.706 373.724 356.731 190.39 339.02C135.418 333.71 95.1598 284.841 100.47 229.868C105.781 174.896 154.65 134.637 209.623 139.947C373.982 155.825 484.999 145.939 575.835 132.537Z" fill="#C6FF1B"/>
+</g>
+<defs>
+<filter id="filter0_fn_0_4" x="-1.22702e-08" y="1.10315e-09" width="1442.01" height="453.996" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="50" result="effect1_foregroundBlur_0_4"/>
+<feTurbulence type="fractalNoise" baseFrequency="2 2" stitchTiles="stitch" numOctaves="3" result="noise" seed="9506" />
+<feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise" />
+<feComponentTransfer in="alphaNoise" result="coloredNoise1">
+<feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+</feComponentTransfer>
+<feComposite operator="in" in2="effect1_foregroundBlur_0_4" in="coloredNoise1" result="noise1Clipped" />
+<feFlood flood-color="#EBEAE7" result="color1Flood" />
+<feComposite operator="in" in2="noise1Clipped" in="color1Flood" result="color1" />
+<feMerge result="effect2_noise_0_4">
+<feMergeNode in="effect1_foregroundBlur_0_4" />
+<feMergeNode in="color1" />
+</feMerge>
+</filter>
+</defs>
+</svg>

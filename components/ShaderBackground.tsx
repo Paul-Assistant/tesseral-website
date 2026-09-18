@@ -88,7 +88,9 @@ export default function ShaderBackground() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const gl = canvas.getContext('webgl')
+    const mobile = window.matchMedia('(max-width: 767px), (pointer: coarse)').matches
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const gl = canvas.getContext('webgl', { antialias: false, depth: false, stencil: false, powerPreference: 'low-power' })
     if (!gl) return
 
     // Compile shaders
@@ -117,9 +119,14 @@ export default function ShaderBackground() {
 
     // Resize
     const resize = () => {
-      canvas.width  = window.innerWidth
-      canvas.height = window.innerHeight
+      const scale = Math.min(mobile ? .5 : .6, 720 / window.innerWidth)
+      const width = Math.round(window.innerWidth * scale)
+      const height = Math.round(window.innerHeight * scale)
+      if (canvas.width === width && canvas.height === height) return
+      canvas.width = width
+      canvas.height = height
       gl.viewport(0, 0, canvas.width, canvas.height)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
     }
     resize()
     window.addEventListener('resize', resize)
@@ -134,29 +141,52 @@ export default function ShaderBackground() {
     window.addEventListener('mousemove', onMove)
 
     // Render loop
-    let raf: number
+    let raf = 0
     const start = performance.now()
-    const render = () => {
-      const t = (performance.now() - start) / 1000
+    let lastFrame = 0
+    const render = (now: number) => {
+      raf = 0
+      if (document.hidden || document.documentElement.dataset.journeyCovered === 'true') return
+      // Keep the atmospheric background smooth while avoiding needless
+      // backdrop-filter re-rasterization on every display refresh.
+      if (now - lastFrame < (mobile ? 100 : 66)) {
+        raf = requestAnimationFrame(render)
+        return
+      }
+      lastFrame = now
+      const t = (now - start) / 1000
       smx += (mx - smx) * 0.035
       smy += (my - smy) * 0.035
       gl.uniform1f(uTime, t)
       gl.uniform2f(uMouse, smx, smy)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
+      if (!reducedMotion) raf = requestAnimationFrame(render)
+    }
+    render(100)
+    const visibility = () => {
+      cancelAnimationFrame(raf)
       raf = requestAnimationFrame(render)
     }
-    render()
+    document.addEventListener('visibilitychange', visibility)
+    window.addEventListener('journey-visibility', visibility)
 
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', onMove)
+      document.removeEventListener('visibilitychange', visibility)
+      window.removeEventListener('journey-visibility', visibility)
+      gl.deleteBuffer(buf)
+      gl.deleteProgram(prog)
+      gl.deleteShader(vert)
+      gl.deleteShader(frag)
     }
   }, [])
 
   return (
     <canvas
       ref={canvasRef}
+      aria-hidden="true"
       style={{
         position: 'fixed',
         inset: 0,
@@ -165,6 +195,7 @@ export default function ShaderBackground() {
         zIndex: 0,
         display: 'block',
         pointerEvents: 'none',
+        transform: 'translate3d(var(--spray-shake-x, 0px), var(--spray-shake-y, 0px), 0) scale(1.025)',
       }}
     />
   )
