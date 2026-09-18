@@ -43,7 +43,7 @@
 
 .hero-button { width: auto; min-width: 160px; }
 .hero-button--compact { min-width: 118px; }
-.hero-description { max-width: 660px; }
+.hero-description { max-width: 580px; }
 .hero-actions { position: relative; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px; }
 .hero-secondary { color: #403a2f; font-size: 12px; text-underline-offset: 5px; }
 .hero-secondary:hover { text-decoration: underline; }
