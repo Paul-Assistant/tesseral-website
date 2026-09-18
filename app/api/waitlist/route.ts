@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) return Response.json({ error: 'Launch signups are temporarily unavailable. Please try again later.' }, { status: 503 })
   try {
-    const response = await fetch(`${url.replace(/\/$/, '')}/rest/v1/launch_waitlist?on_conflict=email`, {
+    const response = await fetch(`${url.replace(/\/$/, '')}/rest/v1/waitlist?on_conflict=email`, {
       method: 'POST',
       headers: {
         apikey: key,
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
         Prefer: 'resolution=ignore-duplicates,return=minimal',
       },
-      body: JSON.stringify({ email: email.toLowerCase(), source: 'tesseral-website' }),
+      body: JSON.stringify({ email: email.toLowerCase() }),
       signal: AbortSignal.timeout(10000),
     })
     if (!response.ok) throw new Error('Delivery failed')
