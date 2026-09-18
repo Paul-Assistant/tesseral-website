@@ -27,7 +27,7 @@ export default function HowItWorksSlide({ step = 0 }: { step?: number }) {
       </div>
     </aside>
     <div className="how-preview">
-      <Image className="how-monitor" src={`/how-it-works/step-${step + 1}${step < 2 ? '-background' : ''}.png`} width={step === 2 ? 3700 : 4094} height={[2406, 2417, 2160][step]} sizes="(max-width: 767px) 100vw, 114vw" loading="eager" alt={[
+      <Image className="how-monitor" src={`/how-it-works/step-${step + 1}${step < 2 ? '-background' : ''}.png`} width={step === 2 ? 3700 : 4094} height={[2406, 2417, 2160][step]} sizes="(max-width: 767px) 100vw, 114vw" loading="lazy" alt={[
         'Tesseral on a studio display, with document upload and stored studio knowledge.',
         'Tesseral connects project research, Figma, Notion and documents around the client.',
         'The Tesseral knowledge base connects the client brief, research and meeting room.',

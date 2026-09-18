@@ -30,3 +30,19 @@ The database supplies `id` and `subscribed_at`. Configure `SUPABASE_URL` and
 `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`) in Vercel Preview.
 Never use a `NEXT_PUBLIC_` prefix for the secret. Duplicate emails are ignored.
 The form reports success only after Supabase accepts the write.
+
+## Search and AI discovery
+
+Set `NEXT_PUBLIC_SITE_URL` to the canonical public homepage origin before a
+production deployment. Only `VERCEL_ENV=production` on a configured custom domain
+is indexable; previews are noindex and disallow crawling. The production sitemap
+contains the homepage URL, not fragment anchors or private API routes.
+Organization, WebSite, WebPage, and SoftwareApplication JSON-LD describes existing
+page content without invented reviews, ratings, or availability claims. `/llms.txt`
+is an optional plain-text product guide, not a ranking guarantee or substitute
+for HTML. Keep it synchronized with product changes.
+
+After the public domain goes live, verify it in Google Search Console and Bing
+Webmaster Tools, submit `/sitemap.xml`, inspect the live URL, and monitor Core Web
+Vitals and indexing. Verify CDN/bot protection permits legitimate search crawlers,
+including OAI-SearchBot. Robots rules are not access controls for API routes.

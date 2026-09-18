@@ -49,3 +49,5 @@
 .credit-tooltip { position: absolute; z-index: 5; left: -46px; bottom: calc(100% + 10px); width: 230px; padding: 14px 16px; border-radius: 10px; background: #201e18; color: #fff; box-shadow: 0 8px 30px #201e1826; font: 12px/1.5 var(--font-soft), sans-serif; }
 .credit-tooltip::after { content: ''; position: absolute; top: 100%; left: 49px; border: 5px solid transparent; border-top-color: #201e18; }
 .credit-info::after { content: ''; position: absolute; bottom: 100%; left: -8px; right: -8px; height: 12px; }
+
+@media(max-width:767px) { .pricing > h2 { font-size:32px; line-height:1.1; letter-spacing:-.64px; } }
