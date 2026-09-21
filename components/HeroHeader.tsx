@@ -88,6 +88,7 @@ export default function HeroHeader() {
           .to(slot, { width: rows[next].scrollWidth, duration: .7, ease: 'power3.inOut' }, .08)
           .to(incoming, { yPercent: 0, rotateX: 0, opacity: 1, duration: .65, stagger: .035, ease: 'power3.out' }, .18)
           .set(rows[current], { visibility: 'hidden' })
+        transition.timeScale(3)
       }
 
       // Wait for actual type metrics so the changing phrase never clips.
