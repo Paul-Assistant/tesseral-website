@@ -80,7 +80,7 @@ export default function HeroHeader() {
         const incoming = rows[next].querySelectorAll('.rotating-char')
         transition = gsap.timeline({ onComplete: () => {
           current = next
-          timer = gsap.delayedCall(3.5, rotate)
+          timer = gsap.delayedCall(1.4, rotate)
         } })
         transition.set(rows[next], { visibility: 'visible' })
           .set(incoming, { yPercent: 110, rotateX: -70, opacity: 0 })
@@ -88,14 +88,13 @@ export default function HeroHeader() {
           .to(slot, { width: rows[next].scrollWidth, duration: .7, ease: 'power3.inOut' }, .08)
           .to(incoming, { yPercent: 0, rotateX: 0, opacity: 1, duration: .65, stagger: .035, ease: 'power3.out' }, .18)
           .set(rows[current], { visibility: 'hidden' })
-        transition.timeScale(3)
       }
 
       // Wait for actual type metrics so the changing phrase never clips.
       document.fonts.ready.then(() => {
         if (!alive) return
         slot.style.width = `${rows[0].scrollWidth}px`
-        timer = gsap.delayedCall(2.4, rotate)
+        timer = gsap.delayedCall(1.4, rotate)
       })
       let headingWidth = heading.clientWidth
       const resize = () => {
