@@ -16,7 +16,7 @@
 .how-step-number { font: 300 clamp(76px, 8.33vw, 120px)/1 var(--font-mono), monospace; letter-spacing: -.1em; }
 .how-step-meta { padding-top: 8px; font: 12px/1.8 var(--font-mono), monospace; letter-spacing: .6px; text-transform: uppercase; }
 .how-step-copy { margin-top: clamp(40px, calc(var(--story-vh, 1svh) * 17), 180px); max-width: 339px; padding-bottom: 24px; }
-.how-step h2 { font-size: clamp(24px, 2.22vw, 32px); font-weight: 500; line-height: 1.1; letter-spacing: -.02em; margin-bottom: 32px; }
+.how-step h2 { font-size: clamp(24px, 2.22vw, 32px); font-weight: 500; line-height: 1.1; letter-spacing: -.04em; margin-bottom: 32px; }
 .how-step p { font: 12px/1.4 var(--font-mono), monospace; letter-spacing: -.36px; color: #645f52; margin-top: 16px; }
 .how-preview { position: absolute; z-index: 0; width: 114%; left: -1%; top: 0; bottom: 0; }
 .how-monitor { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left center; }

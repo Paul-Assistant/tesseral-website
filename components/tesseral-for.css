@@ -5,7 +5,7 @@
 .audience-wheel { --audience-pitch: 230px; position: relative; min-width: 0; perspective: 1100px; perspective-origin: 50% 72px; }
 .audience-list { list-style: none; }
 .audience-row { min-height: 230px; padding: 28px 32px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr); align-items: center; gap: clamp(20px, 3vw, 48px); transform-origin: center; backface-visibility: hidden; }
-.audience-row h3 { font-size: clamp(36px, 5.55vw, 80px); font-weight: 500; line-height: 1.2; letter-spacing: -.02em; white-space: nowrap; }
+.audience-row h3 { font-size: clamp(36px, 5.55vw, 80px); font-weight: 500; line-height: 1.2; letter-spacing: -.04em; white-space: nowrap; }
 .audience-description { display: flex; flex-direction: column; gap: 16px; }
 .audience-description span { color: #645f52; font: 500 8px/1.4 var(--font-mono), monospace; text-transform: uppercase; letter-spacing: -.16px; }
 .audience-description p { font-weight: 500; max-width: 291px; font-size: clamp(14px, 1.25vw, 18px); line-height: 1.2; letter-spacing: -.02em; }

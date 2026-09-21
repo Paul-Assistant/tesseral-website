@@ -1,5 +1,5 @@
 .integrations { position: relative; min-height: 80svh; padding: 120px max(24px, 5.3vw); display: grid; grid-template-columns: minmax(260px, 339px) minmax(0, 1fr); align-items: center; gap: 48px; font-family: var(--font-soft), sans-serif; color: #201e18; overflow: clip; }
-.integrations-copy h2 { font-size: 32px; font-weight: 500; line-height: 1.1; letter-spacing: -.64px; }
+.integrations-copy h2 { font-size: 32px; font-weight: 500; line-height: 1.1; letter-spacing: -.04em; }
 .integrations-copy > p { max-width: 287px; margin: 40px 0; font-size: 12px; line-height: 1.4; color: #645f52; }
 .integration-request { display: inline-flex; gap: 12px; align-items: center; background: #201e18; color: white; border-radius: 12px; padding: 4px 4px 4px 12px; font-size: 9px; text-transform: uppercase; text-decoration: none; }
 .integration-pause { display: none; margin-top: 24px; color: #645f52; font: 10px var(--font-mono), monospace; background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
@@ -11,7 +11,7 @@
 .integration-icons--2 img { width: 78px; height: 78px; }
 .integration-icons--3 { width: 150px; }
 .integration-icons--3 img { width: 56px; height: 56px; }
-.integration-card h3 { margin: 28px 0 24px; font-size: 16px; font-weight: 500; letter-spacing: -.32px; }
+.integration-card h3 { margin: 28px 0 24px; font-size: 16px; font-weight: 500; letter-spacing: -.04em; }
 .integration-card p { font: 12px/1.4 var(--font-mono), monospace; color: #645f52; letter-spacing: -.36px; }
 .integrations[data-animated] .integration-stage { position: relative; display: block; height: 420px; }
 .integrations[data-animated] .integration-card { position: absolute; left: calc(50% - 111.5px); top: 50%; margin-top: -175px; height: 350px; backface-visibility: hidden; will-change: transform; }

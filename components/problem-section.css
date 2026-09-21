@@ -2,7 +2,7 @@
 .problem-stage { position: sticky; top: 0; height: calc(var(--story-vh, 1svh) * 100); min-height: 440px; overflow: clip; }
 .problem-scene { position: absolute; inset: 0; transform: translate3d(var(--spray-shake-x, 0px), var(--spray-shake-y, 0px), 0); will-change: transform; backface-visibility: hidden; }
 .problem-board { --board-scale: .8; position: absolute; width: 1262.318px; height: 656.098px; left: 50%; top: calc(50% + 40px); transform: translate(-50%, -50%) scale(var(--board-scale)); }
-.problem h2 { position: absolute; top: 0; left: 313px; width: 617px; color: #403a2f; font: 500 42.503px/1 var(--font-ginger), sans-serif; letter-spacing: -1.7001px; text-align: center; }
+.problem h2 { position: absolute; top: 0; left: 313px; width: 617px; color: #403a2f; font: 500 42.503px/1 var(--font-ginger), sans-serif; letter-spacing: -.04em; text-align: center; }
 .problem-cards { list-style: none; }
 .problem-title-wrap { position: absolute; inset: 0; pointer-events: none; }
 .solution-spray { position: absolute; left: -130.007px; top: 166.004px; width: 1442.01px; height: 453.996px; z-index: 10; overflow: visible; pointer-events: none; }
@@ -22,13 +22,13 @@
 .problem-card-meta > span > span { display: inline-block; margin-top: 8px; white-space: nowrap; }
 .problem-card-copy { width: 252px; font-size: 12px; line-height: 1.4; letter-spacing: -.24px; color: #645f52; }
 .problem-card-copy strong { font: 700 12px/1.4 var(--font-mono), monospace; overflow-wrap: anywhere; }
-.problem-card h3 { font: 500 14px/1.4 var(--font-soft), sans-serif; letter-spacing: -.28px; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
+.problem-card h3 { font: 500 14px/1.4 var(--font-soft), sans-serif; letter-spacing: -.04em; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
 @media (prefers-reduced-motion: no-preference) {
   .problem { height: calc(var(--story-vh, 1svh) * 700); }
 }
 @media (max-width: 767px) {
   .problem-board { width: 354px; height: 650px; top: calc(50% + 72px); }
-  .problem h2 { left: 0; width: 354px; font-size: 32px; letter-spacing: -1.28px; }
+  .problem h2 { left: 0; width: 354px; font-size: 32px; letter-spacing: -.04em; }
   .problem-desktop-break { display: none; }
   .problem-card-position { left: calc(8px + var(--card-index) * 4px); top: calc(145px + var(--card-index) * 25px); }
   .problem-card { background: rgba(243, 242, 241, .65); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
@@ -57,7 +57,7 @@
 /* Updated Figma cards: compact header, medium title and checked copy. */
 .problem-card { justify-content: initial; }
 .problem-card-top { flex-shrink: 0; height: 40px; }
-.problem-card h3 { margin-top: 76px; font-size: 18px; line-height: 1.1; letter-spacing: -.36px; }
+.problem-card h3 { margin-top: 76px; font-size: 18px; line-height: 1.1; letter-spacing: -.04em; }
 .problem-card-copy { margin-top: auto; list-style: none; width: 100%; display: flex; flex-direction: column; gap: 8px; }
 .problem-card-copy li { display: flex; align-items: flex-start; gap: 12px; }
 .problem-card-copy li > img { flex: 0 0 10px; margin-top: 5px; }
