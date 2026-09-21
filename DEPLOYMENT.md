@@ -24,11 +24,18 @@ An optional `INTEGRATION_REQUEST_WEBHOOK_URL` overrides Resend delivery.
 
 ## Forms
 
-Launch audit: the existing Resend key is send-only. Its domain-list request
+Production uses the replacement Resend key supplied by the owner. One explicitly
+authorized, labelled test integration request was accepted by Resend (HTTP 200)
+on September 21, 2026; inbox receipt was not independently verified. The older
+key remains limited to the codex/figma-header preview branch.
+
+Launch audit: the older Resend key is send-only. Its domain-list request
 returns HTTP 401 with `restricted_api_key`, which is an expected permission
 restriction, not an invalid credential. The form offers a direct email link if
 delivery fails. Supabase persistence and duplicate protection were verified end
-to end on staging; the exact synthetic record was removed.
+to end on staging. Persistence was also verified through the live tesseral.design
+form after launch. Both exact synthetic records were removed and their absence
+verified.
 
 Every signup CTA opens the email-only launch modal. `/api/waitlist` normalizes
 email addresses and writes to the existing `public.waitlist` Supabase table.
@@ -103,9 +110,34 @@ from a staging Lighthouse score. Real-user data needs sufficient traffic.
 - Verify a synthetic signup in Supabase and remove only that exact test record.
 - Run PageSpeed Insights on desktop and mobile after deployment.
 
-The current public root domain belongs to the older `landing` Vercel project.
-Moving it to this project is a distinct release step after review. Preserve
-`app.tesseral.design` on the existing dashboard project.
+Launched September 21, 2026 at https://tesseral.design with deployment
+`dpl_9u4dHRDM1tTtLB6d9hDa9NH2amxf` (functional source commit `3302dc9`).
+The root domain was moved atomically from `landing` to `tesseral-website`.
+HTTP and www redirect with status 308 to https://tesseral.design/.
+The homepage, privacy page, robots and sitemap return HTTP 200; production is
+indexable and has the correct canonical URL. `app.tesseral.design` and
+`staging.tesseral.design` remain on the existing dashboard project.
+
+The live browser check confirmed no Google script before consent and the correct
+GA tag after opt-in. GA Realtime and Search Console account configuration remain
+account tasks; no claim of search indexing or GA ingestion is made.
+
+Public PageSpeed report (September 21, 2026, 12:21 Prague):
+https://pagespeed.web.dev/analysis/https-tesseral-design/npb1hfehkn
+
+| Metric | Desktop | Mobile |
+| --- | --- | --- |
+| Performance | 99 | 82 |
+| Accessibility | 100 | 100 |
+| Best Practices | 100 | 100 |
+| SEO | 100 | 100 |
+| LCP | 0.9 s | 4.7 s |
+| TBT | 0 ms | 10 ms |
+| CLS | 0 | 0 |
+
+These are lab measurements, not real-user Core Web Vitals or ranking guarantees.
+Mobile hero loading is the main remaining performance opportunity. Both device
+reports passed all three experimental Agentic Browsing checks.
 
 ## Performance and motion
 
