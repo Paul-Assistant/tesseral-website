@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useReportWebVitals } from 'next/web-vitals'
 import { CONSENT_KEY, GA_ID, readAnalyticsConsent, trackEvent } from '@/lib/analytics'
 import './site-analytics.css'
@@ -10,7 +10,6 @@ export default function SiteAnalytics() {
   const [ready, setReady] = useState(false)
   const [settings, setSettings] = useState(false)
   const [dismissed, setDismissed] = useState(false)
-  const panel = useRef<HTMLDialogElement>(null)
   const visible = ready && (settings || (choice === null && !dismissed))
   useEffect(() => {
     setChoice(readAnalyticsConsent()); setReady(true)
@@ -52,12 +51,6 @@ export default function SiteAnalytics() {
     document.querySelectorAll('main section[id], main footer[id]').forEach(section => observer.observe(section))
     return () => observer.disconnect()
   }, [choice, ready])
-  useEffect(() => {
-    const dialog = panel.current
-    if (!dialog) return
-    if (visible && !dialog.open) dialog.showModal()
-    if (!visible && dialog.open) dialog.close()
-  }, [visible])
   const report = useCallback((metric: { name: string; value: number; rating: string }) => {
     trackEvent('web_vital', { metric: metric.name, value: Math.round(metric.value * 1000) / 1000, rating: metric.rating })
   }, [])
@@ -77,9 +70,9 @@ export default function SiteAnalytics() {
     }
     setChoice(allowed); setSettings(false)
   }
-  return <dialog ref={panel} className="site-preferences" aria-labelledby="site-preferences-title" aria-describedby="site-preferences-description" onCancel={() => { setSettings(false); setDismissed(true) }}>
+  return <dialog open={visible} className="site-preferences" aria-labelledby="site-preferences-title" aria-describedby="site-preferences-description" onKeyDown={event => { if (event.key === 'Escape') { setSettings(false); setDismissed(true) } }}>
     <p id="site-preferences-title">Your cookie preferences.</p>
-    <span id="site-preferences-description">With your permission, we use Google Analytics to understand visits and improve this website. Your waitlist email isn’t shared with analytics. <a href="/privacy">Privacy</a></span>
+    <span id="site-preferences-description">May we use analytics to improve Tesseral? Your waitlist email stays private. <a href="/privacy">Privacy</a></span>
     <div><button type="button" onClick={() => choose(false)}>No thanks</button><button type="button" onClick={() => choose(true)}>Allow analytics</button></div>
   </dialog>
 }
