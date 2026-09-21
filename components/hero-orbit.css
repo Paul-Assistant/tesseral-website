@@ -44,7 +44,7 @@
 .orbit-core > img { width:56px; height:56px; }
 .orbit-core > span { font-size:12px; }
 .orbit-core-glow { top:-54px; }
-.orbit-question { position:absolute; left:calc(100% + 18px); top:0; width:220px; padding:16px 20px; border-radius:18px 18px 18px 4px; border:1px solid #ffffffcf; background:rgba(255,255,255,.48); backdrop-filter:blur(16px); box-shadow:inset 1px 1px 0 #fff8,0 8px 32px #403a2f08; font:500 13px/1.4 var(--font-soft); color:#403a2f; text-align:left; transform-origin:bottom left; will-change:transform,opacity; }
+.orbit-question { position:absolute; left:calc(100% - 6px); top:auto; bottom:calc(100% - 12px); width:max-content; max-width:180px; padding:10px 13px; border-radius:16px 16px 16px 4px; border:1px solid #ffffffcf; background:rgba(255,255,255,.48); backdrop-filter:blur(16px); box-shadow:inset 1px 1px 0 #fff8,0 8px 32px #403a2f08; font:500 12px/1.35 var(--font-soft); letter-spacing:-.2px; color:#403a2f; text-align:left; transform-origin:bottom left; will-change:transform,opacity; }
 .orbit-ring { opacity:.07; }
 .orbit-line { opacity:.13; }
 .orbit-motion { position:absolute; right:24px; bottom:18px; pointer-events:auto; z-index:25; }
@@ -53,6 +53,6 @@
  .orbit-core { top:19%; }
  .orbit-core > img { width:44px; height:44px; }
  .orbit-source { width:125px; }
- .orbit-question { left:50%; top:calc(100% + 10px); margin-left:-115px; width:230px; padding:10px 14px; text-align:center; font-size:11px; border-radius:4px 14px 14px 14px; transform-origin:top center; }
+ .orbit-question { left:calc(100% - 6px); max-width:min(150px, calc(50vw - 44px)); padding:9px 11px; font-size:11px; }
  .orbit-motion { bottom:94px; right:12px; font-size:9px; }
 }
