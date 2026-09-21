@@ -2,9 +2,8 @@
 .hero-orbit { position:relative; width:100%; height:560px; isolation:isolate; }
 .orbit-visuals { position:absolute; inset:0; pointer-events:none; }
 .orbit-connections { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
-.orbit-line { stroke:#777366; stroke-width:.7; opacity:.25; }
+.orbit-line { stroke:#bce94f; stroke-width:2; stroke-linecap:round; stroke-dasharray:.14 .86; opacity:0; filter:blur(.8px) drop-shadow(0 0 5px #bce94f); }
 .orbit-ring { fill:none; stroke:#8b8777; stroke-width:.6; stroke-dasharray:2 9; opacity:.22; }
-.orbit-pulse { fill:#9dcc20; opacity:0; }
 .orbit-source { position:absolute; top:0; left:0; width:156px; padding:12px; border:1px solid #ffffffa6; border-radius:12px; background:rgba(255,255,255,.65); box-shadow:0 5px 20px #413b2f05; display:flex; flex-direction:column; gap:8px; will-change:transform; text-align:left; color:#201e18; }
 .orbit-source[hidden] { display:none; }
 .orbit-source-top { display:flex; align-items:center; justify-content:space-between; color:#7b776b; }
@@ -45,8 +44,7 @@
 .orbit-core > span { font-size:12px; }
 .orbit-core-glow { top:-54px; }
 .orbit-question { position:absolute; left:calc(100% - 6px); top:auto; bottom:calc(100% - 12px); width:max-content; max-width:180px; padding:10px 13px; border-radius:16px 16px 16px 4px; border:1px solid #ffffffcf; background:rgba(255,255,255,.48); backdrop-filter:blur(16px); box-shadow:inset 1px 1px 0 #fff8,0 8px 32px #403a2f08; font:500 12px/1.35 var(--font-soft); letter-spacing:-.2px; color:#403a2f; text-align:left; transform-origin:bottom left; will-change:transform,opacity; }
-.orbit-ring { opacity:.07; }
-.orbit-line { opacity:.13; }
+.orbit-ring { opacity:0; }
 .orbit-motion { position:absolute; right:24px; bottom:18px; pointer-events:auto; z-index:25; }
 .orbit-source { width:170px; }
 @media(max-width:767px) {
