@@ -1,0 +1,8 @@
+.privacy-page { width: min(760px, calc(100% - 48px)); margin: 0 auto; padding: 64px 0 96px; color: #201e18; font-family: var(--font-soft), sans-serif; font-size: 18px; line-height: 1.65; }
+body:has(.privacy-page) { background: #f5f5ee; }
+.privacy-page h1 { font: 500 clamp(38px, 6vw, 64px)/1.05 var(--font-ginger), sans-serif; letter-spacing: -.04em; margin: 48px 0 24px; }
+.privacy-page h2 { font: 500 28px/1.15 var(--font-ginger), sans-serif; letter-spacing: -.04em; margin: 36px 0 12px; }
+.privacy-page p { margin-bottom: 16px; }
+.privacy-page a { text-decoration: underline; text-underline-offset: 4px; }
+.privacy-page button { border: 1px solid #201e18; border-radius: 12px; padding: 10px 16px; cursor: pointer; }
+.privacy-page :is(a, button):focus-visible { outline: 2px solid #201e18; outline-offset: 4px; }
