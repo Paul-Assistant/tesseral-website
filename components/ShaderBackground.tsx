@@ -90,6 +90,9 @@ export default function ShaderBackground() {
 
     const mobile = window.matchMedia('(max-width: 767px), (pointer: coarse)').matches
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // The orbit supplies the mobile motion. A matching CSS atmosphere avoids
+    // compiling a full-screen WebGL shader during the first mobile paint.
+    if (mobile) return
     const gl = canvas.getContext('webgl', { antialias: false, depth: false, stencil: false, powerPreference: 'low-power' })
     if (!gl) return
 
@@ -203,6 +206,7 @@ export default function ShaderBackground() {
         height: '100vh',
         zIndex: 0,
         display: 'block',
+        background: 'radial-gradient(ellipse at 20% 25%, #f3f0ea 0%, transparent 65%), radial-gradient(ellipse at 85% 70%, #e5e5e8 0%, transparent 65%), #ebeae7',
         pointerEvents: 'none',
         transform: 'translate3d(var(--spray-shake-x, 0px), var(--spray-shake-y, 0px), 0) scale(1.025)',
       }}

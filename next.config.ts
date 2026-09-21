@@ -12,6 +12,9 @@ const splineAssets = {
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
+  // This small landing site favors first visits: ship styles with the HTML
+  // instead of adding render-blocking stylesheet round trips on mobile.
+  experimental: { inlineCss: true },
   turbopack: { resolveAlias: Object.fromEntries(Object.entries(splineAssets).map(([key, value]) => [key, `./${path.relative(process.cwd(), value)}`])) },
   webpack(config) {
     Object.assign(config.resolve.alias, splineAssets);

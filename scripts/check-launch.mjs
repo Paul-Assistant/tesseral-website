@@ -16,7 +16,7 @@ for (const [environment, url, indexable] of [['preview', 'https://tesseral.desig
   assert.equal(site.isIndexable, indexable)
   const robots = moduleFrom('app/robots.ts', { '@/lib/site': site }).default()
   const sitemap = moduleFrom('app/sitemap.ts', { '@/lib/site': site }).default()
-  assert.equal(robots.rules.disallow, indexable ? robots.rules.disallow : '/')
+  assert.deepEqual(robots.rules.disallow, indexable ? ['/api/'] : '/')
   assert.equal(sitemap.length, indexable ? 2 : 0)
   if (indexable) { assert.equal(robots.sitemap, `${url}/sitemap.xml`); assert.equal(robots.rules.allow, '/'); assert.deepEqual(sitemap.map(x => x.url), [`${url}/`, `${url}/privacy`]) }
 }

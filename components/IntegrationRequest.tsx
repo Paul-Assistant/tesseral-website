@@ -43,7 +43,7 @@ function RequestDialog({ close }: { close: () => void }) {
         <label htmlFor="request-email">Email</label><input id="request-email" name="email" type="email" autoComplete="email" required maxLength={254} />
         <label htmlFor="request-message">Message</label><textarea id="request-message" name="message" required maxLength={4000} rows={5} placeholder="Which integration would you like, and how would you use it?" />
         <div className="request-honeypot" aria-hidden="true"><label htmlFor="request-website">Website</label><input id="request-website" name="website" tabIndex={-1} autoComplete="off" /></div>
-        {state === 'error' && <p className="request-error" role="alert">{error}</p>}
+        {state === 'error' && <p className="request-error" role="alert">{error} You can also <a href="mailto:tom@garcy.studio?subject=Tesseral%20integration%20request" style={{ textDecoration: 'underline' }}>email us directly</a>.</p>}
         <button type="submit" className="request-submit" disabled={state === 'sending'}>{state === 'sending' ? 'Sending…' : 'Send request'}</button>
       </form>
     </>}

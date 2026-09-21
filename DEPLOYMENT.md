@@ -24,6 +24,12 @@ An optional `INTEGRATION_REQUEST_WEBHOOK_URL` overrides Resend delivery.
 
 ## Forms
 
+Launch audit: the existing Resend key is send-only. Its domain-list request
+returns HTTP 401 with `restricted_api_key`, which is an expected permission
+restriction, not an invalid credential. The form offers a direct email link if
+delivery fails. Supabase persistence and duplicate protection were verified end
+to end on staging; the exact synthetic record was removed.
+
 Every signup CTA opens the email-only launch modal. `/api/waitlist` normalizes
 email addresses and writes to the existing `public.waitlist` Supabase table.
 The database supplies `id` and `subscribed_at`; its unique email constraint and
@@ -103,9 +109,17 @@ Moving it to this project is a distinct release step after review. Preserve
 
 ## Performance and motion
 
-Fonts are losslessly compressed WOFF2; original OTF sources are retained.
+Fonts are losslessly compressed WOFF2 (736,820 → 300,660 bytes); original OTF
+sources are retained. Only heading/body fonts are preloaded; orbit icons use
+responsive image sizing. Next.js `experimental.inlineCss` ships this small
+landing page’s CSS with the HTML to avoid render-blocking stylesheet round
+trips. It trades independent stylesheet caching for faster first visits and
+should be rechecked when upgrading Next.js.
 Orbit cards start transparent at their final layout origin, then use transforms,
 avoiding the old hydration layout jump. Animation pauses offscreen and in hidden
 tabs and respects reduced motion. Heavy Spline content loads near its section.
-Mobile scroll dimensions are recalculated only on width changes, avoiding browser
+On mobile, a matching CSS atmosphere replaces the full-screen WebGL background,
+and the decorative hero spray paints without an entrance delay. The orbit and
+scroll storytelling remain animated. Mobile scroll dimensions are recalculated
+only on width changes, avoiding browser
 toolbar resize jumps. Keep these behaviors when modifying the scroll story.

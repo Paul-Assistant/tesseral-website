@@ -102,4 +102,5 @@
  .hero-content--orbit .hero-heading { font-size:clamp(27px,7.4vw,44px); }
  .hero-content--orbit .hero-description { padding-inline:4px; max-width:390px; }
  .hero-content--orbit .hero-actions { gap:12px; }
+ .hero-spray__paint { animation:none; }
 }
