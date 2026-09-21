@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useReportWebVitals } from 'next/web-vitals'
 import { CONSENT_KEY, GA_ID, readAnalyticsConsent, trackEvent } from '@/lib/analytics'
 import './site-analytics.css'
@@ -9,9 +9,13 @@ export default function SiteAnalytics() {
   const [choice, setChoice] = useState<boolean | null>(null)
   const [ready, setReady] = useState(false)
   const [settings, setSettings] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
+  const panel = useRef<HTMLDialogElement>(null)
+  const visible = ready && (settings || (choice === null && !dismissed))
   useEffect(() => {
     setChoice(readAnalyticsConsent()); setReady(true)
-    const open = () => setSettings(true)
+    const open = (event: Event) => { event.preventDefault(); setSettings(true) }
+    if (new URLSearchParams(location.search).get('preferences') === 'open') setSettings(true)
     const sync = () => setChoice(readAnalyticsConsent())
     window.addEventListener('tesseral-cookie-settings', open)
     window.addEventListener('storage', sync)
@@ -48,6 +52,12 @@ export default function SiteAnalytics() {
     document.querySelectorAll('main section[id], main footer[id]').forEach(section => observer.observe(section))
     return () => observer.disconnect()
   }, [choice, ready])
+  useEffect(() => {
+    const dialog = panel.current
+    if (!dialog) return
+    if (visible && !dialog.open) dialog.showModal()
+    if (!visible && dialog.open) dialog.close()
+  }, [visible])
   const report = useCallback((metric: { name: string; value: number; rating: string }) => {
     trackEvent('web_vital', { metric: metric.name, value: Math.round(metric.value * 1000) / 1000, rating: metric.rating })
   }, [])
@@ -67,14 +77,18 @@ export default function SiteAnalytics() {
     }
     setChoice(allowed); setSettings(false)
   }
-  if (!ready || (choice !== null && !settings)) return null
-  return <aside className="analytics-consent" aria-label="Analytics preferences">
-    <p>Help us make Tesseral better.</p>
-    <span>With your permission, we use Google Analytics to understand visits and improve this website. Your waitlist email isn’t shared with analytics. <a href="/privacy">Privacy</a></span>
+  return <dialog ref={panel} className="site-preferences" aria-labelledby="site-preferences-title" aria-describedby="site-preferences-description" onCancel={() => { setSettings(false); setDismissed(true) }}>
+    <p id="site-preferences-title">Your cookie preferences.</p>
+    <span id="site-preferences-description">With your permission, we use Google Analytics to understand visits and improve this website. Your waitlist email isn’t shared with analytics. <a href="/privacy">Privacy</a></span>
     <div><button type="button" onClick={() => choose(false)}>No thanks</button><button type="button" onClick={() => choose(true)}>Allow analytics</button></div>
-  </aside>
+  </dialog>
 }
 
 export function CookieSettingsButton() {
-  return <button type="button" onClick={() => window.dispatchEvent(new Event('tesseral-cookie-settings'))}>Cookie settings</button>
+  return <a href="/privacy?preferences=open" aria-haspopup="dialog" onClick={event => {
+    const request = new Event('tesseral-cookie-settings', { cancelable: true })
+    window.dispatchEvent(request)
+    // Keep the real URL as a fallback if the shared listener is unavailable.
+    if (request.defaultPrevented) event.preventDefault()
+  }}>Cookie settings</a>
 }
