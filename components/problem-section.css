@@ -24,7 +24,7 @@
 .problem-card-copy strong { font: 700 12px/1.4 var(--font-mono), monospace; overflow-wrap: anywhere; }
 .problem-card h3 { font: 500 14px/1.4 var(--font-soft), sans-serif; letter-spacing: -.28px; text-box-trim: trim-both; text-box-edge: cap alphabetic; }
 @media (prefers-reduced-motion: no-preference) {
-  .problem { height: calc(var(--story-vh, 1svh) * 1460); }
+  .problem { height: calc(var(--story-vh, 1svh) * 700); }
 }
 @media (max-width: 767px) {
   .problem-board { width: 354px; height: 650px; top: calc(50% + 72px); }
@@ -63,3 +63,18 @@
 .problem-card-copy li > img { flex: 0 0 10px; margin-top: 5px; }
 .problem-card-copy li > span { min-width: 0; }
 .problem-card-copy strong { font-size: 11px; }
+
+/* Three paired stories share one reading position and one headline. */
+.problem-pair { position: absolute; inset: 0; }
+.problem h2 { left: 281px; width: 700px; }
+.problem-card-meta > span { width: auto; text-align: right; }
+.problem .solution-spray { left: 205px; top: 170px; width: 850px; height: 400px; }
+.problem:not([data-animated]) .problem-pair { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin-bottom: 48px; }
+@media (max-width: 767px) {
+  .problem-board { top: calc(50% + 40px); }
+  .problem h2 { left: 0; width: 354px; }
+  .problem-card-position, .problem-card-position.solution-card-position { left: 16px; top: 155px; }
+  .problem .solution-spray { left: -173px; top: 160px; width: 700px; height: 420px; }
+}
+
+.problem:not([data-animated]) h2 { width: min(100%, 700px); }
