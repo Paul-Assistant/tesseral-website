@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import './hero-orbit.css'
 
 const QUESTIONS = ['What makes our brand different?', 'What should our next campaign say?', 'Can you help me shape this pitch?', 'How would our brand say this?']
@@ -101,8 +102,8 @@ export default function HeroOrbit() {
     <div className="hero-orbit" ref={root} role="img" aria-label="Files, Figma, Google Docs, Slides and Notion connect to Tesseral. Tesseral supplies live context to your agents through MCP and generates research into industry standards, key people, markets and competitors.">
       <div className="orbit-visuals" aria-hidden="true">
         <svg className="orbit-connections"><ellipse className="orbit-ring" />{SOURCES.map(source => <g key={source.title}><line className="orbit-line" pathLength="1" /></g>)}</svg>
-        {SOURCES.map((source, index) => <div className={`orbit-source${source.research ? ' orbit-source--research' : source.outward ? ' orbit-source--agent' : ''}`} key={source.title} style={{ left: `${50 + Math.cos(index / SOURCES.length * Math.PI * 2 - .7) * 34}%`, top: `${37 + Math.sin(index / SOURCES.length * Math.PI * 2 - .7) * 23}%`, transform: 'translate(-50%, -50%) scale(.85)' }}>
-          <div className="orbit-source-top"><img src={source.icon} width="24" height="24" alt="" /><span>↗</span></div>
+        {SOURCES.map(source => <div className={`orbit-source${source.research ? ' orbit-source--research' : source.outward ? ' orbit-source--agent' : ''}`} key={source.title}>
+          <div className="orbit-source-top"><Image src={source.icon} width={24} height={24} sizes="(max-width: 767px) 28px, 42px" alt="" /><span>↗</span></div>
           <strong>{source.title}</strong><span className="orbit-source-detail">{source.detail}</span>
           {source.image && <img className="orbit-thumbnail" src="/hero-orbit/mood.webp" width="138" height="54" alt="" />}
           {source.research && <ul className="orbit-research-topics">{source.research.map(topic => <li key={topic}>{topic}</li>)}</ul>}

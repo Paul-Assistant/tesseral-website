@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import './integration-request.css'
+import { trackEvent } from '@/lib/analytics'
 
-function WaitlistDialog({ close }: { close: () => void }) {
+function WaitlistDialog({ close, source }: { close: () => void; source: string }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [error, setError] = useState('')
@@ -25,7 +26,9 @@ function WaitlistDialog({ close }: { close: () => void }) {
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'We couldn’t save your email. Please try again.')
       setState('sent')
+      trackEvent('generate_lead', { method: 'waitlist', source })
     } catch (cause) {
+      trackEvent('waitlist_error', { source })
       setError(cause instanceof Error && cause.name !== 'TimeoutError' ? cause.message : 'The request timed out. Please try again.')
       setState('error')
     }
@@ -47,5 +50,6 @@ function WaitlistDialog({ close }: { close: () => void }) {
 
 export default function WaitlistButton({ children, className }: { children: React.ReactNode; className: string }) {
   const [open, setOpen] = useState(false)
-  return <><button type="button" className={`${className} waitlist-trigger`} onClick={() => setOpen(true)} aria-haspopup="dialog">{children}</button>{open && <WaitlistDialog close={() => setOpen(false)} />}</>
+  const [source, setSource] = useState('unknown')
+  return <><button type="button" className={`${className} waitlist-trigger`} onClick={event => { const origin = event.currentTarget.closest('section,footer,header')?.id || 'header'; setSource(origin); trackEvent('waitlist_open', { source: origin }); setOpen(true) }} aria-haspopup="dialog">{children}</button>{open && <WaitlistDialog source={source} close={() => setOpen(false)} />}</>
 }

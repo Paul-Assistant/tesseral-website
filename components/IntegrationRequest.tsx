@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import './integration-request.css'
+import { trackEvent } from '@/lib/analytics'
 
 function RequestDialog({ close }: { close: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null)
@@ -13,7 +14,7 @@ function RequestDialog({ close }: { close: () => void }) {
     const overflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     dialog.current?.showModal()
-    return () => { document.body.style.overflow = overflow; previous?.focus() }
+    return () => { document.body.style.overflow = overflow; previous?.focus({ preventScroll: true }) }
   }, [])
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -25,7 +26,9 @@ function RequestDialog({ close }: { close: () => void }) {
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'Your request could not be sent. Please try again.')
       setState('sent')
+      trackEvent('integration_request')
     } catch (cause) {
+      trackEvent('integration_error')
       setError(cause instanceof Error && cause.name !== 'TimeoutError' ? cause.message : 'The request timed out. Please try again.')
       setState('error')
     }
@@ -49,5 +52,5 @@ function RequestDialog({ close }: { close: () => void }) {
 
 export default function IntegrationRequest() {
   const [open, setOpen] = useState(false)
-  return <><button type="button" className="integration-request" onClick={() => setOpen(true)} aria-haspopup="dialog"><span>Request an integration</span><img src="/problem/card-icon.svg" width="40" height="40" alt="" /></button>{open && <RequestDialog close={() => setOpen(false)} />}</>
+  return <><button type="button" className="integration-request" onClick={() => { trackEvent('integration_open'); setOpen(true) }} aria-haspopup="dialog"><span>Request an integration</span><img src="/problem/card-icon.svg" width="40" height="40" alt="" /></button>{open && <RequestDialog close={() => setOpen(false)} />}</>
 }

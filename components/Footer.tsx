@@ -1,6 +1,7 @@
 'use client'
 
 import WaitlistButton from './WaitlistButton'
+import { CookieSettingsButton } from './SiteAnalytics'
 
 import { useEffect, useRef, useState } from 'react'
 import './footer.css'
@@ -43,5 +44,6 @@ export default function Footer() {
       <span className="footer-credit__label">Made by</span>
       <a href="https://garcy.studio/" aria-label="Garcy Studio"><img src="/footer/garcy-studio.svg" width="89" height="16" alt="Garcy Studio" /></a>
     </div>
+    <div className="footer-legal"><a href="/privacy">Privacy</a><CookieSettingsButton /></div>
   </footer>
 }

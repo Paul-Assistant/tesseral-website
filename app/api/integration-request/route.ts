@@ -14,9 +14,19 @@ export async function POST(request: Request) {
   const message = typeof data.message === 'string' ? data.message.trim() : ''
   if (!name || name.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || !message || message.length > 4000) return Response.json({ error: 'Please enter your name, a valid email, and a message of up to 4,000 characters.' }, { status: 400 })
   const endpoint = process.env.INTEGRATION_REQUEST_WEBHOOK_URL
-  if (!endpoint) return Response.json({ error: 'Requests are temporarily unavailable. Please try again later.' }, { status: 503 })
+  const resendKey = process.env.RESEND_API_KEY
+  const recipient = process.env.INTEGRATION_REQUEST_TO
+  if (!endpoint && (!resendKey || !recipient)) return Response.json({ error: 'Requests are temporarily unavailable. Please try again later.' }, { status: 503 })
   try {
-    const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, message, source: 'tesseral-website', type: 'integration-request' }), signal: AbortSignal.timeout(10000) })
+    const response = await fetch(endpoint || 'https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(!endpoint ? { Authorization: `Bearer ${resendKey}` } : {}) },
+      body: JSON.stringify(endpoint ? { name, email, message, source: 'tesseral-website', type: 'integration-request' } : {
+        from: 'Tesseral <hello@tesseral.design>', to: [recipient], reply_to: email,
+        subject: 'Tesseral integration request', text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+      }),
+      signal: AbortSignal.timeout(10000),
+    })
     if (!response.ok) throw new Error('Delivery failed')
     return Response.json({ ok: true })
   } catch { return Response.json({ error: 'Your request could not be sent. Please try again.' }, { status: 502 }) }

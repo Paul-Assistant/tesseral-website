@@ -21,7 +21,7 @@
 .price-reel > span { height: 1em; flex: 0 0 1em; }
 @keyframes price-roll { from { transform: translateY(calc(var(--digit) * -1em)); } to { transform: translateY(calc((var(--digit) + 10) * -1em)); } }
 .pricing-total { font: 9px var(--font-mono), monospace; text-align: right; color: #645f52; margin: 10px 0 16px; }
-.pricing-subscribe { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 4px; border-radius: 12px; background: #201e18; color: white; text-decoration: none; font-size: 9px; text-transform: uppercase; }
+.pricing-subscribe { display: flex; width: 100%; align-items: center; justify-content: flex-end; gap: 12px; padding: 4px; border-radius: 12px; background: #201e18; color: white; text-decoration: none; font-size: 9px; text-transform: uppercase; }
 .pricing-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .billing-switch button:focus-visible, .pricing-subscribe:focus-visible { outline: 2px solid #201e18; outline-offset: 5px; }
 @media(max-width: 1000px) { .pricing-card { padding: 24px 18px; }.pricing-audience { font-size: 10px; } }

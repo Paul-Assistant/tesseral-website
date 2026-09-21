@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react'
+import { trackEvent } from '@/lib/analytics'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 type Navigation = { current: { cancel?: () => void } }
@@ -9,6 +10,7 @@ export function navigateToSection(event: MouseEvent<HTMLAnchorElement>, id: stri
   const target = document.getElementById(id)
   if (!target) return
   event.preventDefault()
+  trackEvent('navigation_click', { section: id })
   navigation.current.cancel?.()
   const destination = () => Math.max(0, window.scrollY + target.getBoundingClientRect().top - (parseFloat(getComputedStyle(target).scrollMarginTop) || 0))
   const jump = () => {

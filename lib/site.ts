@@ -7,7 +7,7 @@ export const siteDescription = 'Connect files, links, and brand knowledge in one
 export const siteSchema = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Organization', '@id': `${siteUrl}/#organization`, name: 'Tesseral', url: siteUrl, logo: `${siteUrl}/icon.png` },
+    { '@type': 'Organization', '@id': `${siteUrl}/#organization`, name: 'Tesseral', url: siteUrl, logo: `${siteUrl}/icon.png`, parentOrganization: { '@type': 'Organization', name: 'Garcy s.r.o.', address: { '@type': 'PostalAddress', addressCountry: 'CZ' } } },
     { '@type': 'WebSite', '@id': `${siteUrl}/#website`, name: 'Tesseral', url: siteUrl, inLanguage: 'en', publisher: { '@id': `${siteUrl}/#organization` } },
     { '@type': 'WebPage', '@id': `${siteUrl}/#webpage`, url: siteUrl, name: siteTitle, description: siteDescription, inLanguage: 'en', isPartOf: { '@id': `${siteUrl}/#website` }, about: { '@id': `${siteUrl}/#software` }, primaryImageOfPage: { '@type': 'ImageObject', url: `${siteUrl}/social-preview.jpg`, width: 1600, height: 934 } },
     { '@type': 'SoftwareApplication', '@id': `${siteUrl}/#software`, name: 'Tesseral', url: siteUrl, applicationCategory: 'BusinessApplication', operatingSystem: 'Web browser', description: siteDescription, publisher: { '@id': `${siteUrl}/#organization` }, featureList: ['Shared client and brand knowledge from files and links', 'Questions, brainstorming, pitches and presentations', 'Shared prompt library for images, video and copy', 'MCP connection for AI agents', 'Synced sources with manual refresh', 'Client collaboration for studios, agencies, freelancers and brands'] },

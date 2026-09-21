@@ -1,6 +1,7 @@
 'use client'
 
 import WaitlistButton from './WaitlistButton'
+import { trackEvent } from '@/lib/analytics'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import gsap from 'gsap'
@@ -41,7 +42,7 @@ export default function Pricing() {
     })
     return () => mm.revert()
   }, [])
-  const selectBilling = (next: typeof billing) => { if (next !== billing) { setBilling(next); setRevision(value => value + 1) } }
+  const selectBilling = (next: typeof billing) => { if (next !== billing) { trackEvent('billing_change', { billing: next }); setBilling(next); setRevision(value => value + 1) } }
   return <section id="pricing" className="pricing" ref={root} aria-labelledby="pricing-title">
     <h2 id="pricing-title">Choose the space your work needs.</h2>
     <p className="pricing-intro">Start with your projects and team. Choose the plan that fits how you work.</p>
