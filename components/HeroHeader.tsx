@@ -1,6 +1,7 @@
 'use client'
 
 import WaitlistButton from './WaitlistButton'
+import HeroOrbit from './HeroOrbit'
 
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
@@ -161,7 +162,8 @@ export default function HeroHeader() {
       <ActionButton compact>Get started</ActionButton>
     </header>
     <section className="hero" ref={root} id="home" aria-label="Tesseral introduction">
-    <div className="hero-content">
+    <div className="hero-content hero-content--orbit">
+    <div className="hero-copy">
       <div className="hero-title-area">
         <h1 className="hero-heading" aria-label="Everything you know about your clients. Ready to work with.">
           <span className="hero-heading-reveal" aria-hidden="true">
@@ -177,6 +179,8 @@ export default function HeroHeader() {
       </div>
       <p className="hero-description">Bring your files, links, and brand assets into one shared brain that stays up to date.<br />Ask questions, explore ideas, and create with the context your team needs.</p>
       <div className="hero-actions"><ActionButton>Create your Tesseral</ActionButton><a className="hero-secondary" href="#how-it-works" onClick={event => navigateToSection(event, 'how-it-works', navigationFrame)}><span className="hero-secondary__fill" aria-hidden="true" /><span className="hero-secondary__label">How it works</span><span className="hero-secondary__icon"><img src="/header/question.svg" width="16" height="15" alt="" /></span></a></div>
+    </div>
+    <HeroOrbit />
     </div>
   </section>
   </>

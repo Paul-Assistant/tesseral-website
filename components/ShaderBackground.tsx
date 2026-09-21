@@ -141,6 +141,7 @@ export default function ShaderBackground() {
     window.addEventListener('mousemove', onMove)
 
     // Render loop
+    let heroVisible = true
     let raf = 0
     const start = performance.now()
     let lastFrame = 0
@@ -160,18 +161,26 @@ export default function ShaderBackground() {
       gl.uniform1f(uTime, t)
       gl.uniform2f(uMouse, smx, smy)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
-      if (!reducedMotion) raf = requestAnimationFrame(render)
+      if (!reducedMotion && !heroVisible) raf = requestAnimationFrame(render)
     }
     render(100)
     const visibility = () => {
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(render)
     }
+    // The orbit owns the hero motion; keep its atmospheric background still.
+    const heroObserver = new IntersectionObserver(([entry]) => {
+      heroVisible = entry.isIntersecting
+      visibility()
+    })
+    const hero = document.getElementById('home')
+    if (hero) heroObserver.observe(hero)
     document.addEventListener('visibilitychange', visibility)
     window.addEventListener('journey-visibility', visibility)
 
     return () => {
       cancelAnimationFrame(raf)
+      heroObserver.disconnect()
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', onMove)
       document.removeEventListener('visibilitychange', visibility)

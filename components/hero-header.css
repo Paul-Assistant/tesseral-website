@@ -83,3 +83,20 @@
  .hero-heading { will-change:auto; transform:none !important; }
  .hero-menu { touch-action:pan-y pinch-zoom; }
 }
+
+/* Product sources orbit beside the message, then stack beneath it on mobile. */
+.hero-content--orbit { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:12px; width:min(1440px,100%); margin:auto; padding:36px 40px 64px; }
+.hero-copy { display:flex; flex-direction:column; align-items:center; gap:32px; min-width:0; }
+.hero-content--orbit .hero-title-area { width:100%; }
+.hero-content--orbit .hero-heading { font-size:clamp(32px,3.5vw,52px); letter-spacing:-.04em; transform:none !important; }
+.hero-content--orbit .hero-spray { width:100%; left:0; height:auto; aspect-ratio:590/163; bottom:-30px; opacity:.55; }
+.hero-content--orbit .hero-description { max-width:490px; }
+@media(min-width:768px) and (max-width:1050px) { .hero-content--orbit { padding-inline:24px; }.hero-content--orbit .hero-heading { font-size:clamp(26px,3.1vw,32px); }.hero-copy { gap:26px; }.hero-content--orbit .hero-actions { gap:12px; } }
+@media(max-width:767px) {
+ .hero-content--orbit { display:flex; padding:44px 16px 112px; gap:24px; }
+ .hero-copy { gap:26px; width:100%; }
+ .hero-content--orbit .hero-heading { font-size:clamp(27px,7.4vw,44px); }
+ .hero-content--orbit .hero-description { padding-inline:4px; max-width:390px; }
+ .hero-content--orbit .hero-actions { gap:12px; }
+ .hero-content--orbit .hero-spray { bottom:-24px; }
+}
