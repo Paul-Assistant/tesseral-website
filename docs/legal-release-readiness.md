@@ -1,12 +1,12 @@
-# Service legal release — 27 September 2026
+# Service legal release — 28 September 2026
 
 ## Prepared
 
-Draft routes `/terms` and `/privacy` cover the website and app. `lib/legal.ts` contains the text; `legalReviewPending` is true. Draft pages are visibly labelled and noindex. Staging only: do not publish these drafts as effective policies yet.
+The owner explicitly authorised publication on 28 September 2026. Routes `/terms` and `/privacy` cover the website and app. The review flag is removed, and both pages use that effective date. Exa query-training practices are now disclosed explicitly instead of asserting unverified provider-wide no-training.
 
 Owner-confirmed: This is Garcy s.r.o.; Na Usedlosti 1837/10, Prague 4, Czech Republic; VAT CZ07826800. ARES confirmed full name, IČO 07826800 and postal code 147 00. Consumers and businesses may subscribe. 14-day refunds (draft uses initial purchase, matching the question asked); paid access until period end, then 30 days for export; explicit account/project deletion within 30 days with legally required billing records retained separately. Customer content must not train general-purpose AI models. Support/privacy: loren@garcy.studio.
 
-## Required before effective publication
+## Outstanding app and provider work (publication does not complete these)
 
 - Verify Exa account agreement. Its standard privacy policy says query data may train models powering Exa, while separately contracted business processing is governed by that agreement. Current research code sends company names, research queries and URLs. Do not conflate an enterprise zero-retention offer with a contract the account actually has.
 - Verify Anthropic organisation has not opted into training/Development Partner Program and that customer content is not submitted as training feedback. Commercial API documentation provides no-training by default but has opt-in exceptions. Retention is separate from training.
@@ -16,7 +16,7 @@ Owner-confirmed: This is Garcy s.r.o.; Na Usedlosti 1837/10, Prague 4, Czech Rep
 - App signup should link dated Terms and Privacy, record Terms acceptance, preserve separate optional analytics consent and provide refund/withdrawal information. Do not treat a privacy notice as blanket consent to all processing.
 - Replace Stripe's legacy legal URLs with https://tesseral.design/terms and https://tesseral.design/privacy only after publication. Dashboard notes still identify unrelated legacy URLs.
 - Set website integration request recipient `INTEGRATION_REQUEST_TO` to loren@garcy.studio in Production and the existing branch preview; do not broaden credential scopes. No email has been sent to Loren during this work.
-- Once resolved, remove draft flag, review final wording/effective date, add `/terms` to production sitemap and update its test, build, deploy and verify both URLs plus footer/app links. Current production remains unchanged.
+- Once resolved, remove draft flag, review final wording/effective date, add `/terms` to production sitemap and update its test, build, deploy and verify both URLs plus footer/app links. Do not treat page publication as verification of these app workflows.
 
 ## Sources checked
 
