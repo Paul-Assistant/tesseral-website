@@ -9,3 +9,6 @@
 html {
   scroll-behavior: auto;
 }
+
+/* Shared headline tracking: −4% at every responsive font size. */
+h1, h2, h3, h4, h5, h6 { letter-spacing: -.04em; }

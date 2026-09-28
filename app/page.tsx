@@ -1,16 +1,9 @@
-'use client'
-
-import dynamic from 'next/dynamic'
-
-const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), { ssr: false })
+import HomeExperience from '@/components/HomeExperience'
+import { siteSchema } from '@/lib/site'
 
 export default function Home() {
-  return (
-    <>
-      <ShaderBackground />
-      <main style={{ position: 'relative', zIndex: 1 }}>
-        {/* sections go here */}
-      </main>
-    </>
-  )
+  return <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema).replace(/</g, '\\u003c') }} />
+    <HomeExperience />
+  </>
 }
