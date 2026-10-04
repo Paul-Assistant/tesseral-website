@@ -19,7 +19,7 @@ function CreditInfo({ credits, plan }: { credits: number; plan: string }) {
   const id = `credits-${plan.toLowerCase()}`
   return <span className="credit-info" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
     <button type="button" className="credit-info-button" aria-label={`About ${plan} credits`} aria-expanded={open} aria-describedby={open ? id : undefined} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)} onClick={() => setOpen(true)} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); setOpen(false) } }}>i</button>
-    {open && <span id={id} className="credit-tooltip" role="tooltip">For example, {credits.toLocaleString('en-US')} credits is enough for {(credits / 2).toLocaleString('en-US')} chat messages and {credits / 20} Tesseral generations.</span>}
+    {open && <span id={id} className="credit-tooltip" role="tooltip">For example, {credits.toLocaleString('en-US')} credits can cover {Math.floor(credits / 10).toLocaleString('en-US')} standard chat messages and {Math.floor(credits / 200)} standard Tesseral generations. Chat starts at 5 credits; standard generation costs 100. Larger requests and extra actions cost more, with a quote before you begin.</span>}
   </span>
 }
 
