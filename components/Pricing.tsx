@@ -9,9 +9,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './pricing.css'
 
 const PLANS = [
-  { name: 'Starter', audience: 'For your brand or a few clients', monthly: 49, yearly: 39, features: [['Projects', '3 included'], ['Seats', '3 included'], ['Credits', '500'], ['Extra project', '+$9/mo'], ['Extra seat', '+$9/mo'], ['MCP/API', true], ['Client invite', false]] },
-  { name: 'Studio', audience: 'For teams working across clients', monthly: 129, yearly: 103, features: [['Projects', '10 included'], ['Seats', '10 included'], ['Credits', '2000'], ['Extra project', '+$9/mo'], ['Extra seat', '+$9/mo'], ['MCP/API', true], ['Client invite', true]] },
-  { name: 'Agency', audience: 'For more clients and bigger teams', monthly: 349, yearly: 279, features: [['Projects', 'Unlimited'], ['Seats', 'Unlimited'], ['Credits', '6000'], ['MCP/API', true], ['Client invite', true], ['Priority support', true], ['Demo call', true]] },
+  { name: 'Starter', audience: 'For your brand or a few clients', monthly: 44, yearly: 35, annual: 420, features: [['Projects', '3 included'], ['Seats', '3 included'], ['Credits', '500'], ['MCP/API', true], ['Client invite', false]] },
+  { name: 'Studio', audience: 'For teams working across clients', monthly: 115, yearly: 92, annual: 1104, features: [['Projects', '10 included'], ['Seats', '10 included'], ['Credits', '2000'], ['MCP/API', true], ['Client invite', true]] },
+  { name: 'Agency', audience: 'For more clients and bigger teams', monthly: 309, yearly: 247, annual: 2964, features: [['Projects', 'Unlimited'], ['Seats', 'Unlimited'], ['Credits', '6000'], ['MCP/API', true], ['Client invite', true], ['Priority support', true], ['Demo call', true]] },
 ] as const
 
 function CreditInfo({ credits, plan }: { credits: number; plan: string }) {
@@ -24,7 +24,7 @@ function CreditInfo({ credits, plan }: { credits: number; plan: string }) {
 }
 
 function RollingPrice({ value, revision }: { value: number; revision: number }) {
-  return <span className="price-digits" aria-hidden="true"><span>$</span>{String(value).split('').map((digit, index) => <span className="price-digit" key={index}>
+  return <span className="price-digits" aria-hidden="true"><span>€</span>{String(value).split('').map((digit, index) => <span className="price-digit" key={index}>
     <span className="price-reel" key={`${revision}-${digit}`} style={{ '--digit': Number(digit), '--delay': `${index * 35}ms` } as CSSProperties}>{Array.from({ length: 20 }, (_, n) => <span key={n}>{n % 10}</span>)}</span>
   </span>)}</span>
 }
@@ -57,10 +57,15 @@ export default function Pricing() {
       <ul className="pricing-features">{plan.features.map(([label, value]) => <li key={label}><span className="pricing-feature-label">{label}{label === 'Credits' && <CreditInfo credits={Number(value)} plan={plan.name} />}</span>{typeof value === 'boolean' ? <img src={`/pricing/${value ? 'included' : 'excluded'}.svg`} width="12" height="12" alt={value ? 'Included' : 'Not included'} /> : <strong>{value}</strong>}</li>)}</ul>
       <div className="pricing-amount" aria-live="polite" aria-atomic="true">
         <span className="pricing-discount">{billing === 'yearly' ? '20% OFF' : 'Monthly'}</span>
-        <span className="pricing-value"><span className="pricing-sr">${plan[billing]} per month, billed {billing}</span><RollingPrice value={plan[billing]} revision={revision} /><span aria-hidden="true">/mo</span></span>
+        <span className="pricing-value"><span className="pricing-sr">€{plan[billing]} per month, billed {billing}</span><RollingPrice value={plan[billing]} revision={revision} /><span aria-hidden="true">/mo</span></span>
       </div>
-      <p className="pricing-total">{billing === 'yearly' ? `$${(plan.yearly * 12).toLocaleString('en-US')} billed yearly` : `$${plan.monthly} billed monthly`}</p>
+      <p className="pricing-total">{billing === 'yearly' ? `€${plan.annual.toLocaleString('en-US')} billed yearly` : `€${plan.monthly} billed monthly`}</p>
       <WaitlistButton className="pricing-subscribe"><span>Choose {plan.name}</span><img src={`/pricing/${plan.name.toLowerCase()}.svg`} width="40" height="40" alt="" /></WaitlistButton>
     </article>)}</div>
+    <div className="pricing-credit-packs" aria-label="Additional credit packs">
+      <h3>Need more credits?</h3>
+      <p>One-time credit packs to keep your work moving.</p>
+      <ul>{[{ credits: 500, price: 9 }, { credits: 1500, price: 22 }, { credits: 4000, price: 45 }].map(pack => <li key={pack.credits}><span>{pack.credits.toLocaleString('en-US')} credits</span><strong>€{pack.price}</strong></li>)}</ul>
+    </div>
   </section>
 }
