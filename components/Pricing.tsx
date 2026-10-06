@@ -62,10 +62,5 @@ export default function Pricing() {
       <p className="pricing-total">{billing === 'yearly' ? `€${plan.annual.toLocaleString('en-US')} billed yearly` : `€${plan.monthly} billed monthly`}</p>
       <WaitlistButton className="pricing-subscribe"><span>Choose {plan.name}</span><img src={`/pricing/${plan.name.toLowerCase()}.svg`} width="40" height="40" alt="" /></WaitlistButton>
     </article>)}</div>
-    <div className="pricing-credit-packs" aria-label="Additional credit packs">
-      <h3>Need more credits?</h3>
-      <p>One-time credit packs to keep your work moving.</p>
-      <ul>{[{ credits: 500, price: 9 }, { credits: 1500, price: 22 }, { credits: 4000, price: 45 }].map(pack => <li key={pack.credits}><span>{pack.credits.toLocaleString('en-US')} credits</span><strong>€{pack.price}</strong></li>)}</ul>
-    </div>
   </section>
 }
