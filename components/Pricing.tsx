@@ -1,6 +1,5 @@
 'use client'
 
-import WaitlistButton from './WaitlistButton'
 import { trackEvent } from '@/lib/analytics'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
@@ -60,7 +59,7 @@ export default function Pricing() {
         <span className="pricing-value"><span className="pricing-sr">€{plan[billing]} per month, billed {billing}</span><RollingPrice value={plan[billing]} revision={revision} /><span aria-hidden="true">/mo</span></span>
       </div>
       <p className="pricing-total">{billing === 'yearly' ? `€${(plan.yearly * 12).toLocaleString('en-US')} billed yearly` : `€${plan.monthly} billed monthly`}</p>
-      <WaitlistButton className="pricing-subscribe"><span>Choose {plan.name}</span><img src={`/pricing/${plan.name.toLowerCase()}.svg`} width="40" height="40" alt="" /></WaitlistButton>
+      <a href="https://app.tesseral.design" className="pricing-subscribe"><span>Choose {plan.name}</span><img src={`/pricing/${plan.name.toLowerCase()}.svg`} width="40" height="40" alt="" /></a>
     </article>)}</div>
   </section>
 }

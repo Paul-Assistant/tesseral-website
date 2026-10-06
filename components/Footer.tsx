@@ -1,6 +1,5 @@
 'use client'
 
-import WaitlistButton from './WaitlistButton'
 import { CookieSettingsButton } from './SiteAnalytics'
 
 import { useEffect, useRef, useState } from 'react'
@@ -36,9 +35,9 @@ export default function Footer() {
       muted playsInline loop preload="none" poster="/footer/poster.webp" aria-hidden="true"
       onError={() => setFailed(true)}
       onPlaying={() => setReady(true)} />
-    <WaitlistButton className="footer-cta">
+    <a href="https://app.tesseral.design" className="footer-cta">
       <span>Create your Tesseral</span><img src="/footer/plus.svg" width="66" height="66" alt="" />
-    </WaitlistButton>
+    </a>
     <div className="footer-credit">
       <a href="#home" aria-label="Tesseral — back to top"><img src="/header/logo.webp" width="28" height="28" alt="" /><img src="/footer/wordmark.svg" width="54" height="13" alt="Tesseral" /></a>
       <span className="footer-credit__label">Made by</span>

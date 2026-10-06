@@ -1,6 +1,5 @@
 'use client'
 
-import WaitlistButton from './WaitlistButton'
 import HeroOrbit from './HeroOrbit'
 
 import { useEffect, useRef, useState } from 'react'
@@ -18,11 +17,11 @@ const SECTIONS = [
 ]
 
 function ActionButton({ children, compact = false }: { children: React.ReactNode; compact?: boolean }) {
-  return <WaitlistButton className={`hero-button${compact ? ' hero-button--compact' : ''}`}>
+  return <a href="https://app.tesseral.design" className={`hero-button${compact ? ' hero-button--compact' : ''}`}>
     <span className="hero-button__fill" aria-hidden="true" />
     <span className="hero-button__label">{children}</span>
     <img className="hero-button__icon" src="/header/button.svg" width="40" height="40" alt="" />
-  </WaitlistButton>
+  </a>
 }
 
 export default function HeroHeader() {
