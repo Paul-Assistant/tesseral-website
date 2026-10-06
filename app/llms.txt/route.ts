@@ -7,7 +7,7 @@ export function GET() {
 
 > ${siteDescription}
 
-Tesseral is a shared knowledge workspace for studios, freelancers, agencies, and brands. Public access is currently offered through a launch notification signup, not immediate account creation.
+Tesseral is a shared knowledge workspace for studios, freelancers, agencies, and brands. Accounts are available at https://app.tesseral.design. New workspaces require email verification and checkout; invited users join their shared workspace or project without buying a plan.
 
 ## Product
 
@@ -20,8 +20,8 @@ Tesseral is a shared knowledge workspace for studios, freelancers, agencies, and
 
 The prompt library gives teams a shared starting point for images, video, and copy. MCP connects AI agents to current project knowledge, reducing repeated briefing and manual context copying.
 
-## Launch
+## Get started
 
-[Join the launch notification list](${siteUrl}/): Use any Get started, Create your Tesseral, or plan selection button to open the email signup form.
+[Open Tesseral](https://app.tesseral.design): Sign in or create an account. Website Get started, Create your Tesseral, and plan selection buttons open the app.
 `, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
 }
