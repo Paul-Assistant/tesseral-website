@@ -34,3 +34,5 @@
 .horizon-glow{background:#95999c26}
 .horizon{background:#060708;box-shadow:0 -3px 10px #c6ff1b30,0 -18px 45px #c6ff1b0d}
 .cosmos:after{opacity:.18}
+/* Broader atmospheric rim on the large background sphere. */
+.planet-edge{box-shadow:-3px -4px 14px #e7ede373,-20px -28px 65px #c6ff1b30,-45px -55px 145px #aeb9a332,inset 16px 22px 52px #c3d6a51a}
