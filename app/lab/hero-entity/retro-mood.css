@@ -36,3 +36,7 @@
 .entity-playground[data-mood=observatory] .retro-orb{filter:blur(17px);box-shadow:0 -20px 65px #dfdfcd60,0 -60px 160px #b5b8ac40,0 -100px 240px #b5b8ac18}
 .entity-playground[data-mood=observatory] .retro-land{filter:blur(10px);box-shadow:0 -14px 55px #85898128}
 .sphere-particles{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mix-blend-mode:screen;filter:blur(.2px)}
+/* Thin optical streak, with a restrained surrounding bloom. */
+.prism-halo{width:840px;height:190px;left:-420px;top:-95px;filter:blur(26px)}
+.prism-streak{width:850px;height:20px;left:-425px;top:-10px;filter:blur(6px)}
+.prism-core{width:170px;height:32px;left:-85px;top:-16px;filter:blur(7px)}
