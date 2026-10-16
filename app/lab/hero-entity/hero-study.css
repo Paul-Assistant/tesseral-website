@@ -57,3 +57,8 @@
 @keyframes brief-iridescence{from{transform:translate(-8%,-10%) rotate(-15deg)}to{transform:translate(12%,15%) rotate(28deg)}}
 @media(prefers-reduced-motion:reduce){.magnetic-file::before,.magnetic-file::after{animation:none}.magnetic-file,.magnetic-file::before{transition:none}}
 .planet-edge{background:radial-gradient(ellipse at 10% 3%,#0d1011,#030506 52%)}
+/* Broader, more diffuse rim light within a darker overall exposure. */
+.entity-playground .cosmos{filter:brightness(.78)}
+.planet-edge{filter:blur(30px);box-shadow:-8px -12px 38px #f1ffd980,-38px -55px 135px #c6ff1b66,-85px -120px 250px #c6ff1b40,-145px -185px 360px #c6ff1b1c,inset 24px 36px 90px #deefb41c}
+.orbit-light{filter:blur(23px);box-shadow:0 9px 25px #e2e4e12e,0 22px 60px #b5b9bd32,0 50px 120px #74787b1c,inset 0 -38px 95px #a3a6a920}
+.horizon{filter:blur(21px);box-shadow:0 -7px 24px #c5c9cc28,0 -30px 80px #aab0b514}

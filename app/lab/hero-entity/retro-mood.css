@@ -30,3 +30,8 @@
 .prism-halo{width:840px;height:460px;left:-420px;top:-230px;filter:blur(32px)}
 .prism-streak{width:850px;height:70px;left:-425px;top:-35px;filter:blur(14px)}
 .prism-core{width:170px;height:90px;left:-85px;top:-45px;filter:blur(11px)}
+.entity-playground[data-mood=observatory]{background:#111416}
+.entity-playground[data-mood=observatory] .cosmos{filter:grayscale(1) brightness(.75)}
+.entity-playground[data-mood=observatory] .retro-world{filter:grayscale(1) brightness(.82)}
+.entity-playground[data-mood=observatory] .retro-orb{filter:blur(17px);box-shadow:0 -20px 65px #dfdfcd60,0 -60px 160px #b5b8ac40,0 -100px 240px #b5b8ac18}
+.entity-playground[data-mood=observatory] .retro-land{filter:blur(10px);box-shadow:0 -14px 55px #85898128}
