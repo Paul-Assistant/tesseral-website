@@ -40,3 +40,9 @@
 .prism-halo{width:840px;height:190px;left:-420px;top:-95px;filter:blur(26px)}
 .prism-streak{width:850px;height:20px;left:-425px;top:-10px;filter:blur(6px)}
 .prism-core{width:170px;height:32px;left:-85px;top:-16px;filter:blur(7px)}
+.rim-prism{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;mix-blend-mode:screen;overflow:visible;opacity:0}
+.rim-prism path{fill:none;stroke:url(#rim-prism-colour);stroke-linecap:round;stroke-linejoin:round}
+.rim-prism-halo{stroke-width:48px;filter:blur(20px);opacity:.65}
+.rim-prism-light{stroke-width:15px;filter:blur(8px)}
+.rim-prism-core{stroke-width:4px;filter:blur(3px)}
+@media(prefers-reduced-motion:reduce){.rim-prism{display:none}}

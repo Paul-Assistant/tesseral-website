@@ -11,7 +11,6 @@ import './hero-study.css'
 
 const palette = ['#7B7B7B', '#C6FF1B', '#E9ECE6']
 export default function HeroStudy(){
- const [mood,setMood]=useState('observatory')
  const root=useRef<HTMLElement>(null),file=useRef<HTMLButtonElement>(null),stage=useRef<HTMLDivElement>(null)
  const interaction=useRef<EntityInteraction>({x:0,y:0,strength:0,burst:0,morph:0})
  const drag=useRef({held:false,x:0,y:0,ox:0,oy:0,startX:0,startY:0,absorbing:0,fromX:0,fromY:0,done:false,shrink:1})
@@ -56,8 +55,8 @@ export default function HeroStudy(){
  const release=()=>{const d=drag.current;if(!d.held)return;d.held=false;const b=stage.current!.getBoundingClientRect(),r=root.current!.getBoundingClientRect();const dist=Math.hypot(d.x-(b.left-r.left+b.width/2),d.y-(b.top-r.top+b.height/2));if(dist<Math.min(b.width,b.height)*.34){d.absorbing=performance.now();d.fromX=d.x;d.fromY=d.y;setStatus('Making a connection…')}else setStatus('Bring the file closer.')}
  useEffect(()=>{window.addEventListener('pointerup',release);window.addEventListener('mouseup',release);return()=>{window.removeEventListener('pointerup',release);window.removeEventListener('mouseup',release)}},[])
  const reset=()=>{drag.current.done=false;drag.current.absorbing=0;const b=root.current!.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.24:.19);drag.current.y=b.height*(b.width<650?.77:.56);file.current!.style.opacity='1';drag.current.shrink=1;setDone(false);setStatus('Bring the file closer.')}
- return <main ref={root} className="entity-playground" data-mood={mood}>
-  <RetroMood mood={mood} onMood={setMood}/>
+ return <main ref={root} className="entity-playground" data-mood="observatory">
+  <RetroMood/>
   <div className="cosmos" aria-hidden="true"><div className="cosmos-motion"><div className="solar-veil"/><div className="orbit-light"/><div className="planet-edge"/><div className="horizon-glow"/><div className="horizon"/></div><div className="entity-atmosphere"/></div>
   <svg className="cosmic-grain" width="100%" height="100%" aria-hidden="true"><filter id="cosmic-noise"><feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#cosmic-noise)"/></svg>
   <SphereParticles/><PrismFlare/><ButtonStudies/><CosmicDust/><ParticleShockwave interaction={interaction}/>

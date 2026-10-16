@@ -1,7 +1,7 @@
 'use client'
 import {useEffect,useRef} from 'react'
 export default function PrismFlare(){
- const ref=useRef<HTMLDivElement>(null)
+ const ref=useRef<SVGSVGElement>(null)
  useEffect(()=>{
   const el=ref.current!,root=el.closest('main')!,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
   if(reduced)return
@@ -28,7 +28,11 @@ export default function PrismFlare(){
     const x=cx+lx*Math.cos(a)-ly*Math.sin(a),y=cy+lx*Math.sin(a)+ly*Math.cos(a)
     if(x<r.left+30||x>r.right-30||y<r.top+90||y>r.bottom-40)continue
     if(Math.hypot(event.clientX-x,event.clientY-y)>95)continue
-    el.style.transform=`translate3d(${x-r.left}px,${y-r.top}px,0)`
+    el.setAttribute('viewBox',`0 0 ${r.width} ${r.height}`)
+    const span=Math.min(.32,330/rx),points=Array.from({length:65},(_,i)=>{const t=theta-span+2*span*i/64,px=Math.cos(t)*rx,py=Math.sin(t)*ry;return `${cx+px*Math.cos(a)-py*Math.sin(a)-r.left},${cy+px*Math.sin(a)+py*Math.cos(a)-r.top}`})
+    el.querySelectorAll('path').forEach(path=>path.setAttribute('d','M'+points.join(' L')))
+    const ends=[points[0].split(','),points[64].split(',')],gradient=el.querySelector('linearGradient')!
+    gradient.setAttribute('x1',ends[0][0]);gradient.setAttribute('y1',ends[0][1]);gradient.setAttribute('x2',ends[1][0]);gradient.setAttribute('y2',ends[1][1])
     started=lastShot=now;segments=0;travel=0;segmentTravel=0;break
    }
   }
@@ -36,5 +40,5 @@ export default function PrismFlare(){
   root.addEventListener('pointermove',move);frame=requestAnimationFrame(draw)
   return()=>{root.removeEventListener('pointermove',move);cancelAnimationFrame(frame)}
  },[])
- return <div ref={ref} className="prism-flare" aria-hidden="true"><div className="prism-halo"/><div className="prism-streak"/><div className="prism-core"/></div>
+ return <svg ref={ref} className="rim-prism" aria-hidden="true"><defs><linearGradient id="rim-prism-colour" gradientUnits="userSpaceOnUse"><stop stopColor="#b6b4db" stopOpacity="0"/><stop offset=".22" stopColor="#c5c8dc" stopOpacity=".3"/><stop offset=".43" stopColor="#e9eac3" stopOpacity=".8"/><stop offset=".5" stopColor="#fffdeb"/><stop offset=".6" stopColor="#e1efb8" stopOpacity=".8"/><stop offset=".8" stopColor="#d0c4df" stopOpacity=".25"/><stop offset="1" stopColor="#d0c4df" stopOpacity="0"/></linearGradient></defs><path className="rim-prism-halo"/><path className="rim-prism-light"/><path className="rim-prism-core"/></svg>
 }
