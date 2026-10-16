@@ -9,7 +9,7 @@ import './hero-study.css'
 
 const palette = ['#7B7B7B', '#C6FF1B', '#E9ECE6']
 export default function HeroStudy(){
- const [mood,setMood]=useState('original')
+ const [mood,setMood]=useState('observatory')
  const root=useRef<HTMLElement>(null),file=useRef<HTMLButtonElement>(null),stage=useRef<HTMLDivElement>(null)
  const interaction=useRef<EntityInteraction>({x:0,y:0,strength:0,burst:0,morph:0})
  const drag=useRef({held:false,x:0,y:0,ox:0,oy:0,startX:0,startY:0,absorbing:0,fromX:0,fromY:0,done:false,shrink:1})

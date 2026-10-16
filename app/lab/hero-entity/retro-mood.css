@@ -6,3 +6,13 @@
 .entity-playground:not([data-mood=original]) .cosmic-grain{opacity:.76;mix-blend-mode:soft-light}.retro-observer{position:absolute;z-index:1;bottom:5%;right:14%;width:120px;pointer-events:none;transform:translate(calc(var(--mx)*-1.2),calc(var(--my)*-.55));filter:contrast(.85) sepia(.15);opacity:.85}.retro-observer svg{width:100%;display:block}
 @media(max-width:650px){.mood-panel{top:15px}.mood-options button{font-size:10px;padding:9px 4px}.mood-caption{font-size:9px;gap:10px}.retro-observer{right:5%;bottom:16%;width:80px}.retro-orb{width:140vw;height:140vw;left:35%;top:30%}.entity-playground[data-mood=observatory] .retro-orb{width:240vw;height:240vw}}
 @media(prefers-reduced-motion:reduce){.retro-world,.retro-world *,.mood-options button{transition:none}.retro-observer,.retro-stars,.retro-orb,.retro-ring,.retro-land,.retro-nebula{transform:none}}
+.photographic-sky{position:absolute;inset:-4%;width:108%;height:108%;transform:translate(calc(var(--mx)*.2),calc(var(--my)*.2));opacity:.85;filter:blur(.25px);z-index:3;mix-blend-mode:screen}
+.entity-playground[data-mood=observatory]{background:#171a1b}
+.entity-playground[data-mood=observatory] .retro-world{filter:grayscale(1)}
+.entity-playground[data-mood=observatory] .retro-orb{background:radial-gradient(ellipse at 30% 6%,#a1a59d88,#525a5866 24%,#22282b 60%);box-shadow:0 -12px 35px #dfdfcd60,0 -35px 100px #b5b8ac38;filter:blur(9px)}
+.entity-playground[data-mood=observatory] .retro-land{filter:blur(5px);background:linear-gradient(10deg,#111619,#393d3c);box-shadow:0 -8px 30px #85898126}
+.entity-playground[data-mood=observatory] .retro-nebula{width:65%;left:40%;background:radial-gradient(ellipse,#d2d5c532,transparent 68%);filter:blur(55px)}
+.entity-playground[data-mood=observatory] .cosmos{filter:grayscale(1);opacity:.3}
+.entity-playground[data-mood=observatory] .retro-print{background:radial-gradient(ellipse at 60% 35%,transparent 10%,#0b10112b 55%,#040708b3 100%);box-shadow:inset 0 0 180px #05070980;z-index:4}
+.entity-playground[data-mood=observatory] .cosmic-grain{opacity:.85}
+@media(prefers-reduced-motion:reduce){.photographic-sky{transform:none}}
