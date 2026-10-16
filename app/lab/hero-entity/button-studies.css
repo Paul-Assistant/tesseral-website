@@ -72,3 +72,10 @@
 .material-edge .material-reflection{padding:1.5px;box-shadow:none}
 
 @supports(backdrop-filter:url(#button-dispersion)){.material-edge{backdrop-filter:blur(7px) url(#button-dispersion) saturate(.75);-webkit-backdrop-filter:blur(7px) url(#button-dispersion) saturate(.75)}}
+.material-edge{background:linear-gradient(145deg,#e8edf04d,#dce7ef33)}
+.material-edge .material-cloud{opacity:.18}
+@supports(backdrop-filter:url(#button-dispersion)){.material-edge{backdrop-filter:url(#button-dispersion) blur(3.5px) saturate(1.4) hue-rotate(28deg);-webkit-backdrop-filter:url(#button-dispersion) blur(3.5px) saturate(1.4) hue-rotate(28deg)}}
+.material-icon{translate:var(--magnet-x,0px) var(--magnet-y,0px)}
+.material-icon::after{content:"";position:absolute;inset:-10px;border-radius:inherit;pointer-events:none;opacity:var(--proximity,0);background:conic-gradient(from calc(var(--magnet-angle,0rad) + 90deg),transparent 0deg,#d5ddff 50deg,#efffe0 85deg,transparent 120deg);filter:blur(10px);z-index:-1}
+.material-icon .material-rim{filter:brightness(calc(1 + var(--proximity,0)*1.4))}
+.material-icon .material-cloud{opacity:calc(.08 + var(--proximity,0)*.75)}
