@@ -24,3 +24,13 @@
 @keyframes orbit-flow{from{translate:-1% -1%;rotate:-2deg}to{translate:3% 4%;rotate:3deg}}
 @keyframes planet-flow{from{translate:0 0;rotate:0deg}to{translate:-3% 2%;rotate:-4deg}}
 @media(prefers-reduced-motion:reduce){.cosmos-motion,.solar-veil,.orbit-light,.planet-edge,.horizon-glow{animation:none}}
+
+/* Charcoal atmosphere; colour is concentrated at the illuminated rims. */
+.entity-playground{background:#08090a}
+.cosmos{background:radial-gradient(ellipse at 70% 10%,#393b3d30,transparent 70%)}
+.solar-veil{background:radial-gradient(ellipse at 30% 75%,#aeb0b23d 0%,#75787b2b 16%,#40434618 37%,transparent 60%)}
+.orbit-light{background:radial-gradient(ellipse at 45% 100%,#797c7f22,transparent 58%);box-shadow:0 5px 12px #d6e8aa36,0 12px 30px #c6ff1b3d,0 30px 75px #74797522,inset 0 -25px 65px #a2a6a326}
+.planet-edge{background:radial-gradient(ellipse at 10% 3%,#16181a,#08090b 52%);box-shadow:-3px -5px 12px #dce3d43b,-9px -13px 30px #c6ff1b25,-30px -38px 105px #8a8e9326}
+.horizon-glow{background:#95999c26}
+.horizon{background:#060708;box-shadow:0 -3px 10px #c6ff1b30,0 -18px 45px #c6ff1b0d}
+.cosmos:after{opacity:.18}

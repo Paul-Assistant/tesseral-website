@@ -25,7 +25,7 @@ export default function CosmicDust(){
      const py=((p.y*height+flowY*p.depth+y*65*p.depth)%height+height)%height
      const dist=Math.hypot(px/width-(x+.5),py/height-(y+.5))
      const light=1+Math.max(0,1-dist*3)*.6
-     ctx.fillStyle=`rgba(${p.depth>.8?'198,255,135':'205,213,208'},${p.alpha*light*(.8+.2*Math.sin(time*.12+p.phase))})`
+     ctx.fillStyle=`rgba(200,203,205,${p.alpha*light*(.8+.2*Math.sin(time*.12+p.phase))})`
      ctx.fillRect(px,py,p.size,p.size)
     }
    }
