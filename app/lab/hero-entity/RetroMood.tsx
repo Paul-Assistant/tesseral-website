@@ -1,0 +1,10 @@
+'use client'
+import { useState } from 'react'
+import './retro-mood.css'
+const moods=[['original','Original','The current soft, abstract atmosphere.'],['atlas','Silver atlas','Monochrome star charts, etched planetary rings and aged photographic grain.'],['eclipse','Lime eclipse','A huge eclipsed sun, faded olive light and a dark paper sky.'],['observatory','Lost observatory','A tilted planetary horizon, muted mineral tones and a distant viewing terrace.']] as const
+export default function RetroMood({mood,onMood}:{mood:string;onMood:(value:string)=>void}){
+ const [people,setPeople]=useState(false)
+ return <><div className="mood-panel"><div className="mood-options" role="group" aria-label="Background mood">{moods.map(([id,label])=><button key={id} type="button" aria-pressed={mood===id} onClick={()=>onMood(id)}>{label}</button>)}</div><div className="mood-caption"><span>{moods.find(m=>m[0]===mood)?.[2]}</span><button type="button" aria-pressed={people} onClick={()=>setPeople(!people)}>Figure {people?'on':'off'}</button></div></div>
+ <div className="retro-world" aria-hidden="true"><svg className="retro-stars" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">{Array.from({length:520},(_,i)=>{const x=((i*7919+379)%16000)/10,y=((i*3571+191)%10000)/10;return <circle key={i} cx={x} cy={y} r={i%31===0?1.8:i%7===0?1:.45} opacity={.15+(i%9)/15} fill={i%17===0?'#d7ddb1':'#d9dcd9'}/>})}</svg><div className="retro-orb"/><div className="retro-ring"/><div className="retro-nebula"/><div className="retro-land"/><div className="retro-print"/></div>
+ {people&&<div className="retro-observer" aria-hidden="true"><svg viewBox="0 0 180 210"><path d="M0 196 130 181 180 190v20H0Z" fill="#181c1d"/><path d="m82 183 68 5-19 5-50-5Z" fill="#050707" opacity=".5"/><g transform="translate(60 45)"><ellipse cx="26" cy="14" rx="8" ry="10" fill="#b6b8ad"/><path d="m19 23-10 10-5 41 6 2 9-34-3 43 27 1-4-43 10 28 5-3-9-35-12-10Z" fill="#c5c6b8"/><path d="m16 82 3 51-5 9h11l4-47 6 47h10l-4-11 2-48Z" fill="#555c59"/><path d="m18 10 2-7 10-2 5 10-1 5-4-7-11 7Z" fill="#272d2c"/></g></svg></div>}</>
+}
