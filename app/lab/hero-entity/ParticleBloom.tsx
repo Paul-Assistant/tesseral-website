@@ -252,6 +252,7 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
           renderer.setRenderTarget(auraB);renderer.render(postScene,postCamera)
         }
         quad.material=composite;renderer.setRenderTarget(null);renderer.render(postScene,postCamera)
+        window.dispatchEvent(new CustomEvent("tesseral-render",{detail:renderer.domElement}))
       }
       frame=requestAnimationFrame(draw)
     }
