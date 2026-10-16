@@ -16,3 +16,12 @@
 .entity-playground[data-mood=observatory] .retro-print{background:radial-gradient(ellipse at 60% 35%,transparent 10%,#0b10112b 55%,#040708b3 100%);box-shadow:inset 0 0 180px #05070980;z-index:4}
 .entity-playground[data-mood=observatory] .cosmic-grain{opacity:.85}
 @media(prefers-reduced-motion:reduce){.photographic-sky{transform:none}}
+.entity-playground .cosmic-grain,.entity-playground[data-mood=observatory] .cosmic-grain{opacity:.32}
+.photographic-sky{filter:blur(.12px);opacity:.95}
+.mood-panel{width:min(460px,calc(100% - 32px))}
+.prism-flare{position:absolute;left:0;top:0;width:0;height:0;z-index:1;pointer-events:none;opacity:0;mix-blend-mode:screen}
+.prism-halo{position:absolute;width:600px;height:330px;left:-300px;top:-165px;border-radius:50%;background:radial-gradient(ellipse,#f8ffe973, #e8ebbe40 16%,#c6ff1b20 30%,#bcb2de20 43%,transparent 68%);filter:blur(24px)}
+.prism-streak{position:absolute;width:620px;height:50px;left:-310px;top:-25px;rotate:-14deg;border-radius:50%;background:linear-gradient(90deg,transparent,#b6c8eb22,#d4c0e780,#fffdeed9,#dce8a080,#c6ff1b22,transparent);filter:blur(10px)}
+.prism-core{position:absolute;width:120px;height:65px;left:-60px;top:-32px;border-radius:50%;background:radial-gradient(ellipse,#fffef0e6,#e7efd385 25%,transparent 68%);filter:blur(7px)}
+.prism-halo::after{content:"";position:absolute;inset:0;border-radius:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");opacity:.35;mix-blend-mode:multiply}
+@media(prefers-reduced-motion:reduce){.prism-flare{display:none}}
