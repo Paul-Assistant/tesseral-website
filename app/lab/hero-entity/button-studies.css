@@ -92,3 +92,11 @@
 .organic-shell{filter:none}
 .organic-tip{opacity:var(--proximity,0);filter:blur(4px);pointer-events:none}
 .material-icon::after{display:none}
+/* Restore the frosted interior within the deforming outline. */
+.organic-shell .organic-body{fill:url(#organic-fill)}
+.organic-shell .organic-interior{opacity:.16;transition:opacity 1.4s cubic-bezier(.22,1,.36,1)}
+.material-icon:hover .organic-interior,.material-icon:focus-visible .organic-interior{opacity:.8}
+.organic-current{transform-origin:50px 50px;animation:organic-current 13s ease-in-out infinite alternate}
+@keyframes organic-current{from{transform:translate(-12px,-9px) rotate(-18deg)}to{transform:translate(15px,12px) rotate(30deg)}}
+.material-icon .material-label{color:#25282b}
+@media(prefers-reduced-motion:reduce){.organic-current{animation:none}.organic-shell .organic-interior{transition:none}}
