@@ -56,3 +56,4 @@
 .magnetic-file small,.magnetic-file .file-grip{color:#c1c9cf}
 @keyframes brief-iridescence{from{transform:translate(-8%,-10%) rotate(-15deg)}to{transform:translate(12%,15%) rotate(28deg)}}
 @media(prefers-reduced-motion:reduce){.magnetic-file::before,.magnetic-file::after{animation:none}.magnetic-file,.magnetic-file::before{transition:none}}
+.planet-edge{background:radial-gradient(ellipse at 10% 3%,#0d1011,#030506 52%)}

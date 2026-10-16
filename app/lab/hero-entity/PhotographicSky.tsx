@@ -10,7 +10,7 @@ export default function PhotographicSky(){
    ctx.clearRect(0,0,w,h)
    // Soft, overlapping exposures create uneven photographic density.
    for(let i=0;i<40;i++){const x=random()*w,y=random()*h,r=(.1+random()*.4)*w,g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(210,213,209,${.012+random()*.018})`);g.addColorStop(1,'rgba(210,213,209,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}
-   for(let i=0;i<1900;i++){
+   for(let i=0;i<650;i++){
     const x=random()*w,y=random()*h,size=.5+Math.pow(random(),6)*3,a=.22+random()*.58
     ctx.save();ctx.translate(x,y);ctx.rotate(random()*Math.PI);ctx.fillStyle=`rgba(231,231,225,${a})`;ctx.shadowColor='#e4e5de';ctx.shadowBlur=size>1?3:0
     ctx.fillRect(-size/2,-size/3,size*(.7+random()),size*.55);ctx.restore()

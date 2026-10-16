@@ -25,3 +25,4 @@
 .prism-core{position:absolute;width:120px;height:65px;left:-60px;top:-32px;border-radius:50%;background:radial-gradient(ellipse,#fffef0e6,#e7efd385 25%,transparent 68%);filter:blur(7px)}
 .prism-halo::after{content:"";position:absolute;inset:0;border-radius:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");opacity:.35;mix-blend-mode:multiply}
 @media(prefers-reduced-motion:reduce){.prism-flare{display:none}}
+.entity-playground[data-mood=observatory] .retro-orb{background:radial-gradient(ellipse at 30% 6%,#6d736c50,#29302e80 24%,#0c1114 60%)}
