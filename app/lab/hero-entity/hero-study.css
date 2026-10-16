@@ -44,3 +44,6 @@
 .orbit-light{filter:blur(15px)}
 .planet-edge{filter:blur(22px)}
 .horizon{filter:blur(13px)}
+/* Light gathers around the entity and falls off into the outer space. */
+.entity-atmosphere{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 53% 48%,#d7dfd02e 0%,#a6b1a51c 18%,#77817809 36%,transparent 55%),radial-gradient(ellipse at 53% 48%,transparent 18%,#05070818 42%,#03050699 75%,#020304e6 100%)}
+@media(max-width:650px){.entity-atmosphere{background:radial-gradient(ellipse at 50% 43%,#d7dfd02e 0%,#a6b1a51c 18%,#77817809 36%,transparent 55%),radial-gradient(ellipse at 50% 43%,transparent 18%,#05070818 42%,#03050699 75%,#020304e6 100%)}}
