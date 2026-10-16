@@ -55,3 +55,20 @@
 .material-edge .material-backdrop{background:linear-gradient(160deg,#ffffff19,#ffffff06);backdrop-filter:none;-webkit-backdrop-filter:none}
 .material-edge .material-label{color:#fff;text-shadow:0 1px 4px #0009}
 .material-icon{backdrop-filter:blur(28px) saturate(.6);-webkit-backdrop-filter:blur(28px) saturate(.6)}
+/* Optical material studies: translucent bodies, coloured interference, crisp rims. */
+.material-button .material-label,.material-button .material-label *{text-shadow:none}
+.material-frost{color:#172126;background:linear-gradient(135deg,#e6eeef92,#cedcdd70);backdrop-filter:blur(26px) saturate(.8);-webkit-backdrop-filter:blur(26px) saturate(.8)}
+.material-frost .material-backdrop{background:linear-gradient(155deg,#ffffff30,#cad6e00c);border-color:#ffffff65}
+.material-frost .material-cloud{inset:2px!important;filter:blur(9px);opacity:.85}
+.material-frost .material-cloud:before{background:radial-gradient(ellipse at 20% 45%,#a1d9ecbb,transparent 43%),radial-gradient(ellipse at 75% 60%,#d6a4c2bb,transparent 37%),conic-gradient(from 35deg at 45% 50%,#e9dfad88,#a5d9e4bb,#9d9ec699,#e2b6bd99,#ecdfb888,#a5d9e4aa);animation:glass-current 17s ease-in-out infinite alternate}
+.material-frost:hover .material-cloud,.material-frost:focus-visible .material-cloud{opacity:1;filter:blur(12px)}
+.material-frost .material-rim{padding:2px;background:conic-gradient(from var(--rim-angle),#ffffff 0deg,#60717e 40deg,#d7edff 58deg,#ffffff 70deg,#d8b3cf 100deg,#8ba3b8 140deg,#faf8ed 175deg,#ffffff 205deg,#a2c9de 230deg,#be9aae 255deg,#eee0b7 280deg,#8a97a6 320deg,#fff);box-shadow:none}
+.material-edge{color:#172126;background:linear-gradient(150deg,#e8edf077,#d6e1e956);backdrop-filter:blur(12px) saturate(.75);-webkit-backdrop-filter:blur(12px) saturate(.75)}
+.material-edge .material-backdrop{background:linear-gradient(165deg,#ffffff32,#e1e9ed22);border-color:#ffffff50}
+.material-edge .material-label{color:#172126;text-shadow:none}
+.material-edge .material-cloud{opacity:.38;filter:blur(5px)}
+.material-edge .material-cloud:before{background:linear-gradient(110deg,transparent 15%,#a6d9f28a 28%,#edb7cd66 33%,transparent 43%,#eedeb266 65%,#bad4f288 72%,transparent 85%)}
+.material-edge .material-rim{padding:1.5px;filter:none}
+.material-edge .material-reflection{padding:1.5px;box-shadow:none}
+
+@supports(backdrop-filter:url(#button-dispersion)){.material-edge{backdrop-filter:blur(7px) url(#button-dispersion) saturate(.75);-webkit-backdrop-filter:blur(7px) url(#button-dispersion) saturate(.75)}}
