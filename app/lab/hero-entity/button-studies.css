@@ -26,3 +26,21 @@
 @keyframes glass-current{from{transform:translate(-8%,-10%) rotate(-15deg)}to{transform:translate(12%,15%) rotate(28deg)}}
 @media(max-width:650px){.button-studies{top:22px;gap:10px;max-width:calc(100% - 28px)}.button-study{gap:9px}.button-study-name{font-size:6px;padding-left:8px;letter-spacing:.05em}.material-button{width:calc((100vw - 100px)/2);height:53px}.material-icon{width:48px;height:48px;margin-bottom:2px}.material-label{font-size:10px;gap:7px}.material-label>span{font-size:14px}.button-study-feedback{font-size:6px}.material-edge .material-rim{padding:3px}}
 @media(prefers-reduced-motion:reduce){.material-rim,.material-cloud:before{animation:none}.material-button,.material-button *{transition:none!important}}
+/* A recessed socket keeps the reflective control below the surrounding surface. */
+.button-study:has(.material-edge){position:relative}
+.button-study:has(.material-edge)::before{content:"";position:absolute;left:-9px;right:-9px;bottom:-9px;height:84px;border-radius:999px;background:linear-gradient(160deg,#ffffff0b,#05080938);box-shadow:inset 0 3px 7px #0008,inset 0 -1px 2px #ffffff32,0 1px 0 #ffffff12;pointer-events:none}
+.material-edge .material-rim{padding:1.5px}
+.material-edge .material-backdrop{inset:1.5px!important}
+.material-edge .material-reflection{padding:2px}
+.material-edge{box-shadow:0 3px 7px #0006,inset 0 1px 1px #ffffff45}
+.material-icon{transition:box-shadow 1.2s cubic-bezier(.22,1,.36,1),scale 1.1s cubic-bezier(.22,1,.36,1)}
+.material-icon .material-label{transition:transform 1.1s cubic-bezier(.22,1,.36,1)}
+.material-icon .material-cloud{inset:3px!important;filter:blur(5px);opacity:.08;transition:opacity 1.5s cubic-bezier(.22,1,.36,1),filter 1.5s cubic-bezier(.22,1,.36,1)}
+.material-icon .material-cloud:before{background:radial-gradient(ellipse at 25% 35%,#647782bb,transparent 42%),radial-gradient(ellipse at 70% 65%,#c6ff1b88,transparent 35%),conic-gradient(from 40deg at 45% 50%,transparent,#ffffffbb,transparent,#697d8c99,transparent);animation-duration:13s}
+.material-icon:hover,.material-icon:focus-visible{scale:1.015}
+.material-icon:hover .material-cloud,.material-icon:focus-visible .material-cloud{opacity:.7;filter:blur(7px)}
+.material-icon .material-reflection{transition:opacity 1.4s cubic-bezier(.22,1,.36,1)}
+.material-icon:hover .material-label{transform:translateY(-1px)}
+.material-icon:active,.material-icon[aria-pressed=true]{scale:.985}
+@media(max-width:650px){.button-study:has(.material-edge)::before{left:-5px;right:-5px;bottom:-6px;height:65px}.material-edge .material-rim{padding:1.5px}}
+@media(prefers-reduced-motion:reduce){.material-icon,.material-icon *{transition:none!important}}
