@@ -92,10 +92,16 @@ const vertexShader = `
     p*=1.+burst*.12;
     vec4 mv=modelViewMatrix*vec4(p,1.);
     vec2 destination=magnet*vec2(2.55,2.55);
-    float facing=smoothstep(.58,.98,dot(normalize(mv.xy+vec2(.0001)),normalize(destination+vec2(.0001))));
-    float tendril=facing*pow(seed.z,.75)*attraction;
-    mv.xy=mix(mv.xy,destination,tendril*.84);
-    mv.z+=sin(tendril*3.14)*.22;
+    // Sparse, curved wisps. Most grains stay in the body, with no wedge boundary.
+    vec2 delta=destination-mv.xy;
+    float alignment=max(0.,dot(normalize(mv.xy+vec2(.0001)),normalize(destination+vec2(.0001))));
+    float strand=pow(alignment,3.)*smoothstep(.68,.98,seed.z);
+    float driftPhase=time*.9+seed.x*6.283;
+    float pull=attraction*strand*(.45+.4*sin(seed.y*3.14));
+    vec2 perpendicular=normalize(vec2(-delta.y,delta.x)+vec2(.0001));
+    mv.xy+=delta*pull*.9;
+    mv.xy+=perpendicular*sin(driftPhase+pull*4.)*sin(pull*3.14)*(.12+seed.y*.32);
+    mv.z+=sin(driftPhase*.7)*pull*.2;
     vec3 normal=normalize(normalMatrix*n), view=normalize(-mv.xyz);
     float face=abs(dot(normal,view));
     if(dot(normal,view)<0.)normal=-normal;

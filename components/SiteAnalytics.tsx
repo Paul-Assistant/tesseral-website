@@ -1,11 +1,17 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { useReportWebVitals } from 'next/web-vitals'
 import { CONSENT_KEY, GA_ID, readAnalyticsConsent, trackEvent } from '@/lib/analytics'
 import './site-analytics.css'
 
 export default function SiteAnalytics() {
+  const pathname = usePathname()
+  return pathname.startsWith('/lab/') ? null : <AnalyticsWithConsent />
+}
+
+function AnalyticsWithConsent() {
   const [choice, setChoice] = useState<boolean | null>(null)
   const [ready, setReady] = useState(false)
   const [settings, setSettings] = useState(false)

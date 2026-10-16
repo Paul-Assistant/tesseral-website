@@ -1,13 +1,14 @@
 'use client'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import ParticleBloom, { type EntityInteraction } from './ParticleBloom'
+import ParticleShockwave from './ParticleShockwave'
 import './hero-study.css'
 
 const palette = ['#7B7B7B', '#C6FF1B', '#E9ECE6']
 export default function HeroStudy(){
  const root=useRef<HTMLElement>(null),file=useRef<HTMLButtonElement>(null),stage=useRef<HTMLDivElement>(null)
  const interaction=useRef<EntityInteraction>({x:0,y:0,strength:0,burst:0,morph:0})
- const drag=useRef({held:false,x:0,y:0,ox:0,oy:0,startX:0,startY:0,absorbing:0,fromX:0,fromY:0,done:false})
+ const drag=useRef({held:false,x:0,y:0,ox:0,oy:0,startX:0,startY:0,absorbing:0,fromX:0,fromY:0,done:false,shrink:1})
  const [status,setStatus]=useState('Bring the file closer.'),[done,setDone]=useState(false)
  useEffect(()=>{
   const el=root.current!,card=file.current!,entity=stage.current!
@@ -25,7 +26,7 @@ export default function HeroStudy(){
     if(d.absorbing){
      const t=Math.min(1,(now-d.absorbing)/600),ease=1-Math.pow(1-t,3)
      d.x=d.fromX+(cx-d.fromX)*ease;d.y=d.fromY+(cy-d.fromY)*ease
-     card.style.opacity=String(1-t);card.style.scale=String(1-t*.9)
+     card.style.opacity=String(Math.pow(1-t,1.4));d.shrink=Math.max(.001,1-t)
      if(t===1){d.absorbing=0;d.done=true;setDone(true);setStatus('A little more yours.');interaction.current.burst=1;interaction.current.morph+=1}
     }
     const reach=d.held?Math.max(0,Math.min(1,(b.width*.8-dist)/(b.width*.55))):0
@@ -37,7 +38,7 @@ export default function HeroStudy(){
     el.style.setProperty('--pulse',String(reduced?1:1+Math.sin(flash*Math.PI*3)*flash*.055))
     mx+=(tx-mx)*.035;my+=(ty-my)*.035
     el.style.setProperty('--mx',`${reduced?0:mx*38}px`);el.style.setProperty('--my',`${reduced?0:my*28}px`)
-    card.style.transform=`translate3d(${d.x}px,${d.y}px,0) translate(-50%,-50%) rotate(${d.held?0:reduced?0:Math.sin(clock*.5)*3-5}deg)`
+    card.style.transform=`translate3d(${d.x}px,${d.y}px,0) translate(-50%,-50%) rotate(${d.held||d.absorbing?0:reduced?0:Math.sin(clock*.5)*3-5}deg) scale(${d.shrink})`
    }
    frame=requestAnimationFrame(draw)
   };frame=requestAnimationFrame(draw)
@@ -47,12 +48,12 @@ export default function HeroStudy(){
  const move=(e:PointerEvent<HTMLButtonElement>)=>{const d=drag.current;if(!d.held)return;const r=root.current!.getBoundingClientRect();d.x=Math.max(65,Math.min(r.width-65,e.clientX-r.left-d.ox));d.y=Math.max(40,Math.min(r.height-40,e.clientY-r.top-d.oy))}
  const release=()=>{const d=drag.current;if(!d.held)return;d.held=false;const b=stage.current!.getBoundingClientRect(),r=root.current!.getBoundingClientRect();const dist=Math.hypot(d.x-(b.left-r.left+b.width/2),d.y-(b.top-r.top+b.height/2));if(dist<Math.min(b.width,b.height)*.34){d.absorbing=performance.now();d.fromX=d.x;d.fromY=d.y;setStatus('Making a connection…')}else setStatus('Bring the file closer.')}
  useEffect(()=>{window.addEventListener('pointerup',release);window.addEventListener('mouseup',release);return()=>{window.removeEventListener('pointerup',release);window.removeEventListener('mouseup',release)}},[])
- const reset=()=>{drag.current.done=false;drag.current.absorbing=0;const b=root.current!.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.24:.19);drag.current.y=b.height*(b.width<650?.77:.56);file.current!.style.opacity='1';file.current!.style.scale='1';setDone(false);setStatus('Bring the file closer.')}
+ const reset=()=>{drag.current.done=false;drag.current.absorbing=0;const b=root.current!.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.24:.19);drag.current.y=b.height*(b.width<650?.77:.56);file.current!.style.opacity='1';drag.current.shrink=1;setDone(false);setStatus('Bring the file closer.')}
  return <main ref={root} className="entity-playground">
   <div className="cosmos" aria-hidden="true"><div className="cosmos-motion"><div className="solar-veil"/><div className="orbit-light"/><div className="planet-edge"/><div className="horizon-glow"/><div className="horizon"/></div></div>
   <svg className="cosmic-grain" width="100%" height="100%" aria-hidden="true"><filter id="cosmic-noise"><feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#cosmic-noise)"/></svg>
-  <div className="absorb-light" aria-hidden="true"/>
-  <div ref={stage} className="playground-entity" role="img" aria-label="Living Tesseral entity reacts to the nearby file"><ParticleBloom dark active={false} colors={palette} organic waves radiant interaction={interaction}/><div className="absorb-ring" aria-hidden="true"/></div>
+  <ParticleShockwave interaction={interaction}/>
+  <div ref={stage} className="playground-entity" role="img" aria-label="Living Tesseral entity reacts to the nearby file"><ParticleBloom dark active={false} colors={palette} organic waves radiant interaction={interaction}/></div>
   <button ref={file} className="magnetic-file" aria-label="Drag sample brand brief into Tesseral, or press Enter to connect" aria-hidden={done} tabIndex={done?-1:0} onPointerDown={start} onPointerMove={move} onPointerUp={release} onLostPointerCapture={release} onDragStart={e=>e.preventDefault()} onPointerCancel={()=>{drag.current.held=false;setStatus('Bring the file closer.')}} onKeyDown={e=>{if((e.key==='Enter'||e.key===' ')&&!drag.current.absorbing&&!done){e.preventDefault();drag.current.absorbing=performance.now();drag.current.fromX=drag.current.x;drag.current.fromY=drag.current.y;setStatus('Making a connection…')}}}>
    <svg width="28" height="34" viewBox="0 0 28 34" fill="none" aria-hidden="true"><path d="M5 1h12l8 8v23H3V3a2 2 0 012-2Z" stroke="currentColor"/><path d="M17 1v9h8M8 17h12M8 22h12M8 27h8" stroke="currentColor"/></svg><span><strong>Brand brief</strong><small>PDF · SAMPLE FILE</small></span><span className="file-grip">⠿</span>
   </button>
