@@ -17,10 +17,10 @@ function MaterialButton({kind,children,label,selected,onSelect}:{kind:string;chi
    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}
    const zoom=1.9,sx=source.width/r.width,sy=source.height/r.height
    const sw=b.width/zoom,sh=b.height/zoom
-   ctx.clearRect(0,0,w,h);ctx.fillStyle='#bbc9d0';ctx.fillRect(0,0,w,h)
-   ctx.filter='blur(5px) hue-rotate(100deg) saturate(1.6)';ctx.globalAlpha=.9
+   ctx.clearRect(0,0,w,h);ctx.fillStyle='#b9beb7';ctx.fillRect(0,0,w,h)
+   ctx.filter='blur(5px) saturate(.4)';ctx.globalAlpha=.9
    ctx.drawImage(source,(b.left+b.width/2-sw/2-r.left)*sx,(b.top+b.height/2-sh/2-r.top)*sy,sw*sx,sh*sy,0,0,w,h)
-   ctx.filter='blur(3px) hue-rotate(220deg)';ctx.globalCompositeOperation='screen';ctx.globalAlpha=.28
+   ctx.filter='blur(3px) hue-rotate(25deg) saturate(.55)';ctx.globalCompositeOperation='screen';ctx.globalAlpha=.16
    ctx.drawImage(source,(b.left+b.width/2-sw/2-r.left)*sx,(b.top+b.height/2-sh/2-r.top)*sy,sw*sx,sh*sy,5,0,w,h)
    ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.filter='none'
   }

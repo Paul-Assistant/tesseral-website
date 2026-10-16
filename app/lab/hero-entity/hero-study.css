@@ -36,3 +36,7 @@
 .cosmos:after{opacity:.18}
 /* Broader atmospheric rim on the large background sphere. */
 .planet-edge{box-shadow:-3px -4px 14px #e7ede373,-20px -28px 65px #c6ff1b30,-45px -55px 145px #aeb9a332,inset 16px 22px 52px #c3d6a51a}
+/* One lime sunrise, with neutral light on the surrounding silhouettes. */
+.planet-edge{box-shadow:-4px -7px 20px #f1ffd9a6,-25px -40px 90px #c6ff1b80,-65px -90px 190px #c6ff1b52,-110px -145px 280px #c6ff1b24,inset 18px 28px 65px #deefb426}
+.orbit-light{box-shadow:0 5px 12px #e2e4e136,0 12px 30px #b5b9bd3d,0 30px 75px #74787b22,inset 0 -25px 65px #a3a6a926}
+.horizon{box-shadow:0 -3px 10px #c5c9cc30,0 -18px 45px #aab0b50d}

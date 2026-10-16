@@ -88,3 +88,4 @@
 .material-icon .material-label{color:#fff;transform:none}
 .material-icon::after{inset:-4px}
 @media(max-width:650px){.organic-shell{width:78px;height:78px}}
+.material-edge .material-cloud:before{background:linear-gradient(110deg,transparent 15%,#e1e5dd66 28%,#d1c9db30 33%,transparent 43%,#e8e7c544 65%,#c6ff1b33 72%,transparent 85%)}
