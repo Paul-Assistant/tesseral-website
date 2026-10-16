@@ -60,12 +60,14 @@ const vertexShader = `
   }
   void main(){
     vec2 q=position.xy;
-    if(wireframe>.5){
+    vec2 contour=q;
+    {
       // Contours are made of the same grains, with sparse cross threads.
       // A few free grains remain between them and disperse at the banks.
-      if(seed.w<.76)q.y=floor((q.y+1.)*14.+.5)/14.-1.+(seed.x-.5)*.003;
-      else if(seed.w<.96)q.x=floor((q.x+1.)*38.+.5)/38.-1.+(seed.y-.5)*.0015;
+      if(seed.w<.76)contour.y=floor((q.y+1.)*14.+.5)/14.-1.+(seed.x-.5)*.003;
+      else if(seed.w<.96)contour.x=floor((q.x+1.)*38.+.5)/38.-1.+(seed.y-.5)*.0015;
     }
+    q=mix(q,contour,wireframe);
     vec3 p=form(q);
     vec3 n=normalize(cross(form(q+vec2(.003,0.))-p,form(q+vec2(0.,.003))-p));
     float border=max(abs(q.x),abs(q.y));
@@ -79,7 +81,7 @@ const vertexShader = `
     float cloud=step(mix(.86,.73,waves),seed.w);
     float thickness=.004+pow(dissolve,2.)*.035+cloud*.035;
     if(waves>.5)thickness+=dissolve*dissolve*(.09+cloud*.10);
-    if(wireframe>.5)thickness*=.22;
+    thickness*=mix(1.,.22,wireframe);
     p+=n*position.z*thickness;
     if(waves>.5){
       vec3 drift=vec3(sin(q.x*9.4+time*.21),cos(q.y*3.1-time*.17),sin(q.x*6.2+q.y*2.+time*.2));
@@ -89,7 +91,7 @@ const vertexShader = `
     p+=n*sin(time*.5+seed.y*6.283)*(.008+energy*.02);
     p.x+=sin(p.y*2.+evolution)*.12*sin(evolution);
     p.z+=cos(p.x*2.+evolution)*.17*sin(evolution*.8);
-    p*=1.+burst*.12;
+    // Scale response is a single eased swell controlled by the playground.
     vec4 mv=modelViewMatrix*vec4(p,1.);
     vec2 destination=magnet*vec2(2.55,2.55);
     // Sparse, curved wisps. Most grains stay in the body, with no wedge boundary.
@@ -122,7 +124,7 @@ const vertexShader = `
     opacity*=mix(1.,.4,cloud);
     float rearSoftness=1.+(1.-smoothstep(-1.2,-.3,p.z))*.8;
     gl_PointSize=clamp((1.5+seed.x*.8)*(1.+(1.-dissolve)*.6)*pixelRatio*viewportScale*(7./-mv.z)*rearSoftness, .7, 4.5*pixelRatio);
-    if(wireframe>.5){gl_PointSize*=.72;opacity*=.78;}
+    gl_PointSize*=mix(1.,.72,wireframe);opacity*=mix(1.,.78,wireframe);
     gl_Position=projectionMatrix*mv;
   }
 `
@@ -187,12 +189,12 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
           float a=grains.a+halo.a*.44*(1.-grains.a);
           vec3 c=body*grains.a+light*halo.a*.44*(1.-grains.a);
           c+=halo.rgb*mix(.24,.62,dark);
-          if(radiant>.5){
+          if(radiant>.001){
             // A feathered inner light, shaped by the folds themselves.
             // Outside this core the original Tesseral drift composite is exact.
             vec4 wide=texture2D(aura,tex);
             float core=1.-smoothstep(.035,.235,length((tex-.5)*vec2(aspect,1.)));
-            core*=smoothstep(.04,.45,wide.a);
+            core*=smoothstep(.04,.45,wide.a)*radiant;
             float veil=wide.a*.16*(1.-a)*core;
             vec3 pearl=mix(wide.rgb/max(wide.a,.0001),vec3(1.,1.,.96),.22);
             c+=pearl*veil;
@@ -214,6 +216,7 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
     const observer=new ResizeObserver(resize);observer.observe(root);resize()
     const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
     let frame=0,elapsed=0,last=0,hover=0,px=0,py=0
+    let styleFrom=wireframe?1:0,styleTo=styleFrom,styleTime=3.6
     const interaction=root.parentElement!
     const enter=()=>{hover=1},leave=()=>{hover=0;px=py=0}
     const move=(e:PointerEvent)=>{const b=interaction.getBoundingClientRect();px=(e.clientX-b.left)/b.width-.5;py=(e.clientY-b.top)/b.height-.5}
@@ -228,9 +231,13 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
         uniforms.time.value=elapsed;uniforms.energy.value=THREE.MathUtils.lerp(uniforms.energy.value,current.current.active?1:hover*.3,.035)
         uniforms.organic.value=current.current.organic?1:0
         uniforms.waves.value=current.current.waves?1:0
-        uniforms.wireframe.value=current.current.wireframe?1:0
+        const nextStyle=current.current.wireframe?1:0
+        if(nextStyle!==styleTo){styleFrom=uniforms.wireframe.value;styleTo=nextStyle;styleTime=0}
+        styleTime=Math.min(3.6,styleTime+dt)
+        const progress=styleTime/3.6,eased=progress*progress*progress*(progress*(progress*6-15)+10)
+        uniforms.wireframe.value=THREE.MathUtils.lerp(styleFrom,styleTo,eased)
         composite.uniforms.dark.value=current.current.dark?1:0
-        composite.uniforms.radiant.value=current.current.radiant?1:0
+        composite.uniforms.radiant.value=1-uniforms.wireframe.value
         ;[uniforms.lowColor,uniforms.midColor,uniforms.highColor].forEach((u,i)=>u.value.lerp(tint.set(current.current.colors[i]||current.current.colors[0]),.035))
         group.rotation.set(.15+(reduced?0:Math.sin(elapsed*.15)*.12+py*.12),.25+(reduced?0:Math.sin(elapsed*.18)*.32+px*.18),-.38+(reduced?0:Math.sin(elapsed*.12)*.08))
         renderer.setRenderTarget(target);renderer.render(scene,camera)
@@ -238,7 +245,7 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
         renderer.setRenderTarget(glowA);renderer.render(postScene,postCamera)
         blur.uniforms.image.value=glowA.texture;blur.uniforms.direction.value.set(0,2.7/glowB.height)
         renderer.setRenderTarget(glowB);renderer.render(postScene,postCamera)
-        if(current.current.radiant){
+        if(composite.uniforms.radiant.value>.001){
           blur.uniforms.image.value=glowB.texture;blur.uniforms.direction.value.set(3.8/auraA.width,0)
           renderer.setRenderTarget(auraA);renderer.render(postScene,postCamera)
           blur.uniforms.image.value=auraA.texture;blur.uniforms.direction.value.set(0,3.8/auraB.height)
