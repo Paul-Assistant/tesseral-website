@@ -4,6 +4,7 @@ import ParticleBloom, { type EntityInteraction } from './ParticleBloom'
 import ButtonStudies from './ButtonStudies'
 import RetroMood from './RetroMood'
 import PrismFlare from './PrismFlare'
+import SphereParticles from './SphereParticles'
 import CosmicDust from './CosmicDust'
 import ParticleShockwave from './ParticleShockwave'
 import './hero-study.css'
@@ -59,7 +60,7 @@ export default function HeroStudy(){
   <RetroMood mood={mood} onMood={setMood}/>
   <div className="cosmos" aria-hidden="true"><div className="cosmos-motion"><div className="solar-veil"/><div className="orbit-light"/><div className="planet-edge"/><div className="horizon-glow"/><div className="horizon"/></div><div className="entity-atmosphere"/></div>
   <svg className="cosmic-grain" width="100%" height="100%" aria-hidden="true"><filter id="cosmic-noise"><feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#cosmic-noise)"/></svg>
-  <PrismFlare/><ButtonStudies/><CosmicDust/><ParticleShockwave interaction={interaction}/>
+  <SphereParticles/><PrismFlare/><ButtonStudies/><CosmicDust/><ParticleShockwave interaction={interaction}/>
   <div ref={stage} className="playground-entity" role="img" aria-label="Living Tesseral entity reacts to the nearby file"><ParticleBloom dark active={false} colors={palette} organic waves wireframe={!done} radiant={done} interaction={interaction}/></div>
   <button ref={file} className="magnetic-file" aria-label="Drag sample brand brief into Tesseral, or press Enter to connect" aria-hidden={done} tabIndex={done?-1:0} onPointerDown={start} onPointerMove={move} onPointerUp={release} onLostPointerCapture={release} onDragStart={e=>e.preventDefault()} onPointerCancel={()=>{drag.current.held=false;setStatus('Bring the file closer.')}} onKeyDown={e=>{if((e.key==='Enter'||e.key===' ')&&!drag.current.absorbing&&!done){e.preventDefault();drag.current.absorbing=performance.now();drag.current.fromX=drag.current.x;drag.current.fromY=drag.current.y;setStatus('Making a connection…')}}}>
    <svg width="28" height="34" viewBox="0 0 28 34" fill="none" aria-hidden="true"><path d="M5 1h12l8 8v23H3V3a2 2 0 012-2Z" stroke="currentColor"/><path d="M17 1v9h8M8 17h12M8 22h12M8 27h8" stroke="currentColor"/></svg><span><strong>Brand brief</strong><small>PDF · SAMPLE FILE</small></span><span className="file-grip">⠿</span>
