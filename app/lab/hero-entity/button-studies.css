@@ -44,3 +44,14 @@
 .material-icon:active,.material-icon[aria-pressed=true]{scale:.985}
 @media(max-width:650px){.button-study:has(.material-edge)::before{left:-5px;right:-5px;bottom:-6px;height:65px}.material-edge .material-rim{padding:1.5px}}
 @media(prefers-reduced-motion:reduce){.material-icon,.material-icon *{transition:none!important}}
+/* Filter the scene at the button surface, before its decorative layers. */
+.material-button{isolation:auto;backdrop-filter:blur(22px) saturate(.65);-webkit-backdrop-filter:blur(22px) saturate(.65)}
+.material-frost{color:#202628;background:linear-gradient(145deg,#edf1eedb,#d7dfddc2);backdrop-filter:blur(42px) saturate(.45);-webkit-backdrop-filter:blur(42px) saturate(.45)}
+.material-frost .material-backdrop{background:linear-gradient(155deg,#ffffff45,#d4dcd915);backdrop-filter:none;-webkit-backdrop-filter:none}
+.material-frost .material-label{text-shadow:0 1px 1px #ffffff50}
+.material-frost .material-cloud{opacity:.32}
+.material-frost:hover .material-cloud,.material-frost:focus-visible .material-cloud{opacity:.55}
+.material-edge{background:linear-gradient(150deg,#303a3dcc,#171f24b8);backdrop-filter:blur(22px) saturate(.65) brightness(.7);-webkit-backdrop-filter:blur(22px) saturate(.65) brightness(.7)}
+.material-edge .material-backdrop{background:linear-gradient(160deg,#ffffff19,#ffffff06);backdrop-filter:none;-webkit-backdrop-filter:none}
+.material-edge .material-label{color:#fff;text-shadow:0 1px 4px #0009}
+.material-icon{backdrop-filter:blur(28px) saturate(.6);-webkit-backdrop-filter:blur(28px) saturate(.6)}
