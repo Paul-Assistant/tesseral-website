@@ -1,5 +1,5 @@
 @property --rim-angle{syntax:'<angle>';initial-value:0deg;inherits:false}
-.button-studies{position:absolute;z-index:10;top:30px;left:50%;transform:translateX(-50%);display:flex;gap:26px;align-items:flex-end;padding-bottom:28px;width:max-content;max-width:calc(100% - 40px)}
+.button-studies{position:absolute;z-index:10;top:calc(48% + min(100px,12.33vh));left:53%;transform:translate(-50%,-50%);display:flex;gap:26px;align-items:flex-end;padding-bottom:28px;width:max-content;max-width:calc(100% - 40px)}
 .button-study{display:flex;flex-direction:column;gap:13px;perspective:700px}.button-study-name{font:8px var(--font-mono),monospace;letter-spacing:.12em;color:#b1b4b7;padding-left:16px}.button-study-small .button-study-name{padding:0;text-align:center}
 .material-button{--light-x:50%;--light-y:50%;--tilt-x:0deg;--tilt-y:0deg;position:relative;isolation:isolate;width:238px;height:66px;border:0;border-radius:999px;background:transparent;color:#f0f2ef;cursor:pointer;transform:rotateX(var(--tilt-x)) rotateY(var(--tilt-y));box-shadow:0 14px 30px #0005,0 4px 8px #0003,inset 0 1px 1px #ffffff70,inset 0 -1px 1px #ffffff38;transition:box-shadow .65s cubic-bezier(.2,.7,.2,1),scale .4s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .material-button>span:not(.material-label){position:absolute;inset:0;border-radius:inherit;pointer-events:none}
@@ -24,7 +24,7 @@
 .button-study-feedback{position:absolute;bottom:0;width:100%;text-align:center;color:#8e9498;font:8px var(--font-mono),monospace;letter-spacing:.02em;pointer-events:none}
 @keyframes rim-orbit{to{--rim-angle:360deg}}
 @keyframes glass-current{from{transform:translate(-8%,-10%) rotate(-15deg)}to{transform:translate(12%,15%) rotate(28deg)}}
-@media(max-width:650px){.button-studies{top:22px;gap:10px;max-width:calc(100% - 28px)}.button-study{gap:9px}.button-study-name{font-size:6px;padding-left:8px;letter-spacing:.05em}.material-button{width:calc((100vw - 100px)/2);height:53px}.material-icon{width:48px;height:48px;margin-bottom:2px}.material-label{font-size:10px;gap:7px}.material-label>span{font-size:14px}.button-study-feedback{font-size:6px}.material-edge .material-rim{padding:3px}}
+@media(max-width:650px){.button-studies{top:calc(43% + 9.66vh);left:50%;gap:10px;max-width:calc(100% - 28px)}.button-study{gap:9px}.button-study-name{font-size:6px;padding-left:8px;letter-spacing:.05em}.material-button{width:calc((100vw - 100px)/2);height:53px}.material-icon{width:48px;height:48px;margin-bottom:2px}.material-label{font-size:10px;gap:7px}.material-label>span{font-size:14px}.button-study-feedback{font-size:6px}.material-edge .material-rim{padding:3px}}
 @media(prefers-reduced-motion:reduce){.material-rim,.material-cloud:before{animation:none}.material-button,.material-button *{transition:none!important}}
 /* A recessed socket keeps the reflective control below the surrounding surface. */
 .button-study:has(.material-edge){position:relative}
