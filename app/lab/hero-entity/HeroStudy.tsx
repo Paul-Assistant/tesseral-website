@@ -1,39 +1,61 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import ParticleBloom from './ParticleBloom'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import ParticleBloom, { type EntityInteraction } from './ParticleBloom'
 import './hero-study.css'
 
-const palette = ['#7B7B7B', '#C6FF1B', '#D7D4CD']
-const samples = [
-  {name:'Brand brief',type:'PDF · 12 pages',icon:'▤',answer:'You want to feel premium without becoming unapproachable. Let’s explore that.'},
-  {name:'Visual references',type:'FIGMA · Collection',icon:'✳',answer:'Quiet typography. Unexpected colour. There’s a useful tension here to build on.'},
-  {name:'Competitor research',type:'RESEARCH · 8 sources',icon:'↗',answer:'Your competitors lead with technical expertise. What if your brand led with the people behind it?'}
-]
+const palette = ['#7B7B7B', '#C6FF1B', '#E9ECE6']
 export default function HeroStudy(){
- const root=useRef<HTMLElement>(null)
- const [clean,setClean]=useState(false),[haze,setHaze]=useState(65),[grain,setGrain]=useState(18)
- const [selected,setSelected]=useState<number|null>(null),[dragging,setDragging]=useState(false)
+ const root=useRef<HTMLElement>(null),file=useRef<HTMLButtonElement>(null),stage=useRef<HTMLDivElement>(null)
+ const interaction=useRef<EntityInteraction>({x:0,y:0,strength:0,burst:0,morph:0})
+ const drag=useRef({held:false,x:0,y:0,ox:0,oy:0,startX:0,startY:0,absorbing:0,fromX:0,fromY:0,done:false})
+ const [status,setStatus]=useState('Bring the file closer.'),[done,setDone]=useState(false)
  useEffect(()=>{
-  const el=root.current!;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
-  let x=0,y=0,tx=0,ty=0,frame=0
-  const move=(e:PointerEvent)=>{if(e.pointerType==='touch')return;tx=e.clientX/innerWidth-.5;ty=e.clientY/innerHeight-.5}
-  const leave=()=>{tx=ty=0}
-  const draw=()=>{if(!document.hidden&&!reduced){x+=(tx-x)*.035;y+=(ty-y)*.035;el.style.setProperty('--mx',`${x*65}px`);el.style.setProperty('--my',`${y*45}px`)}frame=requestAnimationFrame(draw)}
-  el.addEventListener('pointermove',move);el.addEventListener('pointerleave',leave);frame=requestAnimationFrame(draw)
-  return()=>{cancelAnimationFrame(frame);el.removeEventListener('pointermove',move);el.removeEventListener('pointerleave',leave)}
+  const el=root.current!,card=file.current!,entity=stage.current!
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
+  let frame=0,last=0,clock=0,mx=0,my=0,tx=0,ty=0
+  const place=()=>{if(drag.current.held||drag.current.absorbing)return;const b=el.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.24:.19);drag.current.y=b.height*(b.width<650?.77:.56)}
+  place();window.addEventListener('resize',place)
+  const move=(e:globalThis.PointerEvent)=>{const b=el.getBoundingClientRect();tx=(e.clientX-b.left)/b.width-.5;ty=(e.clientY-b.top)/b.height-.5}
+  const leave=()=>{tx=ty=0};el.addEventListener('pointermove',move);el.addEventListener('pointerleave',leave)
+  const draw=(now:number)=>{
+   const dt=Math.min((now-last)/1000,.05);last=now
+   if(!document.hidden){
+    clock+=dt;const d=drag.current,b=entity.getBoundingClientRect(),r=el.getBoundingClientRect(),cx=b.left-r.left+b.width/2,cy=b.top-r.top+b.height/2
+    let dx=d.x-cx,dy=d.y-cy,dist=Math.hypot(dx,dy)
+    if(d.absorbing){
+     const t=Math.min(1,(now-d.absorbing)/600),ease=1-Math.pow(1-t,3)
+     d.x=d.fromX+(cx-d.fromX)*ease;d.y=d.fromY+(cy-d.fromY)*ease
+     card.style.opacity=String(1-t);card.style.scale=String(1-t*.9)
+     if(t===1){d.absorbing=0;d.done=true;setDone(true);setStatus('A little more yours.');interaction.current.burst=1;interaction.current.morph+=1}
+    }
+    const reach=d.held?Math.max(0,Math.min(1,(b.width*.8-dist)/(b.width*.55))):0
+    interaction.current.x=dx/(b.width*.5);interaction.current.y=-dy/(b.height*.5)
+    interaction.current.strength+=(reach-interaction.current.strength)*(1-Math.exp(-dt*8))
+    interaction.current.burst=Math.max(0,interaction.current.burst-dt*.65)
+    const flash=interaction.current.burst
+    el.style.setProperty('--flash',String(reduced?flash*.15:flash))
+    el.style.setProperty('--pulse',String(reduced?1:1+Math.sin(flash*Math.PI*3)*flash*.055))
+    mx+=(tx-mx)*.035;my+=(ty-my)*.035
+    el.style.setProperty('--mx',`${reduced?0:mx*38}px`);el.style.setProperty('--my',`${reduced?0:my*28}px`)
+    card.style.transform=`translate3d(${d.x}px,${d.y}px,0) translate(-50%,-50%) rotate(${d.held?0:reduced?0:Math.sin(clock*.5)*3-5}deg)`
+   }
+   frame=requestAnimationFrame(draw)
+  };frame=requestAnimationFrame(draw)
+  return()=>{cancelAnimationFrame(frame);window.removeEventListener('resize',place);el.removeEventListener('pointermove',move);el.removeEventListener('pointerleave',leave)}
  },[])
- const feed=(i:number)=>{setSelected(i);setDragging(false)}
- return <main ref={root} className={`entity-study ${clean?'is-clean':''}`} style={{'--haze':haze/100,'--grain':grain/100} as React.CSSProperties}>
-  <div className="space-field" aria-hidden="true"><div className="space-drift"><div className="space-cloud cloud-one"/><div className="space-cloud cloud-two"/><div className="space-cloud cloud-three"/><div className="space-ray"/></div></div>
-  <svg className="space-grain" width="100%" height="100%" aria-hidden="true"><filter id="space-noise"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#space-noise)"/></svg>
-  <header className="study-header"><a href="/" aria-label="Tesseral homepage"><img src="/header/wordmark.svg" alt="Tesseral"/></a><span className="study-edition">EXPLORATION 01 / LIVING INTELLIGENCE</span><button className="study-view" onClick={()=>setClean(!clean)}>{clean?'Show headline ↗':'Explore the entity ↗'}</button></header>
-  <div className="study-copy"><p className="study-eyebrow"><span/> YOUR CREATIVE INTELLIGENCE</p><h1>Give your next big idea<br/><span>a mind to work with.</span></h1><p className="study-description">Meet your Tesseral. Shaped by 17 years of agency experience,<br className="desktop-break"/> it gets to know your client through files, research and conversations.</p></div>
-  <div className={`entity-stage ${dragging?'is-dragging':''}`} onDragOver={e=>{e.preventDefault();e.dataTransfer.dropEffect='copy'}} onDrop={e=>{e.preventDefault();const value=e.dataTransfer.getData('text/tesseral-sample');if(/^[0-2]$/.test(value))feed(Number(value));else setDragging(false)}}>
-   <button className="entity-touch" aria-label="Meet your Tesseral: try a sample brief" onClick={()=>feed(selected===null?0:(selected+1)%samples.length)}><ParticleBloom dark active={selected!==null} colors={palette} organic waves radiant/></button>
-   <div className="entity-caption">{dragging?'DROP IT INTO YOUR TESSERAL':'YOUR TESSERAL'}<span>{selected===null?'Ready to think with you':'Connecting your world'}</span></div>
-   {selected!==null&&<div className="entity-response" role="status"><small>SAMPLE RESPONSE · {samples[selected].name}</small><p>{samples[selected].answer}</p><button aria-label="Dismiss sample response" onClick={()=>setSelected(null)}>×</button></div>}
-  </div>
-  <div className="study-sources" aria-label="Sample files">{samples.map((file,i)=><button key={file.name} className={`study-file file-${i} ${selected===i?'is-connected':''}`} draggable onDragStart={e=>{e.dataTransfer.setData('text/tesseral-sample',String(i));e.dataTransfer.effectAllowed='copy';setDragging(true)}} onDragEnd={()=>setDragging(false)} onClick={()=>feed(i)}><span className="file-icon">{file.icon}</span><span><strong>{file.name}</strong><small>{selected===i?'CONNECTED':file.type}</small></span><span className="file-add">{selected===i?'✓':'+'}</span></button>)}</div>
-  <footer className="study-bottom"><p>Give it something to think about.<span>Drag a sample file into the entity, or tap to connect.</span></p><div className="study-controls"><label>Atmosphere <input aria-label="Atmosphere" type="range" min="0" max="100" value={haze} onChange={e=>setHaze(+e.target.value)}/></label><label>Grain <input aria-label="Grain" type="range" min="0" max="35" value={grain} onChange={e=>setGrain(+e.target.value)}/></label></div><span className="study-note">HERO STUDY<br/>MOVE TO EXPLORE ↗</span></footer>
+ const start=(e:PointerEvent<HTMLButtonElement>)=>{if(e.button!==0||drag.current.done||drag.current.absorbing)return;const r=root.current!.getBoundingClientRect(),d=drag.current;d.held=true;d.ox=e.clientX-r.left-d.x;d.oy=e.clientY-r.top-d.y;d.startX=d.x;d.startY=d.y;e.currentTarget.setPointerCapture(e.pointerId);setStatus('It can feel you getting closer.')}
+ const move=(e:PointerEvent<HTMLButtonElement>)=>{const d=drag.current;if(!d.held)return;const r=root.current!.getBoundingClientRect();d.x=Math.max(65,Math.min(r.width-65,e.clientX-r.left-d.ox));d.y=Math.max(40,Math.min(r.height-40,e.clientY-r.top-d.oy))}
+ const release=()=>{const d=drag.current;if(!d.held)return;d.held=false;const b=stage.current!.getBoundingClientRect(),r=root.current!.getBoundingClientRect();const dist=Math.hypot(d.x-(b.left-r.left+b.width/2),d.y-(b.top-r.top+b.height/2));if(dist<Math.min(b.width,b.height)*.34){d.absorbing=performance.now();d.fromX=d.x;d.fromY=d.y;setStatus('Making a connection…')}else setStatus('Bring the file closer.')}
+ useEffect(()=>{window.addEventListener('pointerup',release);window.addEventListener('mouseup',release);return()=>{window.removeEventListener('pointerup',release);window.removeEventListener('mouseup',release)}},[])
+ const reset=()=>{drag.current.done=false;drag.current.absorbing=0;const b=root.current!.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.24:.19);drag.current.y=b.height*(b.width<650?.77:.56);file.current!.style.opacity='1';file.current!.style.scale='1';setDone(false);setStatus('Bring the file closer.')}
+ return <main ref={root} className="entity-playground">
+  <div className="cosmos" aria-hidden="true"><div className="cosmos-motion"><div className="solar-veil"/><div className="orbit-light"/><div className="planet-edge"/><div className="horizon-glow"/><div className="horizon"/></div></div>
+  <svg className="cosmic-grain" width="100%" height="100%" aria-hidden="true"><filter id="cosmic-noise"><feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#cosmic-noise)"/></svg>
+  <div className="absorb-light" aria-hidden="true"/>
+  <div ref={stage} className="playground-entity" role="img" aria-label="Living Tesseral entity reacts to the nearby file"><ParticleBloom dark active={false} colors={palette} organic waves radiant interaction={interaction}/><div className="absorb-ring" aria-hidden="true"/></div>
+  <button ref={file} className="magnetic-file" aria-label="Drag sample brand brief into Tesseral, or press Enter to connect" aria-hidden={done} tabIndex={done?-1:0} onPointerDown={start} onPointerMove={move} onPointerUp={release} onLostPointerCapture={release} onDragStart={e=>e.preventDefault()} onPointerCancel={()=>{drag.current.held=false;setStatus('Bring the file closer.')}} onKeyDown={e=>{if((e.key==='Enter'||e.key===' ')&&!drag.current.absorbing&&!done){e.preventDefault();drag.current.absorbing=performance.now();drag.current.fromX=drag.current.x;drag.current.fromY=drag.current.y;setStatus('Making a connection…')}}}>
+   <svg width="28" height="34" viewBox="0 0 28 34" fill="none" aria-hidden="true"><path d="M5 1h12l8 8v23H3V3a2 2 0 012-2Z" stroke="currentColor"/><path d="M17 1v9h8M8 17h12M8 22h12M8 27h8" stroke="currentColor"/></svg><span><strong>Brand brief</strong><small>PDF · SAMPLE FILE</small></span><span className="file-grip">⠿</span>
+  </button>
+  <div className="playground-status"><p role="status">{status}</p><span>{done?'Knowledge changes its shape.':'Drag the file into your Tesseral.'}</span>{done&&<button onClick={reset}>Try again ↗</button>}</div>
  </main>
 }

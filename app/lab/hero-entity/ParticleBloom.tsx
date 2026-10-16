@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import * as THREE from 'three'
 
 // Every visible grain is geometry. There is no filled surface or screen-noise
@@ -8,6 +8,8 @@ import * as THREE from 'three'
 const vertexShader = `
   uniform float time, energy, pixelRatio, viewportScale, organic, waves, wireframe;
   uniform vec3 lowColor, midColor, highColor;
+  uniform vec2 magnet;
+  uniform float attraction, burst, evolution;
   attribute vec4 seed;
   varying vec3 tint;
   varying float opacity;
@@ -15,8 +17,9 @@ const vertexShader = `
   // center at different depths. Both parameters wrap without an open seam.
   vec3 organicForm(vec2 q){
     float t=(q.x+1.)*3.14159265, v=q.y*3.14159265;
+    t+=evolution*.16;
     float breath=sin(time*.24);
-    float lobe=2.+.13*breath;
+    float lobe=2.+.13*breath+.22*sin(evolution*1.4);
     vec3 center=vec3(sin(t)+lobe*sin(2.*t),cos(t)-lobe*cos(2.*t),-1.05*sin(3.*t))*.43;
     vec3 tangent=normalize(vec3(cos(t)+2.*lobe*cos(2.*t),-sin(t)+2.*lobe*sin(2.*t),-3.15*cos(3.*t)));
     vec3 normal=normalize(vec3(-tangent.y,tangent.x,0.));
@@ -84,7 +87,15 @@ const vertexShader = `
     }
     p+=vec3(seed.x-.5,seed.y-.5,seed.z-.5)*dissolve*dissolve*.11;
     p+=n*sin(time*.5+seed.y*6.283)*(.008+energy*.02);
+    p.x+=sin(p.y*2.+evolution)*.12*sin(evolution);
+    p.z+=cos(p.x*2.+evolution)*.17*sin(evolution*.8);
+    p*=1.+burst*.12;
     vec4 mv=modelViewMatrix*vec4(p,1.);
+    vec2 destination=magnet*vec2(2.55,2.55);
+    float facing=smoothstep(.58,.98,dot(normalize(mv.xy+vec2(.0001)),normalize(destination+vec2(.0001))));
+    float tendril=facing*pow(seed.z,.75)*attraction;
+    mv.xy=mix(mv.xy,destination,tendril*.84);
+    mv.z+=sin(tendril*3.14)*.22;
     vec3 normal=normalize(normalMatrix*n), view=normalize(-mv.xyz);
     float face=abs(dot(normal,view));
     if(dot(normal,view)<0.)normal=-normal;
@@ -98,7 +109,7 @@ const vertexShader = `
     c*=.92+seed.z*.16;
     // Tiny pale grains catch light independently, like fine illuminated sand.
     c=mix(c,mix(midColor,vec3(1.),.5),pow(seed.x,18.)*.36*dissolve);
-    tint=c;
+    tint=c*(1.+burst*1.9);
     opacity=(.94+seed.y*.06)*(1.-smoothstep(.75,1.,border));
     if(organic>.5)opacity=.96-dissolve*cloud*.46;
     if(waves>.5)opacity=(1.-smoothstep(.48,1.,abs(q.y)))*(.96-.25*cloud);
@@ -122,7 +133,9 @@ const fragmentShader = `
 `
 const postVertex = 'varying vec2 tex;void main(){tex=uv;gl_Position=vec4(position.xy,0.,1.);}'
 
-export default function ParticleBloom({ dark, active, colors, organic=false, waves=false, radiant=false, wireframe=false }: { dark:boolean; active:boolean; colors:string[]; organic?:boolean; waves?:boolean; radiant?:boolean; wireframe?:boolean }) {
+export type EntityInteraction = { x:number; y:number; strength:number; burst:number; morph:number }
+
+export default function ParticleBloom({ dark, active, colors, organic=false, waves=false, radiant=false, wireframe=false, interaction: externalInteraction }: { dark:boolean; active:boolean; colors:string[]; organic?:boolean; waves?:boolean; radiant?:boolean; wireframe?:boolean; interaction?:RefObject<EntityInteraction> }) {
   const host=useRef<HTMLDivElement>(null)
   const current=useRef({dark,active,colors,organic,waves,radiant,wireframe});current.current={dark,active,colors,organic,waves,radiant,wireframe}
   const [fallback,setFallback]=useState(false)
@@ -147,7 +160,7 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
     }
     const geometry=new THREE.BufferGeometry()
     geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('seed',new THREE.BufferAttribute(seeds,4))
-    const uniforms={wireframe:{value:wireframe?1:0},time:{value:0},energy:{value:0},organic:{value:organic?1:0},waves:{value:waves?1:0},pixelRatio:{value:renderer.getPixelRatio()},viewportScale:{value:1},
+    const uniforms={magnet:{value:new THREE.Vector2()},attraction:{value:0},burst:{value:0},evolution:{value:0},wireframe:{value:wireframe?1:0},time:{value:0},energy:{value:0},organic:{value:organic?1:0},waves:{value:waves?1:0},pixelRatio:{value:renderer.getPixelRatio()},viewportScale:{value:1},
       lowColor:{value:new THREE.Color(colors[0])},midColor:{value:new THREE.Color(colors[1]||colors[0])},highColor:{value:new THREE.Color(colors[2]||colors[0])}}
     const material=new THREE.ShaderMaterial({uniforms,vertexShader,fragmentShader,transparent:false,depthWrite:true})
     const grains=new THREE.Points(geometry,material);grains.frustumCulled=false;group.add(grains)
@@ -175,7 +188,7 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
             float core=1.-smoothstep(.035,.235,length((tex-.5)*vec2(aspect,1.)));
             core*=smoothstep(.04,.45,wide.a);
             float veil=wide.a*.16*(1.-a)*core;
-            vec3 pearl=mix(wide.rgb/max(wide.a,.0001),vec3(1.,.97,.91),.22);
+            vec3 pearl=mix(wide.rgb/max(wide.a,.0001),vec3(1.,1.,.96),.22);
             c+=pearl*veil;
             a+=veil;
             c+=(halo.rgb*mix(.24,.46,dark)+pearl*wide.a*mix(.10,.20,dark))*core;
@@ -204,6 +217,8 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
       const dt=Math.min((now-last)/1000,.05);last=now
       if(!document.hidden){
         if(!reduced)elapsed+=dt
+        const input=externalInteraction?.current;
+        if(input){uniforms.magnet.value.set(input.x,input.y);uniforms.attraction.value=input.strength;uniforms.burst.value=reduced?input.burst*.15:input.burst;uniforms.evolution.value=THREE.MathUtils.lerp(uniforms.evolution.value,input.morph,.012)}
         uniforms.time.value=elapsed;uniforms.energy.value=THREE.MathUtils.lerp(uniforms.energy.value,current.current.active?1:hover*.3,.035)
         uniforms.organic.value=current.current.organic?1:0
         uniforms.waves.value=current.current.waves?1:0
