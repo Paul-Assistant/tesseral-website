@@ -16,7 +16,7 @@ export default function PrismFlare(){
     previousAngle=angle
    }
    lastX=event.clientX;lastY=event.clientY;previousTime=now
-   if(now-lastShot<4500||segments<3||travel<260)return
+   if(now-lastShot<7000||segments<3||travel<260)return
    const r=root.getBoundingClientRect(),planet=root.querySelector(root.dataset.mood==='observatory'?'.retro-orb':'.planet-edge') as HTMLElement|null
    if(!planet)return
    // Fixed positions on the actual rotated ellipse, not the pointer position.
@@ -32,7 +32,7 @@ export default function PrismFlare(){
     started=lastShot=now;segments=0;travel=0;segmentTravel=0;break
    }
   }
-  const draw=(now:number)=>{const t=(now-started)/1000;el.style.opacity=String(t>=0&&t<2.2?.85*(1-Math.exp(-t*14))*Math.exp(-t*2.4):0);frame=requestAnimationFrame(draw)}
+  const draw=(now:number)=>{const t=(now-started)/1000,smooth=(v:number)=>v*v*(3-2*v);const glow=t<0?0:t<2?smooth(t/2):t<3?1:t<5.5?1-smooth((t-3)/2.5):0;el.style.opacity=String(.85*glow);frame=requestAnimationFrame(draw)}
   root.addEventListener('pointermove',move);frame=requestAnimationFrame(draw)
   return()=>{root.removeEventListener('pointermove',move);cancelAnimationFrame(frame)}
  },[])
