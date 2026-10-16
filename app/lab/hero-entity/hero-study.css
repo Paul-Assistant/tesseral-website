@@ -47,3 +47,12 @@
 /* Light gathers around the entity and falls off into the outer space. */
 .entity-atmosphere{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 53% 48%,#d7dfd02e 0%,#a6b1a51c 18%,#77817809 36%,transparent 55%),radial-gradient(ellipse at 53% 48%,transparent 18%,#05070818 42%,#03050699 75%,#020304e6 100%)}
 @media(max-width:650px){.entity-atmosphere{background:radial-gradient(ellipse at 50% 43%,#d7dfd02e 0%,#a6b1a51c 18%,#77817809 36%,transparent 55%),radial-gradient(ellipse at 50% 43%,transparent 18%,#05070818 42%,#03050699 75%,#020304e6 100%)}}
+/* Dark counterpart to the Frosted Flow material. */
+.magnetic-file{isolation:isolate;overflow:hidden;border:1px solid #e7edf05c;background:linear-gradient(145deg,#242a30d9,#10161bc9);backdrop-filter:blur(26px) saturate(.8);-webkit-backdrop-filter:blur(26px) saturate(.8);box-shadow:0 12px 30px #0004,inset 0 1px 1px #ffffff45,inset 0 -1px 1px #b8cde12e;color:#edf1ef;transition:border-color .8s,box-shadow .8s}
+.magnetic-file::before{content:"";position:absolute;inset:-70% -25%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 20% 45%,#a1d9ec66,transparent 43%),radial-gradient(ellipse at 75% 60%,#d6a4c24d,transparent 37%),conic-gradient(from 35deg at 45% 50%,#e9dfad26,#a5d9e44d,#9d9ec640,#e2b6bd33,#ecdfb826,#a5d9e440);filter:blur(12px);opacity:.48;animation:brief-iridescence 17s ease-in-out infinite alternate;transition:opacity 1.2s}
+.magnetic-file::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:conic-gradient(from var(--rim-angle),#ffffffb3,#60717e66,#d7edff99,#ffffffc9,#d8b3cf66,#8ba3b888,#faf8edb3,#a2c9de88,#be9aae66,#eee0b780,#8a97a666,#ffffffb3);mask-image:linear-gradient(#fff,#fff),linear-gradient(#fff,#fff);mask-clip:content-box,border-box;mask-origin:content-box,border-box;mask-composite:exclude;animation:rim-orbit 23s linear infinite}
+.magnetic-file:hover::before,.magnetic-file:focus-visible::before,.magnetic-file:active::before{opacity:.72}
+.magnetic-file:hover{box-shadow:0 14px 34px #0005,inset 0 1px 1px #ffffff65,inset 0 -1px 1px #c7d8e940}
+.magnetic-file small,.magnetic-file .file-grip{color:#c1c9cf}
+@keyframes brief-iridescence{from{transform:translate(-8%,-10%) rotate(-15deg)}to{transform:translate(12%,15%) rotate(28deg)}}
+@media(prefers-reduced-motion:reduce){.magnetic-file::before,.magnetic-file::after{animation:none}.magnetic-file,.magnetic-file::before{transition:none}}
