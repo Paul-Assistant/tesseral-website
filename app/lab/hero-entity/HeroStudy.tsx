@@ -1,17 +1,19 @@
 'use client'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import ParticleBloom, { type EntityInteraction } from './ParticleBloom'
-import ButtonStudies from './ButtonStudies'
+import HeroComposition, { ParticleLogo } from './HeroComposition'
 import RetroMood from './RetroMood'
 import PrismFlare from './PrismFlare'
 import SphereParticles from './SphereParticles'
 import CosmicDust from './CosmicDust'
 import ParticleShockwave from './ParticleShockwave'
 import './hero-study.css'
+import './hero-composition.css'
 
 const palette = ['#7B7B7B', '#C6FF1B', '#E9ECE6']
 export default function HeroStudy(){
- const [showUI,setShowUI]=useState(true),[light,setLight]=useState(false)
+ const [showUI,setShowUI]=useState(true),[light,setLight]=useState(true)
+ const [finish,setFinish]=useState('metal')
  const root=useRef<HTMLElement>(null),file=useRef<HTMLButtonElement>(null),stage=useRef<HTMLDivElement>(null)
  const interaction=useRef<EntityInteraction>({x:0,y:0,strength:0,burst:0,morph:0})
  const drag=useRef({held:false,x:0,y:0,ox:0,oy:0,startX:0,startY:0,absorbing:0,fromX:0,fromY:0,done:false,shrink:1})
@@ -20,7 +22,7 @@ export default function HeroStudy(){
   const el=root.current!,card=file.current!,entity=stage.current!
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
   let frame=0,last=0,clock=0,mx=0,my=0,tx=0,ty=0,swellAt=-10000
-  const place=()=>{if(drag.current.held||drag.current.absorbing)return;const b=el.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.24:.19);drag.current.y=b.height*(b.width<650?.77:.56)}
+  const place=()=>{if(drag.current.held||drag.current.absorbing)return;const b=el.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.78:.847);drag.current.y=b.height*(b.width<650?.72:.252)}
   place();window.addEventListener('resize',place)
   const move=(e:globalThis.PointerEvent)=>{const b=el.getBoundingClientRect();tx=(e.clientX-b.left)/b.width-.5;ty=(e.clientY-b.top)/b.height-.5}
   const leave=()=>{tx=ty=0};el.addEventListener('pointermove',move);el.addEventListener('pointerleave',leave)
@@ -55,16 +57,16 @@ export default function HeroStudy(){
  const move=(e:PointerEvent<HTMLButtonElement>)=>{const d=drag.current;if(!d.held)return;const r=root.current!.getBoundingClientRect();d.x=Math.max(65,Math.min(r.width-65,e.clientX-r.left-d.ox));d.y=Math.max(40,Math.min(r.height-40,e.clientY-r.top-d.oy))}
  const release=()=>{const d=drag.current;if(!d.held)return;d.held=false;const b=stage.current!.getBoundingClientRect(),r=root.current!.getBoundingClientRect();const dist=Math.hypot(d.x-(b.left-r.left+b.width/2),d.y-(b.top-r.top+b.height/2));if(dist<Math.min(b.width,b.height)*.34){d.absorbing=performance.now();d.fromX=d.x;d.fromY=d.y;setStatus('Making a connection…')}else setStatus('Bring the file closer.')}
  useEffect(()=>{window.addEventListener('pointerup',release);window.addEventListener('mouseup',release);return()=>{window.removeEventListener('pointerup',release);window.removeEventListener('mouseup',release)}},[])
- const reset=()=>{drag.current.done=false;drag.current.absorbing=0;const b=root.current!.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.24:.19);drag.current.y=b.height*(b.width<650?.77:.56);file.current!.style.opacity='1';drag.current.shrink=1;setDone(false);setStatus('Bring the file closer.')}
- return <main ref={root} className="entity-playground" data-mood="observatory" data-theme={light?'light':'dark'} data-show-ui={showUI}>
-  <div className="scene-controls" aria-label="Scene controls"><button type="button" role="switch" aria-checked={!showUI} onClick={()=>{drag.current.held=false;setShowUI(!showUI)}}>Scene only <span>{showUI?'Off':'On'}</span></button><button type="button" role="switch" aria-checked={light} onClick={()=>setLight(!light)}>Light mode <span>{light?'On':'Off'}</span></button></div>
+ const reset=()=>{drag.current.done=false;drag.current.absorbing=0;const b=root.current!.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.78:.847);drag.current.y=b.height*(b.width<650?.72:.252);file.current!.style.opacity='1';drag.current.shrink=1;setDone(false);setStatus('Bring the file closer.')}
+ return <main ref={root} className="entity-playground" data-mood="observatory" data-theme={light?'light':'dark'} data-show-ui={showUI} data-finish={finish}>
+  <div className="scene-controls" aria-label="Scene controls"><button type="button" role="switch" aria-checked={!showUI} onClick={()=>{drag.current.held=false;setShowUI(!showUI)}}>Scene only <span>{showUI?'Off':'On'}</span></button><button type="button" role="switch" aria-checked={light} onClick={()=>setLight(!light)}>Light mode <span>{light?'On':'Off'}</span></button><label>Tile <select aria-label="Tile finish" value={finish} onChange={e=>setFinish(e.target.value)}><option value="metal">Silver</option><option value="hologram">Hologram</option><option value="glass">Glass</option></select></label></div>
   <RetroMood/>
   <div className="cosmos" aria-hidden="true"><div className="cosmos-motion"><div className="solar-veil"/><div className="orbit-light"/><div className="planet-edge"/><div className="horizon-glow"/><div className="horizon"/></div><div className="entity-atmosphere"/></div>
   <svg className="cosmic-grain" width="100%" height="100%" aria-hidden="true"><filter id="cosmic-noise"><feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#cosmic-noise)"/></svg>
-  <SphereParticles/><PrismFlare/><ButtonStudies/><CosmicDust/><ParticleShockwave interaction={interaction}/>
+  <SphereParticles/><PrismFlare/><HeroComposition show={showUI}/><CosmicDust/><ParticleShockwave interaction={interaction}/>
   <div ref={stage} className="playground-entity" role="img" aria-label="Living Tesseral entity reacts to the nearby file"><ParticleBloom dark={!light} active={false} colors={light?['#343B3D','#C6FF1B','#6B7577']:palette} organic waves wireframe={!done} radiant={done} interaction={interaction}/></div>
-  <button ref={file} className="magnetic-file" aria-label="Drag sample brand brief into Tesseral, or press Enter to connect" aria-hidden={done||!showUI} tabIndex={done||!showUI?-1:0} onPointerDown={start} onPointerMove={move} onPointerUp={release} onLostPointerCapture={release} onDragStart={e=>e.preventDefault()} onPointerCancel={()=>{drag.current.held=false;setStatus('Bring the file closer.')}} onKeyDown={e=>{if((e.key==='Enter'||e.key===' ')&&!drag.current.absorbing&&!done){e.preventDefault();drag.current.absorbing=performance.now();drag.current.fromX=drag.current.x;drag.current.fromY=drag.current.y;setStatus('Making a connection…')}}}>
-   <svg width="28" height="34" viewBox="0 0 28 34" fill="none" aria-hidden="true"><path d="M5 1h12l8 8v23H3V3a2 2 0 012-2Z" stroke="currentColor"/><path d="M17 1v9h8M8 17h12M8 22h12M8 27h8" stroke="currentColor"/></svg><span><strong>Brand brief</strong><small>PDF · SAMPLE FILE</small></span><span className="file-grip">⠿</span>
+  <button ref={file} className="magnetic-file" aria-label="Drag sample Figma file into Tesseral, or press Enter to connect" aria-hidden={done||!showUI} tabIndex={done||!showUI?-1:0} onPointerDown={start} onPointerMove={move} onPointerUp={release} onLostPointerCapture={release} onDragStart={e=>e.preventDefault()} onPointerCancel={()=>{drag.current.held=false;setStatus('Bring the file closer.')}} onKeyDown={e=>{if((e.key==='Enter'||e.key===' ')&&!drag.current.absorbing&&!done){e.preventDefault();drag.current.absorbing=performance.now();drag.current.fromX=drag.current.x;drag.current.fromY=drag.current.y;setStatus('Making a connection…')}}}>
+   <ParticleLogo/><span className="tile-title">Visual reference</span><span className="tile-meta"><span>FIGMA FILE</span><span>8 PAGES</span></span>
   </button>
   <div className="playground-status"><p role="status">{status}</p><span>{done?'Knowledge changes its shape.':'Drag the file into your Tesseral.'}</span>{done&&<button onClick={reset}>Try again ↗</button>}</div>
  </main>

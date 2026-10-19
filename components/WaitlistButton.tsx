@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import './integration-request.css'
 import { trackEvent } from '@/lib/analytics'
 
-function WaitlistDialog({ close, source }: { close: () => void; source: string }) {
+export function WaitlistDialog({ close, source }: { close: () => void; source: string }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [error, setError] = useState('')
