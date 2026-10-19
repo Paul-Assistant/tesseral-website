@@ -46,3 +46,21 @@
 .rim-prism-light{stroke-width:15px;filter:blur(8px)}
 .rim-prism-core{stroke-width:4px;filter:blur(3px)}
 @media(prefers-reduced-motion:reduce){.rim-prism{display:none}}
+.scene-controls{position:absolute;z-index:30;top:20px;right:22px;display:flex;gap:8px;font-family:var(--font-soft),sans-serif}
+.scene-controls button{display:flex;align-items:center;gap:14px;padding:10px 13px;border:1px solid #ffffff26;border-radius:24px;background:#181d20b3;backdrop-filter:blur(18px);color:#dce1dd;font:500 11px var(--font-soft);cursor:pointer}
+.scene-controls button span{min-width:27px;color:#8e9691;font-size:10px}.scene-controls button[aria-checked=true] span{color:#c6ff1b}.scene-controls button:focus-visible{outline:2px solid #c6ff1b;outline-offset:4px}
+.entity-playground[data-show-ui=false] .button-studies,.entity-playground[data-show-ui=false] .magnetic-file,.entity-playground[data-show-ui=false] .playground-status{visibility:hidden;pointer-events:none}
+.entity-playground[data-theme=light]{background:#e2e5e1;color:#252c2c}
+.entity-playground[data-theme=light] .cosmos{filter:grayscale(1) brightness(1.6);opacity:.13}
+.entity-playground[data-theme=light] .retro-world{filter:grayscale(1);opacity:.85}
+.entity-playground[data-theme=light] .retro-orb{background:radial-gradient(ellipse at 30% 6%,#fcfff6,#c0c7c2 24%,#7f8a87 60%);box-shadow:0 -20px 65px #ffffffb3,0 -60px 160px #f6ffe780,0 -100px 240px #faffec40}
+.entity-playground[data-theme=light] .retro-land{background:linear-gradient(10deg,#a0aaa5,#c3c9c1);box-shadow:0 -14px 55px #faffed40}
+.entity-playground[data-theme=light] .retro-nebula{background:radial-gradient(ellipse,#ffffff80,transparent 68%)}
+.entity-playground[data-theme=light] .retro-print{background:radial-gradient(ellipse at 53% 43%,#ffffff33 10%,transparent 45%,#53615b22 100%);box-shadow:inset 0 0 180px #52615918;mix-blend-mode:multiply}
+.entity-playground[data-theme=light] .photographic-sky{mix-blend-mode:multiply;filter:invert(1);opacity:.45}
+.entity-playground[data-theme=light] .cosmic-grain{opacity:.2;mix-blend-mode:multiply}
+.entity-playground[data-theme=light] .sphere-particles{mix-blend-mode:multiply;filter:invert(1);opacity:.45}
+.entity-playground[data-theme=light] .playground-status>span,.entity-playground[data-theme=light] .button-study-name,.entity-playground[data-theme=light] .button-study-feedback{color:#49564f}
+.entity-playground[data-theme=light] .scene-controls button{background:#f2f5eecc;border-color:#52635433;color:#28342e}.entity-playground[data-theme=light] .scene-controls button span{color:#69756b}.entity-playground[data-theme=light] .scene-controls button[aria-checked=true] span{color:#526b0d}
+.entity-playground[data-theme=light] .playground-status button{color:#405410;background:#c6ff1b33;border-color:#728c1c66}
+@media(max-width:650px){.scene-controls{top:14px;right:14px;gap:6px}.scene-controls button{font-size:10px;padding:9px 11px;gap:9px}}
