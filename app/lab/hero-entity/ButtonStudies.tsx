@@ -30,6 +30,7 @@ export function MaterialButton({kind,children,label,selected,onSelect}:{kind:str
   window.addEventListener('tesseral-render',paint);return()=>window.removeEventListener('tesseral-render',paint)
  },[kind])
  useEffect(()=>{
+  if(matchMedia('(pointer: coarse)').matches)return
   const el=ref.current!,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
   let tx=.5,ty=.5,x=.5,y=.5,frame=0,last=0,mx=0,my=0,g=0,px=-9999,py=-9999
   const move=(e:PointerEvent)=>{const b=el.getBoundingClientRect();tx=(e.clientX-b.left)/b.width;ty=(e.clientY-b.top)/b.height}

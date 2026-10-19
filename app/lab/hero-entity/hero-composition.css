@@ -3,3 +3,16 @@
 @media(prefers-reduced-motion:reduce){.study-brand>img{animation:none}}
 
 .study-nav .material-label>img[src$="globe.svg"]{width:17px;height:17px}.entity-playground .playground-status{left:auto;right:5%;bottom:12%;text-align:right}.entity-playground .playground-status p,.entity-playground .playground-status>span{font:10px var(--font-mono)}.entity-playground .playground-status>span{display:none}.entity-playground .playground-entity{width:min(600px,54vw);height:min(540px,64vh)}.scene-controls select{color:#555}.entity-playground[data-theme=dark] .scene-controls select{color:#ddd}@media(max-width:650px){.entity-playground .playground-entity{width:95vw;height:58vh}.entity-playground .playground-status{bottom:24%;right:6%}}
+
+/* Touch devices keep the atmosphere but avoid continuously rasterizing large filters. */
+@media(pointer:coarse),(max-width:767px){
+ .entity-playground .cosmic-grain{display:none}
+ .entity-playground :is(.cosmos-motion,.retro-world,.retro-orb,.retro-ring,.retro-nebula,.retro-land,.retro-print){animation:none!important;transition:none!important}
+ .entity-playground .cosmos-motion{transform:none!important}
+ .entity-playground .retro-world{transform:none!important}
+ .entity-playground .material-rim,.entity-playground .magnetic-file::after{animation:none}
+ .entity-playground .material-cloud:before,.entity-playground .magnetic-file::before{animation-duration:25s}
+ .entity-playground .magnetic-file{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .entity-playground[data-finish=glass] .magnetic-file{backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}
+ .entity-playground .material-frost .material-backdrop{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+}

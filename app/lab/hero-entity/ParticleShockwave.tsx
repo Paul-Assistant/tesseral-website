@@ -6,15 +6,20 @@ export default function ParticleShockwave({ interaction }: { interaction:RefObje
  const canvas=useRef<HTMLCanvasElement>(null)
  useEffect(()=>{
   const el=canvas.current!,ctx=el.getContext('2d');if(!ctx)return
+  const mobile=matchMedia('(pointer: coarse)').matches||innerWidth<768
+  let dirty=false,lastDraw=0
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
   let width=0,height=0,frame=0,start=-10000,lastMorph=interaction.current.morph
   let seed=731;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}
-  const points=Array.from({length:6500},()=>({angle:random()*Math.PI*2,spread:random(),speed:random(),size:.35+random()*1.1,alpha:.15+random()*.7,wisp:random()}))
-  const resize=()=>{width=el.clientWidth;height=el.clientHeight;const dpr=Math.min(devicePixelRatio,1.5);el.width=width*dpr;el.height=height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+  const points=Array.from({length:mobile?1500:6500},()=>({angle:random()*Math.PI*2,spread:random(),speed:random(),size:.35+random()*1.1,alpha:.15+random()*.7,wisp:random()}))
+  const resize=()=>{width=el.clientWidth;height=el.clientHeight;const dpr=Math.min(devicePixelRatio,mobile?1:1.5);el.width=width*dpr;el.height=height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
   const observer=new ResizeObserver(resize);observer.observe(el);resize()
   const draw=(now:number)=>{
    if(interaction.current.morph!==lastMorph){lastMorph=interaction.current.morph;start=now}
-   const age=(now-start)/1000;ctx.clearRect(0,0,width,height)
+   const age=(now-start)/1000
+   if(age>=4.5||document.hidden){if(dirty){ctx.clearRect(0,0,width,height);dirty=false}frame=requestAnimationFrame(draw);return}
+   if(mobile&&now-lastDraw<33){frame=requestAnimationFrame(draw);return}lastDraw=now
+   ctx.clearRect(0,0,width,height);dirty=true
    if(age>=0&&age<4.5&&!document.hidden){
     const cx=width*(width<650?.5:.53),cy=height*(width<650?.43:.48),max=Math.max(width,height)*.8
     const waveTime=Math.max(0,age-.22),progress=1-Math.exp(-waveTime*1.6),fade=Math.exp(-waveTime*.85)*Math.min(1,waveTime*12)

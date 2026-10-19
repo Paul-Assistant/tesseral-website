@@ -4,8 +4,12 @@ export default function PhotographicSky(){
  const ref=useRef<HTMLCanvasElement>(null)
  useEffect(()=>{
   const canvas=ref.current!,ctx=canvas.getContext('2d');if(!ctx)return
+  const mobile=matchMedia('(pointer: coarse)').matches||innerWidth<768
+  let previousWidth=0,previousHeight=0
   const paint=()=>{
-   const w=canvas.width=Math.min(3200,window.innerWidth*1.8),h=canvas.height=Math.min(2200,window.innerHeight*1.8)
+   if(previousWidth===innerWidth&&Math.abs(previousHeight-innerHeight)<100)return
+   previousWidth=innerWidth;previousHeight=innerHeight
+   const w=canvas.width=Math.min(3200,window.innerWidth*(mobile?1:1.8)),h=canvas.height=Math.min(2200,window.innerHeight*(mobile?1:1.8))
    let seed=1851;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
    ctx.clearRect(0,0,w,h)
    // Soft, overlapping exposures create uneven photographic density.

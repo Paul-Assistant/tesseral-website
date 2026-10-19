@@ -3,6 +3,7 @@ import {useEffect,useRef} from 'react'
 export default function PrismFlare(){
  const ref=useRef<SVGSVGElement>(null)
  useEffect(()=>{
+  if(matchMedia('(pointer: coarse)').matches)return
   const el=ref.current!,root=el.closest('main')!,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
   if(reduced)return
   let frame=0,started=-10000,lastShot=-10000,travel=0,lastX=0,lastY=0,previousTime=0,segments=0,segmentTravel=0,previousAngle=0

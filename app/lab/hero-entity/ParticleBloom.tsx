@@ -151,12 +151,12 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
     const root=host.current;if(!root)return
     let renderer:THREE.WebGLRenderer
     try{renderer=new THREE.WebGLRenderer({alpha:true,antialias:false})}catch{setFallback(true);return}
-    const mobile=root.clientWidth<450
-    renderer.setPixelRatio(Math.min(devicePixelRatio,mobile?1.25:1.5));renderer.setClearColor(0,0)
+    const mobile=matchMedia('(pointer: coarse)').matches||window.innerWidth<768
+    renderer.setPixelRatio(Math.min(devicePixelRatio,mobile?1:1.5));renderer.setClearColor(0,0)
     root.appendChild(renderer.domElement)
     const scene=new THREE.Scene(),group=new THREE.Group();scene.add(group)
     const camera=new THREE.PerspectiveCamera(40,1,.1,30);camera.position.z=7
-    const count=mobile?85000:240000
+    const count=mobile?28000:240000
     const positions=new Float32Array(count*3),seeds=new Float32Array(count*4)
     let randomState=170315
     const random=()=>{randomState=(Math.imul(randomState,1664525)+1013904223)>>>0;return randomState/4294967296}
@@ -209,7 +209,7 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
       const w=root.clientWidth*1.5,h=root.clientHeight*1.5,dpr=renderer.getPixelRatio()
       renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()
       composite.uniforms.aspect.value=w/h
-      target.setSize(w*dpr,h*dpr);glowA.setSize(Math.ceil(w*dpr/3),Math.ceil(h*dpr/3));glowB.setSize(glowA.width,glowA.height)
+      target.setSize(w*dpr,h*dpr);glowA.setSize(Math.ceil(w*dpr/(mobile?5:3)),Math.ceil(h*dpr/(mobile?5:3)));glowB.setSize(glowA.width,glowA.height)
       auraA.setSize(Math.ceil(w*dpr/6),Math.ceil(h*dpr/6));auraB.setSize(auraA.width,auraA.height)
       uniforms.viewportScale.value=Math.max(.8,root.clientHeight/460)
     }
@@ -223,12 +223,13 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
     interaction.addEventListener('pointerenter',enter);interaction.addEventListener('pointerleave',leave);interaction.addEventListener('pointermove',move);interaction.addEventListener('focus',enter);interaction.addEventListener('blur',leave)
     const tint=new THREE.Color()
     const draw=(now:number)=>{
-      const dt=Math.min((now-last)/1000,.05);last=now
+      if(mobile&&now-last<1000/30-1){frame=requestAnimationFrame(draw);return}
+      const dt=Math.min((now-last)/1000,.1);last=now
       if(!document.hidden){
         if(!reduced)elapsed+=dt
         const input=externalInteraction?.current;
-        if(input){uniforms.magnet.value.set(input.x,input.y);uniforms.attraction.value=input.strength;uniforms.burst.value=reduced?input.burst*.15:input.burst;uniforms.evolution.value=THREE.MathUtils.lerp(uniforms.evolution.value,input.morph,.012)}
-        uniforms.time.value=elapsed;uniforms.energy.value=THREE.MathUtils.lerp(uniforms.energy.value,current.current.active?1:hover*.3,.035)
+        if(input){uniforms.magnet.value.set(input.x,input.y);uniforms.attraction.value=input.strength;uniforms.burst.value=reduced?input.burst*.15:input.burst;uniforms.evolution.value=THREE.MathUtils.lerp(uniforms.evolution.value,input.morph,1-Math.exp(-dt*.72))}
+        uniforms.time.value=elapsed;uniforms.energy.value=THREE.MathUtils.lerp(uniforms.energy.value,current.current.active?1:hover*.3,1-Math.exp(-dt*2.1))
         uniforms.organic.value=current.current.organic?1:0
         uniforms.waves.value=current.current.waves?1:0
         const nextStyle=current.current.wireframe?1:0
@@ -238,19 +239,20 @@ export default function ParticleBloom({ dark, active, colors, organic=false, wav
         uniforms.wireframe.value=THREE.MathUtils.lerp(styleFrom,styleTo,eased)
         composite.uniforms.dark.value=current.current.dark?1:0
         composite.uniforms.radiant.value=1-uniforms.wireframe.value
-        ;[uniforms.lowColor,uniforms.midColor,uniforms.highColor].forEach((u,i)=>u.value.lerp(tint.set(current.current.colors[i]||current.current.colors[0]),.035))
+        ;[uniforms.lowColor,uniforms.midColor,uniforms.highColor].forEach((u,i)=>u.value.lerp(tint.set(current.current.colors[i]||current.current.colors[0]),1-Math.exp(-dt*2.1)))
         group.rotation.set(.15+(reduced?0:Math.sin(elapsed*.15)*.12+py*.12),.25+(reduced?0:Math.sin(elapsed*.18)*.32+px*.18),-.38+(reduced?0:Math.sin(elapsed*.12)*.08))
         renderer.setRenderTarget(target);renderer.render(scene,camera)
         quad.material=blur;blur.uniforms.image.value=target.texture;blur.uniforms.direction.value.set(2.7/glowA.width,0)
         renderer.setRenderTarget(glowA);renderer.render(postScene,postCamera)
         blur.uniforms.image.value=glowA.texture;blur.uniforms.direction.value.set(0,2.7/glowB.height)
         renderer.setRenderTarget(glowB);renderer.render(postScene,postCamera)
-        if(composite.uniforms.radiant.value>.001){
+        if(!mobile&&composite.uniforms.radiant.value>.001){
           blur.uniforms.image.value=glowB.texture;blur.uniforms.direction.value.set(3.8/auraA.width,0)
           renderer.setRenderTarget(auraA);renderer.render(postScene,postCamera)
           blur.uniforms.image.value=auraA.texture;blur.uniforms.direction.value.set(0,3.8/auraB.height)
           renderer.setRenderTarget(auraB);renderer.render(postScene,postCamera)
         }
+        composite.uniforms.aura.value=mobile?glowB.texture:auraB.texture;
         quad.material=composite;renderer.setRenderTarget(null);renderer.render(postScene,postCamera)
         window.dispatchEvent(new CustomEvent("tesseral-render",{detail:renderer.domElement}))
       }

@@ -20,14 +20,16 @@ export default function HeroStudy(){
  const [status,setStatus]=useState('Bring the file closer.'),[done,setDone]=useState(false)
  useEffect(()=>{
   const el=root.current!,card=file.current!,entity=stage.current!
+  const mobile=matchMedia('(pointer: coarse)').matches||innerWidth<768
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
   let frame=0,last=0,clock=0,mx=0,my=0,tx=0,ty=0,swellAt=-10000
   const place=()=>{if(drag.current.held||drag.current.absorbing)return;const b=el.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.78:.847);drag.current.y=b.height*(b.width<650?.72:.252)}
   place();window.addEventListener('resize',place)
-  const move=(e:globalThis.PointerEvent)=>{const b=el.getBoundingClientRect();tx=(e.clientX-b.left)/b.width-.5;ty=(e.clientY-b.top)/b.height-.5}
+  const move=(e:globalThis.PointerEvent)=>{if(mobile)return;const b=el.getBoundingClientRect();tx=(e.clientX-b.left)/b.width-.5;ty=(e.clientY-b.top)/b.height-.5}
   const leave=()=>{tx=ty=0};el.addEventListener('pointermove',move);el.addEventListener('pointerleave',leave)
   const draw=(now:number)=>{
-   const dt=Math.min((now-last)/1000,.05);last=now
+   if(mobile&&!drag.current.held&&!drag.current.absorbing&&now-last<33){frame=requestAnimationFrame(draw);return}
+   const dt=Math.min((now-last)/1000,.1);last=now
    if(!document.hidden){
     clock+=dt;const d=drag.current,b=entity.getBoundingClientRect(),r=el.getBoundingClientRect(),cx=b.left-r.left+b.width/2,cy=b.top-r.top+b.height/2
     let dx=d.x-cx,dy=d.y-cy,dist=Math.hypot(dx,dy)

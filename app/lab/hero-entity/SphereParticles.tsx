@@ -4,15 +4,17 @@ export default function SphereParticles(){
  const ref=useRef<HTMLCanvasElement>(null)
  useEffect(()=>{
   const canvas=ref.current!,ctx=canvas.getContext('2d');if(!ctx)return
+  const mobile=matchMedia('(pointer: coarse)').matches||innerWidth<768
   const root=canvas.closest('main')!,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches
   let seed=71;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
-  const particles=Array.from({length:1100},()=>({angle:Math.PI*(1.02+random()*.85),phase:random(),speed:.025+random()*.025,size:.4+random()*.85,drift:(random()-.5)*18,alpha:.14+random()*.24}))
+  const particles=Array.from({length:mobile?220:1100},()=>({angle:Math.PI*(1.02+random()*.85),phase:random(),speed:.025+random()*.025,size:.4+random()*.85,drift:(random()-.5)*18,alpha:.14+random()*.24}))
   let frame=0,last=0,time=0
   const draw=(now:number)=>{
-   const dt=Math.min(.05,(now-last)/1000);last=now
+   if(mobile&&now-last<50){frame=requestAnimationFrame(draw);return}
+   const dt=Math.min(.1,(now-last)/1000);last=now
    if(!document.hidden){
     if(!reduced)time+=dt
-    const r=root.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1),w=Math.round(r.width*dpr),h=Math.round(r.height*dpr)
+    const r=root.getBoundingClientRect(),dpr=Math.min(mobile?1:2,devicePixelRatio||1),w=Math.round(r.width*dpr),h=Math.round(r.height*dpr)
     if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,r.width,r.height)
     const planet=root.querySelector(root.dataset.mood==='observatory'?'.retro-orb':'.planet-edge') as HTMLElement|null
