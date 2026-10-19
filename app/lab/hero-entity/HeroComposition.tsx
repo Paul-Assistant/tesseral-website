@@ -28,9 +28,9 @@ export function ParticleLogo(){
  return <canvas className="tile-particle-logo" ref={ref} width="128" height="128" aria-label="Breathing Figma particle logo" role="img"/>
 }
 const items=[['Overview','home','globe'],['The problem','problem','nav-2'],['How it works','how-it-works','nav-3'],['Pricing','pricing','nav-4']]
-export default function HeroComposition({show}:{show:boolean}){
+export default function HeroComposition(){
  const [open,setOpen]=useState(false)
- return <><div className="hero-composition" hidden={!show}>
+ return <><div className="hero-composition">
   <nav className="study-nav" aria-label="Main navigation">{items.map(([label,id,icon])=><MaterialButton key={id} kind="icon" label={label} selected={id==='home'} onSelect={()=>{if(id==='home')window.scrollTo({top:0});else window.location.assign('/#'+id)}}><img src={`/header/${icon}.svg`} width="43" height="43" alt=""/><span className="nav-tooltip">{label}</span></MaterialButton>)}</nav>
   <div className="study-brand"><p><DigitalText text={'YOUR       CREATIVE\nINTELLIGENCE'} delay={100}/></p><img src="/hero-study/wordmark.svg" width="308" height="74" alt="Tesseral"/></div>
   <div className="study-invitation"><p><DigitalText text={'GIVE IT   SOMETHING\nTO THINK ABOUT.'} delay={450}/></p><p><DigitalText text={'DRAG A SAMPLE FILE\n   INTO YOUR   TESSERAL.\nSEE WHAT   CONNECTS.'} delay={750}/></p></div>

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import ParticleBloom, { type EntityInteraction } from './ParticleBloom'
 import HeroComposition, { ParticleLogo } from './HeroComposition'
+import { MaterialButton } from './ButtonStudies'
 import RetroMood from './RetroMood'
 import PrismFlare from './PrismFlare'
 import SphereParticles from './SphereParticles'
@@ -12,12 +13,11 @@ import './hero-composition.css'
 
 const palette = ['#7B7B7B', '#C6FF1B', '#E9ECE6']
 export default function HeroStudy(){
- const [showUI,setShowUI]=useState(true),[light,setLight]=useState(true)
- const [finish,setFinish]=useState('metal')
+ const [light,setLight]=useState(true)
  const root=useRef<HTMLElement>(null),file=useRef<HTMLButtonElement>(null),stage=useRef<HTMLDivElement>(null)
  const interaction=useRef<EntityInteraction>({x:0,y:0,strength:0,burst:0,morph:0})
  const drag=useRef({held:false,x:0,y:0,ox:0,oy:0,startX:0,startY:0,absorbing:0,fromX:0,fromY:0,done:false,shrink:1})
- const [status,setStatus]=useState('Bring the file closer.'),[done,setDone]=useState(false)
+ const [done,setDone]=useState(false)
  useEffect(()=>{
   const el=root.current!,card=file.current!,entity=stage.current!
   const mobile=matchMedia('(pointer: coarse)').matches||innerWidth<768
@@ -37,7 +37,7 @@ export default function HeroStudy(){
      const t=Math.min(1,(now-d.absorbing)/600),ease=1-Math.pow(1-t,3)
      d.x=d.fromX+(cx-d.fromX)*ease;d.y=d.fromY+(cy-d.fromY)*ease
      card.style.opacity=String(Math.pow(1-t,1.4));d.shrink=Math.max(.001,1-t)
-     if(t===1){d.absorbing=0;d.done=true;setDone(true);setStatus('A little more yours.');interaction.current.burst=1;interaction.current.morph+=1;swellAt=now}
+     if(t===1){d.absorbing=0;d.done=true;setDone(true);interaction.current.burst=1;interaction.current.morph+=1;swellAt=now}
     }
     const reach=d.held?Math.max(0,Math.min(1,(b.width*.8-dist)/(b.width*.55))):0
     interaction.current.x=dx/(b.width*.5);interaction.current.y=-dy/(b.height*.5)
@@ -55,21 +55,20 @@ export default function HeroStudy(){
   };frame=requestAnimationFrame(draw)
   return()=>{cancelAnimationFrame(frame);window.removeEventListener('resize',place);el.removeEventListener('pointermove',move);el.removeEventListener('pointerleave',leave)}
  },[])
- const start=(e:PointerEvent<HTMLButtonElement>)=>{if(e.button!==0||drag.current.done||drag.current.absorbing)return;const r=root.current!.getBoundingClientRect(),d=drag.current;d.held=true;d.ox=e.clientX-r.left-d.x;d.oy=e.clientY-r.top-d.y;d.startX=d.x;d.startY=d.y;e.currentTarget.setPointerCapture(e.pointerId);setStatus('It can feel you getting closer.')}
+ const start=(e:PointerEvent<HTMLButtonElement>)=>{if(e.button!==0||drag.current.done||drag.current.absorbing)return;const r=root.current!.getBoundingClientRect(),d=drag.current;d.held=true;d.ox=e.clientX-r.left-d.x;d.oy=e.clientY-r.top-d.y;d.startX=d.x;d.startY=d.y;e.currentTarget.setPointerCapture(e.pointerId);}
  const move=(e:PointerEvent<HTMLButtonElement>)=>{const d=drag.current;if(!d.held)return;const r=root.current!.getBoundingClientRect();d.x=Math.max(65,Math.min(r.width-65,e.clientX-r.left-d.ox));d.y=Math.max(40,Math.min(r.height-40,e.clientY-r.top-d.oy))}
- const release=()=>{const d=drag.current;if(!d.held)return;d.held=false;const b=stage.current!.getBoundingClientRect(),r=root.current!.getBoundingClientRect();const dist=Math.hypot(d.x-(b.left-r.left+b.width/2),d.y-(b.top-r.top+b.height/2));if(dist<Math.min(b.width,b.height)*.34){d.absorbing=performance.now();d.fromX=d.x;d.fromY=d.y;setStatus('Making a connection…')}else setStatus('Bring the file closer.')}
+ const release=()=>{const d=drag.current;if(!d.held)return;d.held=false;const b=stage.current!.getBoundingClientRect(),r=root.current!.getBoundingClientRect();const dist=Math.hypot(d.x-(b.left-r.left+b.width/2),d.y-(b.top-r.top+b.height/2));if(dist<Math.min(b.width,b.height)*.34){d.absorbing=performance.now();d.fromX=d.x;d.fromY=d.y;}}
  useEffect(()=>{window.addEventListener('pointerup',release);window.addEventListener('mouseup',release);return()=>{window.removeEventListener('pointerup',release);window.removeEventListener('mouseup',release)}},[])
- const reset=()=>{drag.current.done=false;drag.current.absorbing=0;const b=root.current!.getBoundingClientRect();drag.current.x=b.width*(b.width<650?.78:.847);drag.current.y=b.height*(b.width<650?.72:.252);file.current!.style.opacity='1';drag.current.shrink=1;setDone(false);setStatus('Bring the file closer.')}
- return <main ref={root} className="entity-playground" data-mood="observatory" data-theme={light?'light':'dark'} data-show-ui={showUI} data-finish={finish}>
-  <div className="scene-controls" aria-label="Scene controls"><button type="button" role="switch" aria-checked={!showUI} onClick={()=>{drag.current.held=false;setShowUI(!showUI)}}>Scene only <span>{showUI?'Off':'On'}</span></button><button type="button" role="switch" aria-checked={light} onClick={()=>setLight(!light)}>Light mode <span>{light?'On':'Off'}</span></button><label>Tile <select aria-label="Tile finish" value={finish} onChange={e=>setFinish(e.target.value)}><option value="metal">Silver</option><option value="hologram">Hologram</option><option value="glass">Glass</option></select></label></div>
+ return <main ref={root} className="entity-playground" data-mood="observatory" data-theme={light?'light':'dark'}>
+  <div className="hero-theme-toggle"><MaterialButton kind="icon" label={light?'Switch to dark mode':'Switch to light mode'} selected={!light} onSelect={()=>setLight(!light)}><svg className="theme-glyph" data-light={light} width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g className="theme-sun" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></g><path className="theme-moon" d="M19.8 15A8 8 0 0 1 9 4.2 8 8 0 1 0 19.8 15Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/></svg></MaterialButton></div>
   <RetroMood/>
   <div className="cosmos" aria-hidden="true"><div className="cosmos-motion"><div className="solar-veil"/><div className="orbit-light"/><div className="planet-edge"/><div className="horizon-glow"/><div className="horizon"/></div><div className="entity-atmosphere"/></div>
   <svg className="cosmic-grain" width="100%" height="100%" aria-hidden="true"><filter id="cosmic-noise"><feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#cosmic-noise)"/></svg>
-  <SphereParticles/><PrismFlare/><HeroComposition show={showUI}/><CosmicDust/><ParticleShockwave interaction={interaction}/>
+  <SphereParticles/><PrismFlare/><HeroComposition/><CosmicDust/><ParticleShockwave interaction={interaction}/>
   <div ref={stage} className="playground-entity" role="img" aria-label="Living Tesseral entity reacts to the nearby file"><ParticleBloom dark={!light} active={false} colors={light?['#343B3D','#C6FF1B','#6B7577']:palette} organic waves wireframe={!done} radiant={done} interaction={interaction}/></div>
-  <button ref={file} className="magnetic-file" aria-label="Drag sample Figma file into Tesseral, or press Enter to connect" aria-hidden={done||!showUI} tabIndex={done||!showUI?-1:0} onPointerDown={start} onPointerMove={move} onPointerUp={release} onLostPointerCapture={release} onDragStart={e=>e.preventDefault()} onPointerCancel={()=>{drag.current.held=false;setStatus('Bring the file closer.')}} onKeyDown={e=>{if((e.key==='Enter'||e.key===' ')&&!drag.current.absorbing&&!done){e.preventDefault();drag.current.absorbing=performance.now();drag.current.fromX=drag.current.x;drag.current.fromY=drag.current.y;setStatus('Making a connection…')}}}>
-   <ParticleLogo/><span className="tile-title">Visual reference</span><span className="tile-meta"><span>FIGMA FILE</span><span>8 PAGES</span></span>
+  <button ref={file} className="magnetic-file material-frost" aria-label="Drag sample Figma file into Tesseral, or press Enter to connect" aria-hidden={done} tabIndex={done?-1:0} onPointerDown={start} onPointerMove={move} onPointerUp={release} onLostPointerCapture={release} onDragStart={e=>e.preventDefault()} onPointerCancel={()=>{drag.current.held=false;}} onKeyDown={e=>{if((e.key==='Enter'||e.key===' ')&&!drag.current.absorbing&&!done){e.preventDefault();drag.current.absorbing=performance.now();drag.current.fromX=drag.current.x;drag.current.fromY=drag.current.y;}}}>
+   <span className="material-backdrop" aria-hidden="true"/><span className="material-cloud" aria-hidden="true"/><span className="material-rim" aria-hidden="true"/><span className="material-reflection" aria-hidden="true"/>
+   {!done&&<ParticleLogo/>}<span className="tile-title">Visual reference</span><span className="tile-meta"><span>FIGMA FILE</span><span>8 PAGES</span></span>
   </button>
-  <div className="playground-status"><p role="status">{status}</p><span>{done?'Knowledge changes its shape.':'Drag the file into your Tesseral.'}</span>{done&&<button onClick={reset}>Try again ↗</button>}</div>
  </main>
 }
