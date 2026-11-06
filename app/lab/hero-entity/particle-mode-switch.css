@@ -39,3 +39,8 @@
 [data-theme=light] .particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false]{color:#7c8983;text-shadow:0 1px 0 #ffffffc2!important}
 [data-theme=light] .particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false] svg{filter:drop-shadow(0 1px 0 #ffffffc2)}
 [data-theme=light] .particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false] img{filter:opacity(.52) drop-shadow(0 1px 0 #ffffffd9)}
+/* The wave arrives first; lettering rises only after the material has gathered. */
+.particle-mode[data-variant=living] .particle-mode-options button>*{transform:translateY(calc(-6px * var(--label-lift,0)))!important;transition:none!important}
+.particle-mode[data-particle-labels=true][data-glyphs=ready] .particle-mode-options button>*{opacity:calc(1 - var(--label-lift,0))!important}
+.particle-mode[data-variant=living] .particle-mode-well:before{opacity:.18;mix-blend-mode:multiply}
+.particle-mode[data-variant=living] .particle-mode-well:after{background:radial-gradient(ellipse at 25% 20%,#f0e5ff25,transparent 55%),radial-gradient(ellipse at 75% 80%,#e3f6c71c,transparent 60%),linear-gradient(115deg,transparent 20%,#ffffff24 45%,transparent 70%);background-size:180% 180%}

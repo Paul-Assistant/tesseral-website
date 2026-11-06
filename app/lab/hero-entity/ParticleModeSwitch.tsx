@@ -7,7 +7,7 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n))
 const ease = (n: number) => n * n * (3 - 2 * n)
 
 /** A small, independent particle surface: no additional WebGL context. */
-export default function ParticleModeSwitch({ variant = 'mercury', navigation = false, surface = 'recesses' }: { surface?: 'recesses' | 'individual' | 'engraved'; variant?: 'mercury' | 'glass' | 'living'; navigation?: boolean }) {
+export default function ParticleModeSwitch({ variant = 'mercury', navigation = false, surface = 'recesses', particleLabels = false }: { particleLabels?: boolean; surface?: 'recesses' | 'individual' | 'engraved'; variant?: 'mercury' | 'glass' | 'living'; navigation?: boolean }) {
   const width = navigation ? 524 : 300
   const labels = navigation ? ['Overview', 'The problem', 'How it works', 'Pricing'] : ['Voice', 'Type']
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -35,6 +35,27 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
     const dpr = Math.min(devicePixelRatio, mobile ? 1.5 : 2)
     canvas.width = width * dpr; canvas.height = 144 * dpr
     ctx.scale(dpr, dpr)
+    let cancelled = false
+    const glyphs: {x:number;y:number;alpha:number}[][] = []
+    if (particleLabels) void document.fonts.ready.then(async () => {
+      const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('.particle-mode-options button'))
+      for (const button of buttons) {
+        const sample=document.createElement('canvas'); sample.width=156; sample.height=156
+        const pen=sample.getContext('2d')!; pen.scale(2,2)
+        const svg=button.querySelector('svg'), img=button.querySelector('img')
+        const src=img?.getAttribute('src') || (svg ? 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(svg).replace('currentColor','#172021')) : '')
+        const picture=new Image(); picture.src=src
+        try { await picture.decode() } catch { continue }
+        if(cancelled)return
+        const size=navigation ? (buttons.indexOf(button)===0 ? 19 : 43) : 23
+        pen.drawImage(picture,39-size/2,navigation ? 39-size/2 : 16,size,size)
+        if(!navigation){pen.font=`11px ${getComputedStyle(button).fontFamily}`;pen.textAlign='center';pen.fillStyle='#172021';pen.fillText(button.getAttribute('aria-label')||'',39,55)}
+        const pixels=pen.getImageData(0,0,156,156).data, points=[]
+        for(let y=0;y<156;y+=2)for(let x=0;x<156;x+=2){const a=pixels[(y*156+x)*4+3]/255;if(a>.12)points.push({x:x/2-39,y:y/2-39,alpha:a})}
+        glyphs.push(points)
+      }
+      if(!cancelled && glyphs.length===buttons.length)root.dataset.glyphs='ready'
+    })
     const count = variant === 'glass' ? (mobile ? 1400 : 3000) : (mobile ? 2600 : 6500)
     // Uniform surface samples retain their identity throughout a transfer.
     const dots = Array.from({ length: count }, (_, i) => {
@@ -60,6 +81,8 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
             : i===m.to ? 1-ease(clamp((progress-.35)/.65))
             : i===m.from ? ease(clamp(progress/.8)) : 1
           root.style.setProperty(`--seat-${i}`,String(depth))
+          const lift = i===m.to ? (reduced ? 1 : ease(clamp((now-m.start-1650)/650))) : 0
+          root.style.setProperty(`--lift-${i}`,String(lift))
         }
       }
       const rippleAge = (now-m.ripple)/(living ? 2400 : 1600)
@@ -135,13 +158,22 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
           ctx.beginPath(); ctx.arc(x,y,size*2.8,0,Math.PI*2); ctx.fill()
         }
       }
+      if(particleLabels && root.dataset.glyphs==='ready') {
+        const lift=reduced ? 1 : ease(clamp((now-m.start-1650)/650))
+        ctx.fillStyle='#172021'
+        for(const [i,d] of (glyphs[m.to]||[]).entries()){
+          const drift=reduced ? 0 : Math.sin(t*2+i*.7)*.22
+          ctx.globalAlpha=d.alpha*lift*.95
+          ctx.beginPath();ctx.arc(94+m.to*112+d.x+drift,68+d.y-6*lift+drift,.48,0,Math.PI*2);ctx.fill()
+        }
+      }
       ctx.globalAlpha = 1
     }
     frame = requestAnimationFrame(draw)
-    return () => { cancelAnimationFrame(frame); observer.disconnect() }
-  }, [variant, width, navigation])
+    return () => { cancelled=true; cancelAnimationFrame(frame); observer.disconnect(); delete root.dataset.glyphs }
+  }, [variant, width, navigation, particleLabels])
 
-  return <div ref={rootRef} className="particle-mode" data-variant={variant} data-surface={surface} data-mode={mode} style={{width, aspectRatio:`${width} / 144`}}
+  return <div ref={rootRef} className="particle-mode" data-variant={variant} data-surface={surface} data-particle-labels={particleLabels} data-mode={mode} style={{width, aspectRatio:`${width} / 144`}}
     onPointerMove={e => { if(e.pointerType==='touch') return; const r=e.currentTarget.getBoundingClientRect(); motion.current.x=(e.clientX-r.left)*width/r.width; motion.current.y=(e.clientY-r.top)*144/r.height }}
     onPointerLeave={() => { motion.current.x=-1000; motion.current.y=-1000 }}>
     <div className="particle-mode-well" style={{left:`${39/width*100}%`,right:`${39/width*100}%`}} aria-hidden="true" />
@@ -150,7 +182,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
     </div>}
     <canvas ref={canvasRef} aria-hidden="true" />
     <div className="particle-mode-options" style={{left:`${55/width*100}%`,right:`${55/width*100}%`}} role="group" aria-label={navigation ? 'Particle navigation preview' : 'Interaction mode preview'}>
-      {labels.map((label,index)=><button key={label} type="button" aria-pressed={mode===index} onClick={()=>choose(index)} aria-label={label} style={{width:`${78/(width-110)*100}%`}}>
+      {labels.map((label,index)=><button key={label} type="button" aria-pressed={mode===index} onClick={()=>choose(index)} aria-label={label} style={{width:`${78/(width-110)*100}%`, ...({'--label-lift':`var(--lift-${index},${index===mode?1:0})`} as React.CSSProperties)}}>
         {navigation ? <img src={`/header/${['globe','nav-2','nav-3','nav-4'][index]}.svg`} alt="" width="24" height="24"/> : index===0 ?
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11v1a7 7 0 0 0 14 0v-1M12 19v3m-4 0h8"/></svg> :
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M6 9h2m3 0h2m3 0h2M6 12h2m3 0h2m3 0h2M7 16h10"/></svg>}

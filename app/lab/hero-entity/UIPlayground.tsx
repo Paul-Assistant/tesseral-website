@@ -12,6 +12,7 @@ export default function UIPlayground({light}:{light:boolean}) {
    <article className="living-material-study"><div className="material-caption"><span>03 / LIVING MERCURY</span><p>Engraved at rest. Formed from particles when selected.</p></div><ParticleModeSwitch variant="living"/><ParticleModeSwitch variant="living" navigation/></article>
    <article><div className="material-caption"><span>04 / INDIVIDUAL RECESSES</span><p>Individual impressions. No surrounding frame.</p></div><ParticleModeSwitch variant="living" surface="individual"/><ParticleModeSwitch variant="living" surface="individual" navigation/></article>
    <article><div className="material-caption"><span>05 / ENGRAVED SURFACE</span><p>Only the icons and labels are cut into the surface.</p></div><ParticleModeSwitch variant="living" surface="engraved"/><ParticleModeSwitch variant="living" surface="engraved" navigation/></article>
+   <article className="living-material-study"><div className="material-caption"><span>06 / PARTICLE LETTERING</span><p>The wave lifts the icon and label into grains.</p></div><ParticleModeSwitch variant="living" surface="engraved" particleLabels/><ParticleModeSwitch variant="living" surface="engraved" particleLabels navigation/></article>
   </div>
   <div className="material-reference"><span className="material-eyebrow">FROSTED FLOW / REFERENCE</span><MaterialButton kind="frost" label="Feel the surface" selected={false} onSelect={()=>{}}>Feel the surface <span aria-hidden="true">↗</span></MaterialButton></div>
  </section>
