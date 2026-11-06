@@ -44,3 +44,12 @@
 .particle-mode[data-particle-labels=true][data-glyphs=ready] .particle-mode-options button>*{opacity:calc(1 - var(--label-lift,0))!important}
 .particle-mode[data-variant=living] .particle-mode-well:before{opacity:.18;mix-blend-mode:multiply}
 .particle-mode[data-variant=living] .particle-mode-well:after{background:radial-gradient(ellipse at 25% 20%,#f0e5ff25,transparent 55%),radial-gradient(ellipse at 75% 80%,#e3f6c71c,transparent 60%),linear-gradient(115deg,transparent 20%,#ffffff24 45%,transparent 70%);background-size:180% 180%}
+/* 06: selection changes semantics immediately, but the engraved artwork stays
+   unchanged until the arriving wave crossfades it into centered particle lettering. */
+.particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button{color:#0b1010!important;text-shadow:0 1px 0 #ffffff35!important;transition:none}
+.particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button>*{transform:none!important}
+.particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button svg{filter:drop-shadow(0 1px 0 #ffffff38)!important}
+.particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button img{filter:brightness(.15) drop-shadow(0 1px 0 #ffffff38)!important}
+[data-theme=light] .particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button{color:#7c8983!important;text-shadow:0 1px 0 #ffffffc2!important}
+[data-theme=light] .particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button svg{filter:drop-shadow(0 1px 0 #ffffffc2)!important}
+[data-theme=light] .particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button img{filter:opacity(.52) drop-shadow(0 1px 0 #ffffffd9)!important}

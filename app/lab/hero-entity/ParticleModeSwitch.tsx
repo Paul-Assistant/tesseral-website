@@ -176,7 +176,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         for(const [i,d] of (glyphs[m.to]||[]).entries()){
           const drift=reduced ? 0 : Math.sin(t*2+i*.7)*.22
           ctx.globalAlpha=d.alpha*lift*.95
-          ctx.beginPath();ctx.arc(94+m.to*112+d.x+drift,68+d.y-6*lift+drift,.48,0,Math.PI*2);ctx.fill()
+          ctx.beginPath();ctx.arc(94+m.to*112+d.x*(1+.08*lift)+drift,68+d.y*(1+.08*lift)+drift,.48,0,Math.PI*2);ctx.fill()
         }
       }
       ctx.globalAlpha = 1
