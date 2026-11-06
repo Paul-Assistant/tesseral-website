@@ -58,16 +58,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
       scatter += ((!reduced ? clamp(1-distance/72) : 0)-scatter)*.08
       const angle = Math.atan2(m.y-68,m.x-center)
       ctx.clearRect(0,0,width,144)
-      // Glass stays translucent; the granular surface and flowing transfer remain separate.
-      if (variant === 'glass') {
-        const p = ease(progress), cx = 94+(m.from+(m.to-m.from)*p)*112
-        const stretch = Math.sin(p*Math.PI)*14
-        ctx.save(); ctx.beginPath(); ctx.ellipse(cx,68,39+stretch,39-stretch*.45,0,0,Math.PI*2)
-        const fill = ctx.createLinearGradient(cx-40,28,cx+40,108)
-        fill.addColorStop(0,'rgba(255,255,255,.65)'); fill.addColorStop(.35,'rgba(217,229,221,.18)'); fill.addColorStop(.65,'rgba(211,198,229,.27)'); fill.addColorStop(1,'rgba(255,255,255,.48)')
-        ctx.fillStyle=fill; ctx.fill(); ctx.lineWidth=1
-        ctx.strokeStyle='rgba(255,255,255,.72)'; ctx.stroke(); ctx.restore()
-      }
+      // The glass material is entirely granular, with no filled silhouette or outline.
       for (const d of dots) {
         const delay = Math.abs(d.delay)*.42
         const p = ease(clamp((progress-delay)/.58))
@@ -89,7 +80,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         const rim = Math.pow(d.r,18)*(.25+Math.max(0,-d.x-d.y)*.38)
         const tone = Math.floor(clamp(light+reflection+rim)*127)
         ctx.fillStyle = colors[tone]
-        ctx.globalAlpha = (variant === 'glass' ? .22 + Math.pow(d.r,8)*.48 : .64 + z*.3) * (1-loose*.38)
+        ctx.globalAlpha = (variant === 'glass' ? (.38 + reflection*.45) * (1-ease(clamp((d.r-.78)/.22))) : .64 + z*.3) * (1-loose*.38)
         const size = (mobile ? 1.15 : .8) + loose*.7
         ctx.beginPath(); ctx.arc(x,y,size*.53,0,Math.PI*2); ctx.fill()
         if (loose > .3 && d.delay > .7) {
