@@ -22,7 +22,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
     // Finish the current gesture before beginning another; never teleport particles.
     if (performance.now() - m.start < 1450) return
     m.from = m.to; m.to = next; m.start = performance.now()
-    if (variant === 'living') m.ripple = m.start + 1450
+    if (variant === 'living') m.ripple = m.start + 250
     setMode(next)
   }
 
@@ -81,7 +81,8 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         const wave = living
           ? lens*Math.exp(-Math.pow((d.r-rippleAge*1.25)/.2,2))*7 + (1-d.r*d.r)*lens*5 - lens*d.r*1.6
           : Math.sin(d.r*12-rippleAge*13)*ripple*5
-        const radius = 39+breathing+lobe+wave
+        const arrivalSwell = living ? lens*6*ease(clamp((p-.35)/.65)) : 0
+        const radius = 39+breathing+lobe+wave+arrivalSwell
         let x = cx+d.x*radius*(1-flowing*.35)
         let y = 68+d.y*radius*(1-flowing*.58)+Math.sin(p*Math.PI*2+d.a)*flowing*10
         if (living && !reduced) {
@@ -92,12 +93,29 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         const loose = Math.pow(d.r,12)*hover + scatter*Math.pow(d.r,3)*(.35+.65*Math.abs(d.delay))
         x += Math.cos(d.a)*loose*(8+Math.sin(now*.001+d.a)*5)
         y += Math.sin(d.a)*loose*12
-        const light = clamp(.38+z*.34-d.y*.18+Math.pow(Math.max(0,-d.x*.38-d.y*.62+z*.6),18)*.65)
-        const reflectionY = living ? d.y*Math.cos(t*.7)+d.x*Math.sin(t*.7)*.5 : d.y
-        const reflection = Math.exp(-Math.pow((reflectionY+.43+(living ? Math.sin(t)*.2 : 0)+d.x*.18-lens*.35)/(.11+lens*.06),2))*.35
-        const lensReflection = lens * Math.cos(d.r*16-rippleAge*9) * .16
-        const rim = Math.pow(d.r,18)*(.25+Math.max(0,-d.x-d.y)*.38)
-        const tone = Math.floor(clamp(light+reflection+rim+lensReflection)*127)
+        let light: number, reflection: number, rim: number
+        if (living) {
+          // Reflect the view ray about the curved hemisphere normal. Broad environment
+          // lights compress at grazing angles instead of sliding across a flat disc.
+          const bend = lens*Math.sin(d.r*9-rippleAge*7)*.12
+          let nx = d.x*(1+bend), ny = d.y*(1+bend), nz = z
+          const length = Math.hypot(nx,ny,nz)
+          nx/=length; ny/=length; nz/=length
+          const rx=2*nz*nx, ry=2*nz*ny, rz=2*nz*nz-1
+          let lx=-.45+Math.sin(t*.5)*.22, ly=-.65+Math.cos(t*.37)*.1, lz=.7
+          const ll=Math.hypot(lx,ly,lz); lx/=ll; ly/=ll; lz/=ll
+          const key=Math.max(0,rx*lx+ry*ly+rz*lz)
+          const fill=Math.max(0,rx*.78+ry*.15+rz*.6)
+          const fresnel=Math.pow(1-nz,3)
+          light=.22+nz*.24+Math.max(0,-ny)*.11
+          reflection=Math.pow(key,7)*.48+Math.pow(key,30)*.22+Math.pow(fill,12)*.18
+          rim=fresnel*(.12+.22*Math.max(0,-ny))
+        } else {
+          light=clamp(.38+z*.34-d.y*.18+Math.pow(Math.max(0,-d.x*.38-d.y*.62+z*.6),18)*.65)
+          reflection=Math.exp(-Math.pow((d.y+.43+d.x*.18)/.11,2))*.35
+          rim=Math.pow(d.r,18)*(.25+Math.max(0,-d.x-d.y)*.38)
+        }
+        const tone = Math.floor(clamp(light+reflection+rim)*127)
         ctx.fillStyle = colors[tone]
         ctx.globalAlpha = (variant === 'glass' ? (.38 + reflection*.45) * (1-ease(clamp((d.r-.78)/.22))) : .64 + z*.3) * (1-loose*.38)
         const size = (mobile ? 1.15 : .8) + loose*.7
