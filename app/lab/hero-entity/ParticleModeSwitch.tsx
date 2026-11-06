@@ -7,7 +7,7 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n))
 const ease = (n: number) => n * n * (3 - 2 * n)
 
 /** A small, independent particle surface: no additional WebGL context. */
-export default function ParticleModeSwitch({ variant = 'mercury', navigation = false }: { variant?: 'mercury' | 'glass'; navigation?: boolean }) {
+export default function ParticleModeSwitch({ variant = 'mercury', navigation = false }: { variant?: 'mercury' | 'glass' | 'living'; navigation?: boolean }) {
   const width = navigation ? 524 : 300
   const labels = navigation ? ['Overview', 'The problem', 'How it works', 'Pricing'] : ['Voice', 'Type']
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -17,10 +17,12 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
 
   function choose(next: number) {
     const m = motion.current
+    if (variant === 'living' && performance.now() - m.start < 1450) return
     if (next === m.to) { m.ripple = performance.now(); return }
     // Finish the current gesture before beginning another; never teleport particles.
     if (performance.now() - m.start < 1450) return
     m.from = m.to; m.to = next; m.start = performance.now()
+    if (variant === 'living') m.ripple = m.start + 1450
     setMode(next)
   }
 
@@ -41,22 +43,31 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
       return { x: Math.cos(a) * r, y: Math.sin(a) * r, r, a, delay: (Math.sin(i * 12.9898) * 43758.5453) % 1 }
     })
     const colors = Array.from({ length: 128 }, (_, i) => `rgb(${Math.round(40+i*1.68)},${Math.round(44+i*1.65)},${Math.round(45+i*1.60)})`)
-    let frame = 0, last = 0, visible = true, hover = 0, scatter = 0
+    let frame = 0, last = 0, visible = true, hover = 0, scatter = 0, directionX = 1, directionY = 0
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting })
     observer.observe(root)
     function draw(now: number) {
       frame = requestAnimationFrame(draw)
       if (!ctx || !visible || document.hidden || now-last < (mobile ? 33 : 22)) return
+      const dt = Math.min((now-last)/1000,.05)
       last = now
+      const living = variant === 'living'
+      const t = reduced ? 0 : now*.00035
       const m = motion.current, progress = reduced ? 1 : clamp((now-m.start)/1450)
-      const rippleAge = (now-m.ripple)/1600
-      const ripple = reduced || rippleAge > 1 ? 0 : Math.sin(rippleAge*Math.PI)*Math.exp(-rippleAge*1.4)
+      const rippleAge = (now-m.ripple)/(living ? 2400 : 1600)
+      const ripple = reduced || rippleAge < 0 || rippleAge > 1 ? 0 : living ? Math.pow(Math.sin(rippleAge*Math.PI),2) : Math.sin(rippleAge*Math.PI)*Math.exp(-rippleAge*1.4)
+      const lens = living ? ripple : 0
+      root.style.setProperty('--lens-scale',String(1+lens*.09))
       const center = 94 + m.to*112
       const distance = Math.hypot(m.x-center,m.y-68)
-      const targetHover = !reduced && distance > 40 ? clamp(1-(distance-40)/90) : 0
-      hover += (targetHover-hover)*.09
-      scatter += ((!reduced ? clamp(1-distance/72) : 0)-scatter)*.08
-      const angle = Math.atan2(m.y-68,m.x-center)
+      const targetHover = reduced ? 0 : living ? ease(clamp((distance-30)/24))*ease(clamp(1-(distance-40)/100)) : distance > 40 ? clamp(1-(distance-40)/90) : 0
+      hover += (targetHover-hover)*(living ? 1-Math.exp(-dt*5) : .09)
+      scatter += ((!reduced ? ease(clamp(1-distance/80)) : 0)-scatter)*(living ? 1-Math.exp(-dt*4) : .08)
+      if (m.x > -500 && distance > 1) {
+        directionX += ((m.x-center)/distance-directionX)*(1-Math.exp(-dt*6))
+        directionY += ((m.y-68)/distance-directionY)*(1-Math.exp(-dt*6))
+      }
+      const angle = living ? Math.atan2(directionY,directionX) : Math.atan2(m.y-68,m.x-center)
       ctx.clearRect(0,0,width,144)
       // The glass material is entirely granular, with no filled silhouette or outline.
       for (const d of dots) {
@@ -65,20 +76,28 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         const flowing = Math.sin(p*Math.PI)
         const cx = 94 + (m.from+(m.to-m.from)*p)*112
         const z = Math.sqrt(1-d.r*d.r)
-        const breathing = reduced ? 0 : Math.sin(now*.0008+d.a*.3)*.6
+        const breathing = reduced ? 0 : living ? Math.sin(t*1.5+d.a*2)*.75+Math.sin(t*.7-d.a*3)*.4 : Math.sin(now*.0008+d.a*.3)*.6
         const lobe = Math.pow(Math.max(0,Math.cos(d.a-angle)),10)*hover*13*Math.pow(d.r,3)
-        const wave = Math.sin(d.r*12-rippleAge*13)*ripple*5
+        const wave = living
+          ? lens*Math.exp(-Math.pow((d.r-rippleAge*1.25)/.2,2))*7 + (1-d.r*d.r)*lens*5 - lens*d.r*1.6
+          : Math.sin(d.r*12-rippleAge*13)*ripple*5
         const radius = 39+breathing+lobe+wave
         let x = cx+d.x*radius*(1-flowing*.35)
         let y = 68+d.y*radius*(1-flowing*.58)+Math.sin(p*Math.PI*2+d.a)*flowing*10
+        if (living && !reduced) {
+          x += Math.sin(t*2+d.a*3+d.r*7)*(.35+d.r*.65)
+          y += Math.cos(t*1.6+d.a*2-d.r*5)*(.35+d.r*.65)
+        }
         // Only the outer grains loosen into shallow-depth motes near the pointer.
         const loose = Math.pow(d.r,12)*hover + scatter*Math.pow(d.r,3)*(.35+.65*Math.abs(d.delay))
         x += Math.cos(d.a)*loose*(8+Math.sin(now*.001+d.a)*5)
         y += Math.sin(d.a)*loose*12
         const light = clamp(.38+z*.34-d.y*.18+Math.pow(Math.max(0,-d.x*.38-d.y*.62+z*.6),18)*.65)
-        const reflection = Math.exp(-Math.pow((d.y+.43+d.x*.18)/.11,2))*.35
+        const reflectionY = living ? d.y*Math.cos(t*.7)+d.x*Math.sin(t*.7)*.5 : d.y
+        const reflection = Math.exp(-Math.pow((reflectionY+.43+(living ? Math.sin(t)*.2 : 0)+d.x*.18-lens*.35)/(.11+lens*.06),2))*.35
+        const lensReflection = lens * Math.cos(d.r*16-rippleAge*9) * .16
         const rim = Math.pow(d.r,18)*(.25+Math.max(0,-d.x-d.y)*.38)
-        const tone = Math.floor(clamp(light+reflection+rim)*127)
+        const tone = Math.floor(clamp(light+reflection+rim+lensReflection)*127)
         ctx.fillStyle = colors[tone]
         ctx.globalAlpha = (variant === 'glass' ? (.38 + reflection*.45) * (1-ease(clamp((d.r-.78)/.22))) : .64 + z*.3) * (1-loose*.38)
         const size = (mobile ? 1.15 : .8) + loose*.7

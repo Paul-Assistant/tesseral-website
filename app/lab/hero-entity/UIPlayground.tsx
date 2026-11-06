@@ -9,6 +9,7 @@ export default function UIPlayground({light}:{light:boolean}) {
   <div className="material-comparisons">
    <article><div className="material-caption"><span>01 / PARTICLE MERCURY</span><p>A raised silver surface in a recessed well.</p></div><ParticleModeSwitch/><ParticleModeSwitch navigation/></article>
    <article><div className="material-caption"><span>02 / PARTICLE GLASS</span><p>A translucent surface, soft reflections, suspended grains.</p></div><ParticleModeSwitch variant="glass"/><ParticleModeSwitch variant="glass" navigation/></article>
+   <article className="living-material-study"><div className="material-caption"><span>03 / LIVING MERCURY</span><p>Drifting grains. Travelling reflections. A liquid pulse on arrival.</p></div><ParticleModeSwitch variant="living"/><ParticleModeSwitch variant="living" navigation/></article>
   </div>
   <div className="material-reference"><span className="material-eyebrow">FROSTED FLOW / REFERENCE</span><MaterialButton kind="frost" label="Feel the surface" selected={false} onSelect={()=>{}}>Feel the surface <span aria-hidden="true">↗</span></MaterialButton></div>
  </section>

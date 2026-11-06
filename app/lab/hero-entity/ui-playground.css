@@ -9,3 +9,4 @@
 .material-caption{text-align:center;margin-bottom:18px}.material-caption p{margin:10px 0}
 .material-reference{display:flex;align-items:center;flex-direction:column;gap:24px;margin:60px auto 0}
 @media(max-width:850px){.material-comparisons{grid-template-columns:1fr}.ui-material-playground{padding-top:65px}.material-comparisons article{padding:28px 8px 20px}}
+.material-comparisons .living-material-study{grid-column:1/-1;width:100%;max-width:720px;justify-self:center;padding-top:38px;padding-bottom:30px}
