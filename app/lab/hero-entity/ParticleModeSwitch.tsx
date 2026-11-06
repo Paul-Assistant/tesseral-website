@@ -15,14 +15,19 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
   const [mode, setMode] = useState(0)
   const motion = useRef({ from: 0, to: 0, start: -10000, ripple: -10000, x: -1000, y: -1000 })
 
+  const pulses = useRef<number[]>([])
+
   function choose(next: number) {
     const m = motion.current
-    if (variant === 'living' && performance.now() - m.start < 1450) return
-    if (next === m.to) { m.ripple = performance.now(); return }
+    if (next === m.to) {
+      if (variant === 'living') pulses.current.push(performance.now())
+      else m.ripple = performance.now()
+      return
+    }
     // Finish the current gesture before beginning another; never teleport particles.
     if (performance.now() - m.start < 1450) return
     m.from = m.to; m.to = next; m.start = performance.now()
-    if (variant === 'living') m.ripple = m.start + 250
+    if (variant === 'living') pulses.current.push(m.start + 250)
     setMode(next)
   }
 
@@ -87,7 +92,14 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
       }
       const rippleAge = (now-m.ripple)/(living ? 2400 : 1600)
       const ripple = reduced || rippleAge < 0 || rippleAge > 1 ? 0 : living ? Math.pow(Math.sin(rippleAge*Math.PI),2) : Math.sin(rippleAge*Math.PI)*Math.exp(-rippleAge*1.4)
-      const lens = living ? ripple : 0
+      pulses.current = pulses.current.filter(start=>now-start<2400)
+      const waves = reduced ? [] : pulses.current.map(start=>{
+        const age=(now-start)/2400
+        return {age, strength:age<0 ? 0 : Math.pow(Math.sin(age*Math.PI),2)}
+      })
+      const energy = waves.reduce((sum,w)=>sum+w.strength,0)
+      const normalization = Math.max(1,energy/1.35)
+      const lens = living ? energy/normalization : 0
       root.style.setProperty('--lens-scale',String(1+lens*.09))
       const center = 94 + m.to*112
       const distance = Math.hypot(m.x-center,m.y-68)
@@ -110,7 +122,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         const breathing = reduced ? 0 : living ? Math.sin(t*1.5+d.a*2)*.75+Math.sin(t*.7-d.a*3)*.4 : Math.sin(now*.0008+d.a*.3)*.6
         const lobe = Math.pow(Math.max(0,Math.cos(d.a-angle)),10)*hover*13*Math.pow(d.r,3)
         const wave = living
-          ? lens*Math.exp(-Math.pow((d.r-rippleAge*1.25)/.2,2))*7 + (1-d.r*d.r)*lens*5 - lens*d.r*1.6
+          ? waves.reduce((sum,w)=>sum+w.strength*Math.exp(-Math.pow((d.r-w.age*1.25)/.2,2))*7,0)/normalization + (1-d.r*d.r)*lens*5 - lens*d.r*1.6
           : Math.sin(d.r*12-rippleAge*13)*ripple*5
         const arrivalSwell = living ? lens*6*ease(clamp((p-.35)/.65)) : 0
         const radius = 39+breathing+lobe+wave+arrivalSwell
@@ -128,7 +140,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         if (living) {
           // Reflect the view ray about the curved hemisphere normal. Broad environment
           // lights compress at grazing angles instead of sliding across a flat disc.
-          const bend = lens*Math.sin(d.r*9-rippleAge*7)*.12
+          const bend = waves.reduce((sum,w)=>sum+w.strength*Math.sin(d.r*9-w.age*7)*.12,0)/normalization
           let nx = d.x*(1+bend), ny = d.y*(1+bend), nz = z
           const length = Math.hypot(nx,ny,nz)
           nx/=length; ny/=length; nz/=length
@@ -147,7 +159,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
           rim=Math.pow(d.r,18)*(.25+Math.max(0,-d.x-d.y)*.38)
         }
         // A travelling crest and trough make the center-out pulse readable on silver.
-        const lensReflection = lens * Math.cos(d.r*16-rippleAge*9) * .2
+        const lensReflection = living ? waves.reduce((sum,w)=>sum+w.strength*Math.cos(d.r*16-w.age*9)*.2,0)/normalization : 0
         const tone = Math.floor(clamp(light+reflection+rim+lensReflection)*127)
         ctx.fillStyle = colors[tone]
         ctx.globalAlpha = (variant === 'glass' ? (.38 + reflection*.45) * (1-ease(clamp((d.r-.78)/.22))) : .64 + z*.3) * (1-loose*.38)
