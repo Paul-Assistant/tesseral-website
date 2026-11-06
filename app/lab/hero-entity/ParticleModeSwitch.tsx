@@ -107,9 +107,9 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
           const key=Math.max(0,rx*lx+ry*ly+rz*lz)
           const fill=Math.max(0,rx*.78+ry*.15+rz*.6)
           const fresnel=Math.pow(1-nz,3)
-          light=.22+nz*.24+Math.max(0,-ny)*.11
-          reflection=Math.pow(key,7)*.48+Math.pow(key,30)*.22+Math.pow(fill,12)*.18
-          rim=fresnel*(.12+.22*Math.max(0,-ny))
+          light=.38+nz*.34-ny*.18
+          reflection=Math.pow(key,7)*.26+Math.pow(key,30)*.23+Math.pow(fill,12)*.12
+          rim=fresnel*(.25+.38*Math.max(0,-nx-ny))
         } else {
           light=clamp(.38+z*.34-d.y*.18+Math.pow(Math.max(0,-d.x*.38-d.y*.62+z*.6),18)*.65)
           reflection=Math.exp(-Math.pow((d.y+.43+d.x*.18)/.11,2))*.35
