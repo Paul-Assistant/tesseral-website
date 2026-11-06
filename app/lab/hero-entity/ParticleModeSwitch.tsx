@@ -115,7 +115,9 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
           reflection=Math.exp(-Math.pow((d.y+.43+d.x*.18)/.11,2))*.35
           rim=Math.pow(d.r,18)*(.25+Math.max(0,-d.x-d.y)*.38)
         }
-        const tone = Math.floor(clamp(light+reflection+rim)*127)
+        // A travelling crest and trough make the center-out pulse readable on silver.
+        const lensReflection = lens * Math.cos(d.r*16-rippleAge*9) * .2
+        const tone = Math.floor(clamp(light+reflection+rim+lensReflection)*127)
         ctx.fillStyle = colors[tone]
         ctx.globalAlpha = (variant === 'glass' ? (.38 + reflection*.45) * (1-ease(clamp((d.r-.78)/.22))) : .64 + z*.3) * (1-loose*.38)
         const size = (mobile ? 1.15 : .8) + loose*.7
