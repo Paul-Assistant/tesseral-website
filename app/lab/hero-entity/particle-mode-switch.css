@@ -17,3 +17,10 @@
 .particle-mode[data-variant=glass] .particle-mode-options button[aria-pressed=true]{color:inherit}
 @media(prefers-reduced-motion:reduce){.particle-mode-options button{transition:none}}
 .particle-mode[data-variant=living] .particle-mode-options button[aria-pressed=true] :is(svg,img){transform:scale(var(--lens-scale,1));transform-origin:center}
+/* Recesses sit below the particle layer and emerge as grains leave a control. */
+.particle-mode-seats{position:absolute;top:20.14%;bottom:25%;display:flex;justify-content:space-between;pointer-events:none}
+.particle-mode-seats>span{height:100%;border-radius:50%;background:linear-gradient(145deg,#1015153d,#8b939318);box-shadow:inset 3px 4px 7px #0008,inset -2px -3px 5px #ffffff12,0 1px 0 #ffffff17}
+[data-theme=light] .particle-mode-seats>span{background:linear-gradient(145deg,#7b84862b,#eef2ed2b);box-shadow:inset 3px 4px 7px #45504e54,inset -2px -3px 5px #ffffff85,0 1px 0 #ffffff70}
+.particle-mode[data-variant=living] .particle-mode-options button[aria-pressed=false]{color:#949e9a}
+[data-theme=light] .particle-mode[data-variant=living] .particle-mode-options button[aria-pressed=false]{color:#65716c}
+.particle-mode[data-variant=living] .particle-mode-options button[aria-pressed=false] :is(img,svg){opacity:.7;transform:scale(.94);transition:opacity .7s ease,transform .7s ease}

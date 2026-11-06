@@ -54,6 +54,14 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
       const living = variant === 'living'
       const t = reduced ? 0 : now*.00035
       const m = motion.current, progress = reduced ? 1 : clamp((now-m.start)/1450)
+      if (living) {
+        for (let i=0; i<(navigation ? 4 : 2); i++) {
+          const depth = m.from===m.to ? (i===m.to ? 0 : 1)
+            : i===m.to ? 1-ease(clamp((progress-.35)/.65))
+            : i===m.from ? ease(clamp(progress/.8)) : 1
+          root.style.setProperty(`--seat-${i}`,String(depth))
+        }
+      }
       const rippleAge = (now-m.ripple)/(living ? 2400 : 1600)
       const ripple = reduced || rippleAge < 0 || rippleAge > 1 ? 0 : living ? Math.pow(Math.sin(rippleAge*Math.PI),2) : Math.sin(rippleAge*Math.PI)*Math.exp(-rippleAge*1.4)
       const lens = living ? ripple : 0
@@ -131,12 +139,15 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
     }
     frame = requestAnimationFrame(draw)
     return () => { cancelAnimationFrame(frame); observer.disconnect() }
-  }, [variant, width])
+  }, [variant, width, navigation])
 
   return <div ref={rootRef} className="particle-mode" data-variant={variant} data-mode={mode} style={{width, aspectRatio:`${width} / 144`}}
     onPointerMove={e => { if(e.pointerType==='touch') return; const r=e.currentTarget.getBoundingClientRect(); motion.current.x=(e.clientX-r.left)*width/r.width; motion.current.y=(e.clientY-r.top)*144/r.height }}
     onPointerLeave={() => { motion.current.x=-1000; motion.current.y=-1000 }}>
     <div className="particle-mode-well" style={{left:`${39/width*100}%`,right:`${39/width*100}%`}} aria-hidden="true" />
+    {variant==='living' && <div className="particle-mode-seats" aria-hidden="true" style={{left:`${55/width*100}%`,right:`${55/width*100}%`}}>
+      {labels.map((label,index)=><span key={label} style={{width:`${78/(width-110)*100}%`,opacity:`var(--seat-${index},${index===mode?0:1})`}}/>)}
+    </div>}
     <canvas ref={canvasRef} aria-hidden="true" />
     <div className="particle-mode-options" style={{left:`${55/width*100}%`,right:`${55/width*100}%`}} role="group" aria-label={navigation ? 'Particle navigation preview' : 'Interaction mode preview'}>
       {labels.map((label,index)=><button key={label} type="button" aria-pressed={mode===index} onClick={()=>choose(index)} aria-label={label} style={{width:`${78/(width-110)*100}%`}}>
