@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { MaterialButton } from './ButtonStudies'
+import ParticleModeSwitch from './ParticleModeSwitch'
 import { WaitlistDialog } from '@/components/WaitlistButton'
 
 export function DigitalText({text,delay=0}:{text:string;delay?:number}){
@@ -36,5 +37,6 @@ export default function HeroComposition(){
   <div className="study-invitation"><p><DigitalText text={'GIVE IT   SOMETHING\nTO THINK ABOUT.'} delay={450}/></p><p><DigitalText text={'DRAG A SAMPLE FILE\n   INTO YOUR   TESSERAL.\nSEE WHAT   CONNECTS.'} delay={750}/></p></div>
   <div className="study-promise"><h1><DigitalText text={'Give your next big idea\na mind to work with.'} delay={350}/></h1><p><DigitalText text={'17 years of agency experience.\nA starting point that’s already informed.'} delay={650}/></p></div>
   <div className="study-cta"><MaterialButton kind="frost" label="Create your Tesseral" selected={false} onSelect={()=>setOpen(true)}><DigitalText text="Create your Tesseral" delay={300}/><span aria-hidden="true">↗</span></MaterialButton></div>
+ <ParticleModeSwitch/>
  </div>{open&&<WaitlistDialog source="hero-study" close={()=>setOpen(false)}/>}</>
 }
