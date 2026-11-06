@@ -24,3 +24,9 @@
 .particle-mode[data-variant=living] .particle-mode-options button[aria-pressed=false]{color:#949e9a}
 [data-theme=light] .particle-mode[data-variant=living] .particle-mode-options button[aria-pressed=false]{color:#65716c}
 .particle-mode[data-variant=living] .particle-mode-options button[aria-pressed=false] :is(img,svg){opacity:.7;transform:scale(.94);transition:opacity .7s ease,transform .7s ease}
+/* Fine moulded texture and a low-contrast reflection inside the recessed bed. */
+.particle-mode[data-variant=living] .particle-mode-well{overflow:hidden;isolation:isolate}
+.particle-mode[data-variant=living] .particle-mode-well:before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:.105;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");background-size:100px 100px;mix-blend-mode:soft-light}
+.particle-mode[data-variant=living] .particle-mode-well:after{background:radial-gradient(ellipse at 25% 20%,#f0e5ff18,transparent 55%),radial-gradient(ellipse at 75% 80%,#e3f6c713,transparent 60%),linear-gradient(115deg,transparent 20%,#ffffff12 45%,transparent 70%);background-size:180% 180%;animation:mercury-bed-reflection 24s ease-in-out infinite alternate}
+@keyframes mercury-bed-reflection{from{background-position:0% 30%}to{background-position:100% 65%}}
+@media(prefers-reduced-motion:reduce){.particle-mode[data-variant=living] .particle-mode-well:after{animation:none}}
