@@ -4,6 +4,7 @@ import ParticleBloom, { type EntityInteraction } from './ParticleBloom'
 import HeroComposition, { ParticleLogo } from './HeroComposition'
 import { MaterialButton } from './ButtonStudies'
 import RetroMood from './RetroMood'
+import UIPlayground from './UIPlayground'
 import PrismFlare from './PrismFlare'
 import SphereParticles from './SphereParticles'
 import CosmicDust from './CosmicDust'
@@ -59,7 +60,7 @@ export default function HeroStudy(){
  const move=(e:PointerEvent<HTMLButtonElement>)=>{const d=drag.current;if(!d.held)return;const r=root.current!.getBoundingClientRect();d.x=Math.max(65,Math.min(r.width-65,e.clientX-r.left-d.ox));d.y=Math.max(40,Math.min(r.height-40,e.clientY-r.top-d.oy))}
  const release=()=>{const d=drag.current;if(!d.held)return;d.held=false;const b=stage.current!.getBoundingClientRect(),r=root.current!.getBoundingClientRect();const dist=Math.hypot(d.x-(b.left-r.left+b.width/2),d.y-(b.top-r.top+b.height/2));if(dist<Math.min(b.width,b.height)*.34){d.absorbing=performance.now();d.fromX=d.x;d.fromY=d.y;}}
  useEffect(()=>{window.addEventListener('pointerup',release);window.addEventListener('mouseup',release);return()=>{window.removeEventListener('pointerup',release);window.removeEventListener('mouseup',release)}},[])
- return <main ref={root} className="entity-playground" data-mood="observatory" data-theme={light?'light':'dark'}>
+ return <><main ref={root} className="entity-playground" data-mood="observatory" data-theme={light?'light':'dark'}>
   <div className="hero-theme-toggle"><MaterialButton kind="icon" label={light?'Switch to dark mode':'Switch to light mode'} selected={!light} onSelect={()=>setLight(!light)}><svg className="theme-glyph" data-light={light} width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g className="theme-sun" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></g><path className="theme-moon" d="M19.8 15A8 8 0 0 1 9 4.2 8 8 0 1 0 19.8 15Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/></svg></MaterialButton></div>
   <RetroMood/>
   <div className="cosmos" aria-hidden="true"><div className="cosmos-motion"><div className="solar-veil"/><div className="orbit-light"/><div className="planet-edge"/><div className="horizon-glow"/><div className="horizon"/></div><div className="entity-atmosphere"/></div>
@@ -70,5 +71,5 @@ export default function HeroStudy(){
    <span className="material-backdrop" aria-hidden="true"/><span className="material-cloud" aria-hidden="true"/><span className="material-rim" aria-hidden="true"/><span className="material-reflection" aria-hidden="true"/>
    {!done&&<ParticleLogo/>}<span className="tile-title">Visual reference</span><span className="tile-meta"><span>FIGMA FILE</span><span>8 PAGES</span></span>
   </button>
- </main>
+ </main><UIPlayground light={light}/></>
 }
