@@ -7,7 +7,7 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n))
 const ease = (n: number) => n * n * (3 - 2 * n)
 
 /** A small, independent particle surface: no additional WebGL context. */
-export default function ParticleModeSwitch({ variant = 'mercury', navigation = false }: { variant?: 'mercury' | 'glass' | 'living'; navigation?: boolean }) {
+export default function ParticleModeSwitch({ variant = 'mercury', navigation = false, surface = 'recesses' }: { surface?: 'recesses' | 'individual' | 'engraved'; variant?: 'mercury' | 'glass' | 'living'; navigation?: boolean }) {
   const width = navigation ? 524 : 300
   const labels = navigation ? ['Overview', 'The problem', 'How it works', 'Pricing'] : ['Voice', 'Type']
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -141,11 +141,11 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
     return () => { cancelAnimationFrame(frame); observer.disconnect() }
   }, [variant, width, navigation])
 
-  return <div ref={rootRef} className="particle-mode" data-variant={variant} data-mode={mode} style={{width, aspectRatio:`${width} / 144`}}
+  return <div ref={rootRef} className="particle-mode" data-variant={variant} data-surface={surface} data-mode={mode} style={{width, aspectRatio:`${width} / 144`}}
     onPointerMove={e => { if(e.pointerType==='touch') return; const r=e.currentTarget.getBoundingClientRect(); motion.current.x=(e.clientX-r.left)*width/r.width; motion.current.y=(e.clientY-r.top)*144/r.height }}
     onPointerLeave={() => { motion.current.x=-1000; motion.current.y=-1000 }}>
     <div className="particle-mode-well" style={{left:`${39/width*100}%`,right:`${39/width*100}%`}} aria-hidden="true" />
-    {variant==='living' && <div className="particle-mode-seats" aria-hidden="true" style={{left:`${55/width*100}%`,right:`${55/width*100}%`}}>
+    {variant==='living' && surface!=='engraved' && <div className="particle-mode-seats" aria-hidden="true" style={{left:`${55/width*100}%`,right:`${55/width*100}%`}}>
       {labels.map((label,index)=><span key={label} style={{width:`${78/(width-110)*100}%`,opacity:`var(--seat-${index},${index===mode?0:1})`}}/>)}
     </div>}
     <canvas ref={canvasRef} aria-hidden="true" />

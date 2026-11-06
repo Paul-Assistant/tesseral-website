@@ -30,3 +30,12 @@
 .particle-mode[data-variant=living] .particle-mode-well:after{background:radial-gradient(ellipse at 25% 20%,#f0e5ff18,transparent 55%),radial-gradient(ellipse at 75% 80%,#e3f6c713,transparent 60%),linear-gradient(115deg,transparent 20%,#ffffff12 45%,transparent 70%);background-size:180% 180%;animation:mercury-bed-reflection 24s ease-in-out infinite alternate}
 @keyframes mercury-bed-reflection{from{background-position:0% 30%}to{background-position:100% 65%}}
 @media(prefers-reduced-motion:reduce){.particle-mode[data-variant=living] .particle-mode-well:after{animation:none}}
+/* Alternative A: the separate impressions belong to the page surface itself. */
+.particle-mode[data-surface=individual] .particle-mode-well{display:none}
+/* Alternative B: engraved glyphs, with no circular wells under inactive items. */
+.particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false]{color:#0b1010;text-shadow:0 1px 0 #ffffff35!important}
+.particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false] svg{opacity:1;filter:drop-shadow(0 1px 0 #ffffff38);transform:none}
+.particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false] img{opacity:.85;filter:brightness(.15) drop-shadow(0 1px 0 #ffffff38);transform:none}
+[data-theme=light] .particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false]{color:#7c8983;text-shadow:0 1px 0 #ffffffc2!important}
+[data-theme=light] .particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false] svg{filter:drop-shadow(0 1px 0 #ffffffc2)}
+[data-theme=light] .particle-mode[data-surface=engraved] .particle-mode-options button[aria-pressed=false] img{filter:opacity(.52) drop-shadow(0 1px 0 #ffffffd9)}
