@@ -86,7 +86,9 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
             : i===m.to ? 1-ease(clamp((progress-.35)/.65))
             : i===m.from ? ease(clamp(progress/.8)) : 1
           root.style.setProperty(`--seat-${i}`,String(depth))
-          const lift = i===m.to ? (reduced ? 1 : ease(clamp((now-m.start-1650)/650))) : 0
+          const lift = i===m.to ? (reduced ? 1 : ease(clamp((now-m.start-1650)/(particleLabels ? 1100 : 650)))) : 0
+          const glyphVisible = i===m.to && (reduced || now-m.start>=1650)
+          root.style.setProperty(`--glyph-${i}`,glyphVisible ? '1' : '0')
           root.style.setProperty(`--lift-${i}`,String(lift))
         }
       }
@@ -170,13 +172,15 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
           ctx.beginPath(); ctx.arc(x,y,size*2.8,0,Math.PI*2); ctx.fill()
         }
       }
-      if(particleLabels && root.dataset.glyphs==='ready') {
-        const lift=reduced ? 1 : ease(clamp((now-m.start-1650)/650))
+      if(particleLabels && root.dataset.glyphs==='ready' && (reduced || now-m.start>=1650)) {
+        // Hand off at the engraved size, then grow the same opaque grains in place.
+        const lift=reduced ? 1 : ease(clamp((now-m.start-1650)/1100))
+        const glyphScale=1+.22*lift
         ctx.fillStyle='#172021'
         for(const [i,d] of (glyphs[m.to]||[]).entries()){
           const drift=reduced ? 0 : Math.sin(t*2+i*.7)*.22
-          ctx.globalAlpha=d.alpha*lift*.95
-          ctx.beginPath();ctx.arc(94+m.to*112+d.x*(1+.08*lift)+drift,68+d.y*(1+.08*lift)+drift,.48,0,Math.PI*2);ctx.fill()
+          ctx.globalAlpha=d.alpha*.95
+          ctx.beginPath();ctx.arc(94+m.to*112+d.x*glyphScale+drift,68+d.y*glyphScale+drift,.48*glyphScale,0,Math.PI*2);ctx.fill()
         }
       }
       ctx.globalAlpha = 1
@@ -194,7 +198,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
     </div>}
     <canvas ref={canvasRef} aria-hidden="true" />
     <div className="particle-mode-options" style={{left:`${55/width*100}%`,right:`${55/width*100}%`}} role="group" aria-label={navigation ? 'Particle navigation preview' : 'Interaction mode preview'}>
-      {labels.map((label,index)=><button key={label} type="button" aria-pressed={mode===index} onClick={()=>choose(index)} aria-label={label} style={{width:`${78/(width-110)*100}%`, ...({'--label-lift':`var(--lift-${index},${index===mode?1:0})`} as React.CSSProperties)}}>
+      {labels.map((label,index)=><button key={label} type="button" aria-pressed={mode===index} onClick={()=>choose(index)} aria-label={label} style={{width:`${78/(width-110)*100}%`, ...({'--label-lift':`var(--lift-${index},${index===mode?1:0})`,'--glyph-visible':`var(--glyph-${index},${index===mode?1:0})`} as React.CSSProperties)}}>
         {navigation ? <img src={`/header/${['globe','nav-2','nav-3','nav-4'][index]}.svg`} alt="" width="24" height="24"/> : index===0 ?
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11v1a7 7 0 0 0 14 0v-1M12 19v3m-4 0h8"/></svg> :
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M6 9h2m3 0h2m3 0h2M6 12h2m3 0h2m3 0h2M7 16h10"/></svg>}
