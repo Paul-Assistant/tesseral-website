@@ -26,8 +26,8 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05
   host.appendChild(renderer.domElement)
   const scene=new THREE.Scene()
-  const camera=new THREE.PerspectiveCamera(27,1,.1,60)
-  camera.position.set(0,10.6,2.4);camera.lookAt(0,.15,0)
+  const camera=new THREE.OrthographicCamera(-4.4,4.4,2.6,-2.6,.1,60)
+  camera.position.set(0,11,1.2);camera.lookAt(0,.15,0)
   const pmrem=new THREE.PMREMGenerator(renderer), room=new THREE.Scene()
   room.background=new THREE.Color(0x92979a)
   const softboxes: THREE.Mesh[]=[]
@@ -97,18 +97,21 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   }
   mesh(new RoundedBoxGeometry(.82,.62,.15,6,.045),silver,push,0,.66)
   const lip=mesh(new THREE.CylinderGeometry(.065,.065,.76,48),polished,push,0,.96,.015);lip.rotation.z=Math.PI/2
-  // Recessed pyramids across the front face, cut into a satin grip plate.
+  // Same diamond pitch and raised relief as the rotary sidewall, on both grip faces.
   const facets:number[]=[]
-  for(let row=0;row<4;row++)for(let col=0;col<6;col++){
-    const x=-.33+col*.112,y=.47+row*.105,z=.113,h=.047
-    const corners=[[x-h,y-h,z],[x+h,y-h,z],[x+h,y+h,z],[x-h,y+h,z]]
-    const valley=[x,y,z-.031]
-    for(let i=0;i<4;i++)facets.push(...corners[i],...corners[(i+1)%4],...valley)
+  const pitchX=.0432,pitchY=.0467
+  for(const side of [-1,1])for(let row=0;row<9;row++)for(let col=0;col<16;col++){
+    const x=(col-7.5)*pitchX,y=.47+row*pitchY,z=side*.076
+    const corners=[[x-pitchX/2,y-pitchY/2,z],[x+pitchX/2,y-pitchY/2,z],[x+pitchX/2,y+pitchY/2,z],[x-pitchX/2,y+pitchY/2,z]]
+    const peak=[x,y,z+side*.018]
+    for(let i=0;i<4;i++){
+      const next=(i+1)%4
+      facets.push(...corners[side>0?i:next],...corners[side>0?next:i],...peak)
+    }
   }
   const faceGeometry=new THREE.BufferGeometry();faceGeometry.setAttribute('position',new THREE.Float32BufferAttribute(facets,3));faceGeometry.computeVertexNormals()
-  // The thin backing sits behind the cut facets rather than filling their valleys.
-  mesh(new RoundedBoxGeometry(.71,.44,.012,2,.008),silver,push,0,.625,.072)
   mesh(faceGeometry,silver,push)
+  push.scale.setScalar(.78);hinge.scale.setScalar(.78)
   const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
   cylinder(.49,.13,silver,dial,.08);rim(.5,.026,polished,dial,.12)
@@ -123,6 +126,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const angle=(-135+i*6.75)*Math.PI/180
     const tick=mesh(new THREE.BoxGeometry(i%5===0?.015:.009,.004,i%5===0?.10:.045),dark,mounts[1],Math.sin(angle)*.91,.008,-Math.cos(angle)*.91);tick.rotation.y=-angle
   }
+  dial.scale.setScalar(.78)
   let state={...initial}, rotation=(initial.value/100-.5)*Math.PI*1.5, elevation=initial.on?-.34:.34
   let raf=0, last=0, visible=true, running=false, pointerX=0, lightX=-3
   let drag: {id:number;x:number;value:number;kind:string} | null=null
@@ -165,8 +169,10 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   function leave(){pointerX=0;wake()}
   renderer.domElement.addEventListener('pointerdown',down);renderer.domElement.addEventListener('pointermove',move);renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',cancel);renderer.domElement.addEventListener('pointerleave',leave)
   const resize=new ResizeObserver(()=>{
-    const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/h
-    camera.position.set(0,10.6,2.4).multiplyScalar(Math.max(1,1.65/camera.aspect));camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
+    const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h)
+    const aspect=w/h,halfWidth=Math.max(3.5,2.1*aspect)
+    camera.left=-halfWidth;camera.right=halfWidth;camera.top=halfWidth/aspect;camera.bottom=-halfWidth/aspect
+    camera.position.set(0,11,1.2);camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
   });resize.observe(host)
   const visibility=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake()});visibility.observe(host)
   const resume=()=>{if(!document.hidden)wake()};document.addEventListener('visibilitychange',resume)
