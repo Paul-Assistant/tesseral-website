@@ -94,35 +94,29 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   mesh(new RoundedBoxGeometry(.47,.16,.36,4,.04),silver,hinge,0,.12)
   const axle=mesh(new THREE.CylinderGeometry(.09,.09,.68,48),polished,hinge,0,.22);axle.rotation.z=Math.PI/2
   const push=new THREE.Group();push.position.y=.22;mounts[0].add(push);push.userData.control='push'
-  // A single machined blank: continuous shoulders and lower bridge, with a
-  // through-cut opening. Beveled edges flow into the curved side profile.
-  const outline=new THREE.Shape()
-  outline.moveTo(-.23,.04);outline.quadraticCurveTo(-.31,.04,-.32,.14)
-  outline.lineTo(-.36,.79);outline.bezierCurveTo(-.37,.9,-.33,.96,-.23,.97)
-  outline.quadraticCurveTo(0,1.005,.23,.97);outline.bezierCurveTo(.33,.96,.37,.9,.36,.79)
-  outline.lineTo(.32,.14);outline.quadraticCurveTo(.31,.04,.23,.04);outline.closePath()
-  const opening=new THREE.Path()
-  opening.moveTo(-.18,.13);opening.lineTo(.18,.13);opening.quadraticCurveTo(.22,.13,.22,.17)
-  opening.lineTo(.22,.32);opening.quadraticCurveTo(.22,.36,.18,.36)
-  opening.lineTo(-.18,.36);opening.quadraticCurveTo(-.22,.36,-.22,.32)
-  opening.lineTo(-.22,.17);opening.quadraticCurveTo(-.22,.13,-.18,.13)
-  outline.holes.push(opening)
-  const body=new THREE.ExtrudeGeometry(outline,{depth:.12,bevelEnabled:true,bevelThickness:.065,bevelSize:.045,bevelSegments:12,curveSegments:24,steps:12})
-  const bodyPositions=body.getAttribute('position')
-  const bodyUV=body.getAttribute('uv')
+  // Extrude the reference's rounded side profile across the lever width.
+  // The long sides are solid; there is no rectangular frame around the grip.
+  const profile=new THREE.Shape()
+  profile.moveTo(-.16,.50);profile.lineTo(-.16,1.06)
+  profile.bezierCurveTo(-.16,1.25,.16,1.25,.16,1.06)
+  profile.lineTo(.16,.50);profile.bezierCurveTo(.16,.30,-.16,.30,-.16,.50)
+  const body=new THREE.ExtrudeGeometry(profile,{depth:.72,bevelEnabled:true,bevelThickness:.018,bevelSize:.018,bevelSegments:8,curveSegments:32,steps:1})
+  body.rotateY(Math.PI/2);body.translate(-.36,0,0)
+  const bodyPositions=body.getAttribute('position'),bodyUV=body.getAttribute('uv')
   for(let i=0;i<bodyPositions.count;i++){
-    const x=bodyPositions.getX(i),y=bodyPositions.getY(i),z=bodyPositions.getZ(i)-.06
-    bodyPositions.setZ(i,z)
+    const x=bodyPositions.getX(i),y=bodyPositions.getY(i),z=bodyPositions.getZ(i)
     const normalY=Math.abs(body.getAttribute('normal').getY(i))
-    bodyUV.setXY(i,x/.86+.5,normalY>.7 ? z/.25+.5 : y)
+    bodyUV.setXY(i,x/.76+.5,normalY>.7 ? z/.36+.5 : y/1.23)
   }
-  body.computeVertexNormals()
   mesh(body,leverMetal,push)
+  // Narrow neck meets the underside behind the rounded nose, leaving the front recess open.
+  const neck=mesh(new RoundedBoxGeometry(.39,.45,.16,6,.055),leverMetal,push,0,.22,-.075)
+  neck.rotation.x=-.16
   // Same diamond pitch and raised relief as the rotary sidewall, on both grip faces.
   const facets:number[]=[]
   const pitchX=.0432,pitchY=.0467
-  for(const side of [-1,1])for(let row=0;row<9;row++)for(let col=0;col<16;col++){
-    const x=(col-7.5)*pitchX,y=.47+row*pitchY,z=side*.126
+  for(const side of [1])for(let row=0;row<9;row++)for(let col=0;col<16;col++){
+    const x=(col-7.5)*pitchX,y=.60+row*pitchY,z=side*.179
     const corners=[[x-pitchX/2,y-pitchY/2,z],[x+pitchX/2,y-pitchY/2,z],[x+pitchX/2,y+pitchY/2,z],[x-pitchX/2,y+pitchY/2,z]]
     const peak=[x,y,z+side*.018]
     for(let i=0;i<4;i++){
