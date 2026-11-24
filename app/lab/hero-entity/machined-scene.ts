@@ -87,7 +87,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   }
   function cylinder(r:number,h:number,material:THREE.Material,parent:THREE.Object3D,y:number){return mesh(new THREE.CylinderGeometry(r,r,h,96),material,parent,0,y)}
   function rim(r:number,tube:number,material:THREE.Material,parent:THREE.Object3D,y:number){const ring=mesh(new THREE.TorusGeometry(r,tube,12,128),material,parent,0,y);ring.rotation.x=Math.PI/2;return ring}
-  const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:unified?.10:.13}),scene,0,-.18);floor.rotation.x=-Math.PI/2
+  const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:unified?.18:.13}),scene,0,-.18);floor.rotation.x=-Math.PI/2
   scene.add(new THREE.HemisphereLight(0xffffff,0x53575a,unified?.25:.5))
   const key=new THREE.DirectionalLight(0xffffff,unified?3.5:2);key.position.set(unified?3:-3,7,unified?-4:4);key.castShadow=true;key.shadow.mapSize.set(unified?1024:2048,unified?1024:2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=unified?.003:.018;key.shadow.bias=-.0002;key.shadow.radius=unified?18:7;key.shadow.blurSamples=16;scene.add(key)
   const fill=new THREE.DirectionalLight(0xe5edff,unified?.2:1);fill.position.set(4,3,-3);scene.add(fill)
@@ -98,10 +98,10 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
       group.scale.setScalar(.5)
 
       // Only a fine recessed seam around the control; no metal pedestal.
-      const insertMaterial=new THREE.MeshStandardMaterial({color:0xbfc3c6,metalness:.8,roughness:.35,bumpMap:linearBrush,bumpScale:.004})
-      cylinder(.43,.025,insertMaterial,group,.012)
-      rim(.423,.007,insertMaterial,group,.027)
-      const contact=mesh(new THREE.CircleGeometry(.43,96),new THREE.ShadowMaterial({opacity:.28}),group,0,.025)
+      const insertMaterial=new THREE.MeshStandardMaterial({color:0xedeeed,metalness:.12,roughness:.6,bumpMap:linearBrush,bumpScale:.004})
+      cylinder(.43,.025,insertMaterial,group,-.012)
+      rim(.423,.004,insertMaterial,group,.001)
+      const contact=mesh(new THREE.CircleGeometry(.43,96),new THREE.ShadowMaterial({opacity:.28}),group,0,.002)
       contact.rotation.x=-Math.PI/2;contact.castShadow=false
     }else{
       cylinder(.78,.025,dark,group,.008);cylinder(.746,.028,silver,group,.019)
@@ -152,7 +152,8 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const gripUV:number[]=[]
   for(let i=0;i<facets.length;i+=3)gripUV.push(facets[i]/.76+.5,facets[i+1]/1.25)
   faceGeometry.setAttribute('uv',new THREE.Float32BufferAttribute(gripUV,2))
-  mesh(faceGeometry,silver,push)
+  const gripMetal=silver.clone()
+  mesh(faceGeometry,gripMetal,push)
   push.scale.setScalar(.78);hinge.scale.setScalar(.78)
   const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
@@ -194,6 +195,14 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     rotation+=(targetRotation-rotation)*damping;elevation+=(targetElevation-elevation)*damping
     lightX+=((unified?3:-3)+pointerX*.55-lightX)*(reduced?1:1-Math.exp(-dt*3))
     dial.rotation.y=rotation;push.rotation.x=elevation
+    // The tall grip turns away from the overhead softbox in its on detent.
+    // Environment light otherwise fills this face almost uniformly.
+    if(unified){
+      const facing=(elevation+.34)/.68
+      leverMetal.envMapIntensity=.42+facing*.38
+      leverSide.envMapIntensity=.42+facing*.38
+      gripMetal.envMapIntensity=.35+facing*.45
+    }
     lime.emissiveIntensity=state.on?.65:0;indicator.visible=state.on
     key.position.x=lightX
     renderer.render(scene,camera)
@@ -218,7 +227,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const aspect=w/h,halfWidth=Math.max(3.5,2.1*aspect)
     if(camera instanceof THREE.PerspectiveCamera){
       camera.aspect=aspect
-      const distance=(mobileLayout?1.2:5.1)/(Math.tan(Math.PI/24)*aspect)
+      const distance=(mobileLayout?1.55:5.1)/(Math.tan(Math.PI/24)*aspect)
       camera.position.set(0,distance,distance*.12)
     }else{
       camera.left=-halfWidth;camera.right=halfWidth;camera.top=halfWidth/aspect;camera.bottom=-halfWidth/aspect
@@ -226,18 +235,18 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     }
     camera.lookAt(0,.15,0);camera.updateProjectionMatrix()
     if(unified){
-      mounts[0].position.set(mobileLayout?.35:1.2,0,mobileLayout?.48:0)
-      mounts[1].position.set(mobileLayout?-.35:-1.2,0,mobileLayout?.48:0)
+      mounts[0].position.set(mobileLayout?1.12:1.2,0,0)
+      mounts[1].position.set(mobileLayout?-1.12:-1.2,0,0)
       camera.updateMatrixWorld()
       const stage=host.parentElement!
-      const seatSize=mobileLayout?Math.min(100,w*.204):w*.048
+      const seatSize=mobileLayout?w*.158:w*.048
       stage.style.setProperty('--seat-size',`${seatSize}px`)
       stage.style.setProperty('--particle-scale',`${seatSize/78}`)
       for(const [i,mount] of mounts.entries()){
         const p=new THREE.Vector3(mount.position.x,0,mount.position.z).project(camera)
         stage.style.setProperty(`--seat-${i}-x`,`${(p.x*.5+.5)*w}px`)
         stage.style.setProperty('--seat-y',`${(-p.y*.5+.5)*h}px`)
-        stage.style.setProperty('--particle-y',`${mobileLayout?100:(-p.y*.5+.5)*h}px`)
+        stage.style.setProperty('--particle-y',`${(-p.y*.5+.5)*h}px`)
       }
     }
     wake()
