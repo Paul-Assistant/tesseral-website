@@ -27,11 +27,11 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   host.appendChild(renderer.domElement)
   const scene=new THREE.Scene()
   const camera=new THREE.PerspectiveCamera(27,1,.1,60)
-  camera.position.set(.4,10,4.2);camera.lookAt(0,.15,0)
+  camera.position.set(0,10.6,2.4);camera.lookAt(0,.15,0)
   const pmrem=new THREE.PMREMGenerator(renderer), room=new THREE.Scene()
   room.background=new THREE.Color(0x92979a)
   const softboxes: THREE.Mesh[]=[]
-  for(const [x,y,z,w,h,power] of [[-3,6,2,5,8,2.3],[4,4,1,4,6,1.5],[0,5,-4,5,4,1.7]]){
+  for(const [x,y,z,w,h,power] of [[-3,6,2,3.5,8,2.8],[4,4,1,3,6,1.6],[0,5,-4,5,4,1.9]]){
     const box=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(power,power,power),side:THREE.DoubleSide}))
     box.position.set(x,y,z);box.lookAt(0,0,0);room.add(box);softboxes.push(box)
   }
@@ -42,20 +42,30 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const pen=scratch.getContext('2d')!, data=pen.createImageData(512,512)
   for(let y=0;y<512;y++)for(let x=0;x<512;x++){
     const r=Math.hypot(x-256,y-256), n=Math.sin(r*11)*3+Math.sin(r*27)*2
-    const v=125+n+Math.sin(x*12.98+y*78.23)*2, i=(y*512+x)*4
+    const v=125+n*1.6+Math.sin(x*12.98+y*78.23)*3, i=(y*512+x)*4
     data.data[i]=data.data[i+1]=data.data[i+2]=v;data.data[i+3]=255
   }
   pen.putImageData(data,0,0)
   const brushing=new THREE.CanvasTexture(scratch);textures.push(brushing)
+  // Fine parallel machining for the lever and sidewalls, circular machining for the cap.
+  const linearCanvas=document.createElement('canvas');linearCanvas.width=linearCanvas.height=512
+  const linearPen=linearCanvas.getContext('2d')!,linearData=linearPen.createImageData(512,512)
+  for(let y=0;y<512;y++)for(let x=0;x<512;x++){
+    const grain=Math.sin(y*13.71)*9+Math.sin(y*3.27)*4+Math.sin(x*9.31+y*7.17)*2
+    const i=(y*512+x)*4,v=127+grain
+    linearData.data[i]=linearData.data[i+1]=linearData.data[i+2]=v;linearData.data[i+3]=255
+  }
+  linearPen.putImageData(linearData,0,0)
+  const linearBrush=new THREE.CanvasTexture(linearCanvas);textures.push(linearBrush)
   const directionData=new Uint8Array(256*256*4)
   for(let y=0;y<256;y++)for(let x=0;x<256;x++){
     const angle=Math.atan2(y-128,x-128)+Math.PI/2,i=(y*256+x)*4
     directionData[i]=Math.round((Math.cos(angle)*.5+.5)*255);directionData[i+1]=Math.round((Math.sin(angle)*.5+.5)*255);directionData[i+2]=255;directionData[i+3]=255
   }
   const directions=new THREE.DataTexture(directionData,256,256);directions.needsUpdate=true;textures.push(directions)
-  const silver=new THREE.MeshPhysicalMaterial({color:0xcbd0d4,metalness:.92,roughness:.46,bumpMap:brushing,bumpScale:.003,envMapIntensity:1})
-  const polished=new THREE.MeshPhysicalMaterial({color:0xdde0e2,metalness:.95,roughness:.32,envMapIntensity:1})
-  const topMetal=new THREE.MeshPhysicalMaterial({color:0xd9dfe2,metalness:1,roughness:.43,bumpMap:brushing,bumpScale:.007,anisotropy:.45,anisotropyMap:directions,envMapIntensity:1.1})
+  const silver=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.31,bumpMap:linearBrush,bumpScale:.012,anisotropy:.35,envMapIntensity:1.15})
+  const polished=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.23,bumpMap:linearBrush,bumpScale:.006,envMapIntensity:1.15})
+  const topMetal=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.31,bumpMap:brushing,bumpScale:.012,anisotropy:.55,anisotropyMap:directions,envMapIntensity:1.1})
   const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
@@ -156,7 +166,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   renderer.domElement.addEventListener('pointerdown',down);renderer.domElement.addEventListener('pointermove',move);renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',cancel);renderer.domElement.addEventListener('pointerleave',leave)
   const resize=new ResizeObserver(()=>{
     const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/h
-    camera.position.set(.4,10,4.2).multiplyScalar(Math.max(1,1.65/camera.aspect));camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
+    camera.position.set(0,10.6,2.4).multiplyScalar(Math.max(1,1.65/camera.aspect));camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
   });resize.observe(host)
   const visibility=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake()});visibility.observe(host)
   const resume=()=>{if(!document.hidden)wake()};document.addEventListener('visibilitychange',resume)
