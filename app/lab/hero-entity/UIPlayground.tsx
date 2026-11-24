@@ -1,4 +1,5 @@
 'use client'
+import MachinedControls from './MachinedControls'
 import ParticleModeSwitch from './ParticleModeSwitch'
 import { MaterialButton } from './ButtonStudies'
 import './ui-playground.css'
@@ -13,6 +14,7 @@ export default function UIPlayground({light}:{light:boolean}) {
    <article><div className="material-caption"><span>04 / INDIVIDUAL RECESSES</span><p>Individual impressions. No surrounding frame.</p></div><ParticleModeSwitch variant="living" surface="individual"/><ParticleModeSwitch variant="living" surface="individual" navigation/></article>
    <article><div className="material-caption"><span>05 / ENGRAVED SURFACE</span><p>Only the icons and labels are cut into the surface.</p></div><ParticleModeSwitch variant="living" surface="engraved"/><ParticleModeSwitch variant="living" surface="engraved" navigation/></article>
    <article className="living-material-study"><div className="material-caption"><span>06 / PARTICLE LETTERING</span><p>Particles gather first. The wave reveals the centered lettering.</p></div><ParticleModeSwitch variant="living" surface="engraved" particleLabels/><ParticleModeSwitch variant="living" surface="engraved" particleLabels navigation/><div className="material-caption"><span>06B / WITHOUT THE FRAME</span><p>Individual recesses with the same particle lettering.</p></div><ParticleModeSwitch variant="living" surface="individual" particleLabels/><ParticleModeSwitch variant="living" surface="individual" particleLabels navigation/></article>
+   <MachinedControls light={light}/>
   </div>
   <div className="material-reference"><span className="material-eyebrow">FROSTED FLOW / REFERENCE</span><MaterialButton kind="frost" label="Feel the surface" selected={false} onSelect={()=>{}}>Feel the surface <span aria-hidden="true">↗</span></MaterialButton></div>
  </section>
