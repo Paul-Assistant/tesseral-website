@@ -22,7 +22,7 @@ function knurl(radius: number, height: number, columns: number, rows: number, to
 export function createMachinedScene(host: HTMLDivElement, initial: State, toggle: () => void, change: (value: number) => void) {
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'})
   renderer.setPixelRatio(Math.min(devicePixelRatio,matchMedia('(pointer:coarse)').matches?1.5:2))
-  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap
   renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05
   host.appendChild(renderer.domElement)
   const scene=new THREE.Scene()
@@ -35,7 +35,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const box=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(power,power,power),side:THREE.DoubleSide}))
     box.position.set(x,y,z);box.lookAt(0,0,0);room.add(box);softboxes.push(box)
   }
-  const flag=new THREE.Mesh(new THREE.PlaneGeometry(3,7),new THREE.MeshBasicMaterial({color:0x555a60,side:THREE.DoubleSide}))
+  const flag=new THREE.Mesh(new THREE.PlaneGeometry(3,7),new THREE.MeshBasicMaterial({color:0x81868b,side:THREE.DoubleSide}))
   flag.position.set(2,6,-1);flag.lookAt(0,0,0);room.add(flag);softboxes.push(flag)
   const env=pmrem.fromScene(room,.07);scene.environment=env.texture
   softboxes.forEach(box=>{box.geometry.dispose();(box.material as THREE.Material).dispose()});pmrem.dispose()
@@ -77,9 +77,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   }
   function cylinder(r:number,h:number,material:THREE.Material,parent:THREE.Object3D,y:number){return mesh(new THREE.CylinderGeometry(r,r,h,96),material,parent,0,y)}
   function rim(r:number,tube:number,material:THREE.Material,parent:THREE.Object3D,y:number){const ring=mesh(new THREE.TorusGeometry(r,tube,12,128),material,parent,0,y);ring.rotation.x=Math.PI/2;return ring}
-  const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.22}),scene,0,-.18);floor.rotation.x=-Math.PI/2
+  const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.13}),scene,0,-.18);floor.rotation.x=-Math.PI/2
   scene.add(new THREE.HemisphereLight(0xe9f2ff,0x53514c,.5))
-  const key=new THREE.DirectionalLight(0xffffff,2);key.position.set(-3,7,4);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=.018;key.shadow.bias=-.0002;key.shadow.radius=5;scene.add(key)
+  const key=new THREE.DirectionalLight(0xffffff,2);key.position.set(-3,7,4);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=.018;key.shadow.bias=-.0002;key.shadow.radius=7;key.shadow.blurSamples=16;scene.add(key)
   const fill=new THREE.DirectionalLight(0xe5edff,1);fill.position.set(4,3,-3);scene.add(fill)
   const mounts=[-1.52,1.52].map(x=>{
     const group=new THREE.Group();group.position.x=x;scene.add(group)
