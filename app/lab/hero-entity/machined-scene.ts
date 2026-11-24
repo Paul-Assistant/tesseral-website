@@ -74,10 +74,15 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const leverMetal=topMetal.clone()
   leverMetal.bumpMap=linearBrush
   leverMetal.anisotropyMap=null
+  // Extruded end caps need their own planar grain: x is constant on these faces.
+  const leverSide=leverMetal.clone()
+  leverSide.anisotropy=0
+  leverSide.roughness=.24
+  leverSide.bumpScale=.004
   const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
-  function mesh(geometry:THREE.BufferGeometry, material:THREE.Material, parent:THREE.Object3D, x=0,y=0,z=0){
+  function mesh(geometry:THREE.BufferGeometry, material:THREE.Material|THREE.Material[], parent:THREE.Object3D, x=0,y=0,z=0){
     const object=new THREE.Mesh(geometry,material);object.position.set(x,y,z);object.castShadow=true;object.receiveShadow=true;parent.add(object);return object
   }
   function cylinder(r:number,h:number,material:THREE.Material,parent:THREE.Object3D,y:number){return mesh(new THREE.CylinderGeometry(r,r,h,96),material,parent,0,y)}
@@ -86,11 +91,18 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   scene.add(new THREE.HemisphereLight(0xe9f2ff,0x53514c,.5))
   const key=new THREE.DirectionalLight(0xffffff,2);key.position.set(-3,7,unified?-4:4);key.castShadow=true;key.shadow.mapSize.set(unified?1024:2048,unified?1024:2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=.018;key.shadow.bias=-.0002;key.shadow.radius=unified?18:7;key.shadow.blurSamples=16;scene.add(key)
   const fill=new THREE.DirectionalLight(0xe5edff,1);fill.position.set(4,3,-3);scene.add(fill)
-  const mounts=(unified?[3,-3]:[-1.52,1.52]).map(x=>{
+  const mounts=(unified?[1.2,-1.2]:[-1.52,1.52]).map(x=>{
     const group=new THREE.Group();group.position.x=x;scene.add(group)
     if(!unified)mesh(new RoundedBoxGeometry(2.75,.16,2.65,5,.12),panel,group,0,-.08)
-    cylinder(.78,.025,dark,group,.008);cylinder(.746,.028,silver,group,.019)
-    rim(.743,.012,polished,group,.038);cylinder(.715,.035,silver,group,.035)
+    if(unified){
+      group.scale.setScalar(.5)
+
+      // Only a fine recessed seam around the control; no metal pedestal.
+      rim(.49,.005,new THREE.MeshStandardMaterial({color:0x929797,roughness:.7}),group,.002)
+    }else{
+      cylinder(.78,.025,dark,group,.008);cylinder(.746,.028,silver,group,.019)
+      rim(.743,.012,polished,group,.038);cylinder(.715,.035,silver,group,.035)
+    }
     return group
   })
   // A simple rounded lever on a fixed transverse pivot.
@@ -107,14 +119,14 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   profile.lineTo(.16,.50);profile.absarc(0,.50,.16,0,-Math.PI,true);profile.closePath()
   const body=new THREE.ExtrudeGeometry(profile,{depth:.72,bevelEnabled:true,bevelThickness:.018,bevelSize:.018,bevelSegments:8,curveSegments:32,steps:1})
   body.rotateY(Math.PI/2);body.translate(-.36,0,0)
-  const bodyPositions=body.getAttribute('position'),bodyUV=body.getAttribute('uv')
+  const bodyPositions=body.getAttribute('position'),bodyUV=body.getAttribute('uv'),bodyNormals=body.getAttribute('normal')
   for(let i=0;i<bodyPositions.count;i++){
     const x=bodyPositions.getX(i),y=bodyPositions.getY(i),z=bodyPositions.getZ(i)
     // Continuous grain follows the side profile over the rounded crown.
     const grainV=y>1.04 ? (1.04+Math.atan2(y-1.04,z)*.16)/1.25 : y/1.25
-    bodyUV.setXY(i,x/.76+.5,grainV)
+    bodyUV.setXY(i,Math.abs(bodyNormals.getX(i))>.9 ? z/.36+.5 : x/.76+.5,grainV)
   }
-  const smoothBody=toCreasedNormals(body,.65);if(smoothBody!==body)body.dispose();mesh(smoothBody,leverMetal,push)
+  const smoothBody=toCreasedNormals(body,.65);if(smoothBody!==body)body.dispose();mesh(smoothBody,[leverSide,leverMetal],push)
   // Narrow neck meets the underside behind the rounded nose, leaving the front recess open.
   const neck=mesh(new RoundedBoxGeometry(.39,.45,.16,6,.055),leverMetal,push,0,.22,-.075)
   neck.rotation.x=-.16
@@ -148,7 +160,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   // Planar UVs keep the circular lathe marks concentric across the cap.
   const cap=mesh(new THREE.CircleGeometry(.53,128),topMetal,dial,0,.885);cap.rotation.x=-Math.PI/2
   mesh(new RoundedBoxGeometry(.025,.008,.17,2,.005),dark,dial,0,.892,-.37)
-  for(let i=0;i<41;i++){
+  for(let i=0;i<(unified?0:41);i++){
     const angle=(-135+i*6.75)*Math.PI/180
     const tick=mesh(new THREE.BoxGeometry(i%5===0?.015:.009,.004,i%5===0?.10:.045),dark,mounts[1],Math.sin(angle)*.91,.008,-Math.cos(angle)*.91);tick.rotation.y=-angle
   }

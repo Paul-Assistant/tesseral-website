@@ -15,3 +15,8 @@
 @media(max-width:650px){.unified-study .machined-viewport{height:260px}.unified-particles{transform:translate(-50%,-50%) scale(.58)}.unified-study .machined-controls{width:88%;gap:45%}.unified-study .machined-power{font-size:14px}.unified-study .machined-controls p{font-size:10px}}
 .unified-particles{transform:translate(-50%,-50%) scale(1.3)}
 @media(max-width:650px){.unified-particles{transform:translate(-50%,-50%) scale(.58)}}
+/* Match the physical control diameter rather than enlarging the centre pair. */
+.unified-particles{transform:translate(-50%,-50%) scale(.75);margin-top:5px}
+@media(max-width:650px){.unified-particles{transform:translate(-50%,-50%) scale(.36);margin-top:3px}}
+/* One fine surface grain across the physical and particle controls. */
+.unified-study:after{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;opacity:.055;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.94' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23grain)' d='M0 0h240v240H0z'/%3E%3C/svg%3E");background-size:120px 120px}
