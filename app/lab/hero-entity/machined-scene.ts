@@ -6,7 +6,7 @@ type State = { on: boolean; value: number; light: boolean }
 // A cut diamond surface, not a printed texture: each facet catches its own reflection.
 function knurl(radius: number, height: number, columns: number, rows: number, topRadius = radius) {
   const positions: number[] = []
-  const point = (a: number, y: number, r: number) => { const tapered=r+(topRadius-radius)*y/height; return [Math.cos(a)*tapered, y, Math.sin(a)*tapered] }
+  const point = (a: number, y: number, r: number) => { const shoulder=Math.max(0,(y/height-.8)/.2); const tapered=r+(topRadius-radius)*shoulder; return [Math.cos(a)*tapered, y, Math.sin(a)*tapered] }
   for (let row=0; row<rows; row++) for (let col=0; col<columns; col++) {
     const a=col/columns*Math.PI*2, b=(col+1)/columns*Math.PI*2
     const y=row/rows*height, next=(row+1)/rows*height
@@ -27,11 +27,11 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   host.appendChild(renderer.domElement)
   const scene=new THREE.Scene()
   const camera=new THREE.OrthographicCamera(-4.4,4.4,2.6,-2.6,.1,60)
-  camera.position.set(0,11,1.2);camera.lookAt(0,.15,0)
+  camera.position.set(0,11,.65);camera.lookAt(0,.15,0)
   const pmrem=new THREE.PMREMGenerator(renderer), room=new THREE.Scene()
   room.background=new THREE.Color(0x92979a)
   const softboxes: THREE.Mesh[]=[]
-  for(const [x,y,z,w,h,power] of [[-3,6,2,3.5,8,2.8],[4,4,1,3,6,1.6],[0,5,-4,5,4,1.9],[0,2,5,6,2.5,3.3],[-2,.5,4,1.7,5,1.7]]){
+  for(const [x,y,z,w,h,power] of [[-3,6,2,3.5,8,2.8],[4,4,1,3,6,1.6],[0,5,-4,5,4,1.9],[0,2,5,6,3.5,1.5],[-2,.5,4,2.5,5,1.3]]){
     const box=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(power,power,power),side:THREE.DoubleSide}))
     box.position.set(x,y,z);box.lookAt(0,0,0);room.add(box);softboxes.push(box)
   }
@@ -68,7 +68,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const silver=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.31,bumpMap:linearBrush,bumpScale:.012,anisotropy:.35,envMapIntensity:1.15})
   const polished=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.23,bumpMap:linearBrush,bumpScale:.006,envMapIntensity:1.15})
   const topMetal=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.19,bumpMap:brushing,bumpScale:.008,anisotropy:.9,anisotropyMap:directions,envMapIntensity:1.1})
-  const leverMetal=topMetal.clone()
+  const leverMetal=topMetal.clone();leverMetal.roughness=.27;leverMetal.anisotropy=.58;leverMetal.envMapIntensity=.85
   const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
@@ -138,7 +138,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
   cylinder(.49,.13,silver,dial,.08);rim(.5,.026,polished,dial,.12)
   mesh(knurl(.56,.7,72,15,.535),silver,dial,0,.15)
-  mesh(new THREE.CylinderGeometry(.532,.557,.7,96),silver,dial,0,.5)
+  // Straight wall with a short machined shoulder immediately below the cap.
+  const dialProfile=[new THREE.Vector2(.557,0),new THREE.Vector2(.557,.56),new THREE.Vector2(.532,.7)]
+  mesh(new THREE.LatheGeometry(dialProfile,96),silver,dial,0,.15)
   rim(.535,.014,polished,dial,.86)
   cylinder(.531,.025,topMetal,dial,.865)
   // Planar UVs keep the circular lathe marks concentric across the cap.
@@ -194,7 +196,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h)
     const aspect=w/h,halfWidth=Math.max(3.5,2.1*aspect)
     camera.left=-halfWidth;camera.right=halfWidth;camera.top=halfWidth/aspect;camera.bottom=-halfWidth/aspect
-    camera.position.set(0,11,1.2);camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
+    camera.position.set(0,11,.65);camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
   });resize.observe(host)
   const visibility=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake()});visibility.observe(host)
   const resume=()=>{if(!document.hidden)wake()};document.addEventListener('visibilitychange',resume)
