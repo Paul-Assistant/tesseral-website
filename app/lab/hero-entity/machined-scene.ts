@@ -97,24 +97,24 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   // A single machined blank: continuous shoulders and lower bridge, with a
   // through-cut opening. Beveled edges flow into the curved side profile.
   const outline=new THREE.Shape()
-  outline.moveTo(-.26,.02);outline.quadraticCurveTo(-.34,.02,-.35,.11)
-  outline.lineTo(-.40,.84);outline.quadraticCurveTo(-.41,.98,-.31,1)
-  outline.lineTo(.31,1);outline.quadraticCurveTo(.41,.98,.40,.84)
-  outline.lineTo(.35,.11);outline.quadraticCurveTo(.34,.02,.26,.02);outline.closePath()
+  outline.moveTo(-.23,.04);outline.quadraticCurveTo(-.31,.04,-.32,.14)
+  outline.lineTo(-.36,.79);outline.bezierCurveTo(-.37,.9,-.33,.96,-.23,.97)
+  outline.quadraticCurveTo(0,1.005,.23,.97);outline.bezierCurveTo(.33,.96,.37,.9,.36,.79)
+  outline.lineTo(.32,.14);outline.quadraticCurveTo(.31,.04,.23,.04);outline.closePath()
   const opening=new THREE.Path()
   opening.moveTo(-.18,.13);opening.lineTo(.18,.13);opening.quadraticCurveTo(.22,.13,.22,.17)
   opening.lineTo(.22,.32);opening.quadraticCurveTo(.22,.36,.18,.36)
   opening.lineTo(-.18,.36);opening.quadraticCurveTo(-.22,.36,-.22,.32)
   opening.lineTo(-.22,.17);opening.quadraticCurveTo(-.22,.13,-.18,.13)
   outline.holes.push(opening)
-  const body=new THREE.ExtrudeGeometry(outline,{depth:.18,bevelEnabled:true,bevelThickness:.025,bevelSize:.025,bevelSegments:5,curveSegments:24,steps:12})
+  const body=new THREE.ExtrudeGeometry(outline,{depth:.12,bevelEnabled:true,bevelThickness:.065,bevelSize:.045,bevelSegments:12,curveSegments:24,steps:12})
   const bodyPositions=body.getAttribute('position')
   const bodyUV=body.getAttribute('uv')
   for(let i=0;i<bodyPositions.count;i++){
-    const x=bodyPositions.getX(i),y=bodyPositions.getY(i),z=bodyPositions.getZ(i)-.09
+    const x=bodyPositions.getX(i),y=bodyPositions.getY(i),z=bodyPositions.getZ(i)-.06
     bodyPositions.setZ(i,z)
     const normalY=Math.abs(body.getAttribute('normal').getY(i))
-    bodyUV.setXY(i,x/.86+.5,normalY>.7 ? z/.23+.5 : y)
+    bodyUV.setXY(i,x/.86+.5,normalY>.7 ? z/.25+.5 : y)
   }
   body.computeVertexNormals()
   mesh(body,leverMetal,push)
@@ -122,7 +122,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const facets:number[]=[]
   const pitchX=.0432,pitchY=.0467
   for(const side of [-1,1])for(let row=0;row<9;row++)for(let col=0;col<16;col++){
-    const x=(col-7.5)*pitchX,y=.47+row*pitchY,z=side*.116
+    const x=(col-7.5)*pitchX,y=.47+row*pitchY,z=side*.126
     const corners=[[x-pitchX/2,y-pitchY/2,z],[x+pitchX/2,y-pitchY/2,z],[x+pitchX/2,y+pitchY/2,z],[x-pitchX/2,y+pitchY/2,z]]
     const peak=[x,y,z+side*.018]
     for(let i=0;i<4;i++){
