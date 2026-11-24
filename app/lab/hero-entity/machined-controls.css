@@ -18,9 +18,19 @@
 /* All four holes are siblings, rendered at identical size with one light model. */
 .unified-metal-seats span{position:absolute;left:var(--seat-0-x);top:var(--seat-y);width:var(--seat-size);height:var(--seat-size);transform:translate(-50%,-50%);border-radius:50%;background:#e4e6e5;box-shadow:inset -3px 3px 6px #50565b40,inset 3px -3px 6px #fff9;}
 .unified-metal-seats span:nth-child(2){left:var(--seat-1-x)}
-.unified-metal-seats span:nth-child(3){left:calc(50% - 56px * var(--particle-scale))}
-.unified-metal-seats span:nth-child(4){left:calc(50% + 56px * var(--particle-scale))}
+.unified-metal-seats span:nth-child(3){top:var(--particle-y);left:calc(50% - 56px * var(--particle-scale))}
+.unified-metal-seats span:nth-child(4){top:var(--particle-y);left:calc(50% + 56px * var(--particle-scale))}
 .unified-study .particle-mode-seats{display:none}
 .unified-study .machined-viewport{position:relative;z-index:1}
 /* Particle centre is y=68 within its 144px canvas, not the canvas midpoint. */
-.unified-study .unified-particles{top:calc(var(--seat-y,50%) + 4px * var(--particle-scale));margin-top:0;transform:translate(-50%,-50%) scale(var(--particle-scale,.75));z-index:2}
+.unified-study .unified-particles{top:calc(var(--particle-y,50%) + 4px * var(--particle-scale));margin-top:0;transform:translate(-50%,-50%) scale(var(--particle-scale,.75));z-index:2}
+
+@media(max-width:650px){
+ .ui-material-playground .unified-study{padding-top:36px;padding-bottom:36px}
+ .unified-study .machined-viewport{height:380px}
+ .unified-study .machined-controls{width:calc(100% - 48px);gap:28px}
+ .unified-study .machined-power{min-height:44px;font-size:16px}
+ .unified-study .machined-controls p{font-size:12px}
+ .unified-study .machined-controls input{height:20px;margin-top:12px}
+ .unified-study .material-caption h3{font-size:30px}
+}

@@ -37,7 +37,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
     if (!ctx) return
     const mobile = matchMedia('(pointer: coarse)').matches
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
-    const dpr = Math.min(devicePixelRatio, mobile ? 1.5 : 2)
+    const dpr = Math.min(devicePixelRatio, mobile && !aluminium ? 1.5 : 2)
     canvas.width = width * dpr; canvas.height = 144 * dpr
     ctx.scale(dpr, dpr)
     let cancelled = false
@@ -61,7 +61,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
       }
       if(!cancelled && glyphs.length===buttons.length)root.dataset.glyphs='ready'
     })
-    const count = variant === 'glass' ? (mobile ? 1400 : 3000) : (mobile ? 2600 : 6500)
+    const count = variant === 'glass' ? (mobile ? 1400 : 3000) : (mobile && !aluminium ? 2600 : 6500)
     // Uniform surface samples retain their identity throughout a transfer.
     const dots = Array.from({ length: count }, (_, i) => {
       const random = (n: number) => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v) }

@@ -22,7 +22,7 @@ function knurl(radius: number, height: number, columns: number, rows: number, to
 
 export function createMachinedScene(host: HTMLDivElement, initial: State, toggle: () => void, change: (value: number) => void, unified = false) {
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'})
-  renderer.setPixelRatio(Math.min(devicePixelRatio,matchMedia('(pointer:coarse)').matches?1.5:2))
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2))
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap
   renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05
   host.appendChild(renderer.domElement)
@@ -214,10 +214,11 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   renderer.domElement.addEventListener('pointerdown',down);renderer.domElement.addEventListener('pointermove',move);renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',cancel);renderer.domElement.addEventListener('pointerleave',leave)
   const resize=new ResizeObserver(()=>{
     const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h)
+    const mobileLayout=unified && w<=650
     const aspect=w/h,halfWidth=Math.max(3.5,2.1*aspect)
     if(camera instanceof THREE.PerspectiveCamera){
       camera.aspect=aspect
-      const distance=5.1/(Math.tan(Math.PI/24)*aspect)
+      const distance=(mobileLayout?1.2:5.1)/(Math.tan(Math.PI/24)*aspect)
       camera.position.set(0,distance,distance*.12)
     }else{
       camera.left=-halfWidth;camera.right=halfWidth;camera.top=halfWidth/aspect;camera.bottom=-halfWidth/aspect
@@ -225,14 +226,18 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     }
     camera.lookAt(0,.15,0);camera.updateProjectionMatrix()
     if(unified){
+      mounts[0].position.set(mobileLayout?.35:1.2,0,mobileLayout?.48:0)
+      mounts[1].position.set(mobileLayout?-.35:-1.2,0,mobileLayout?.48:0)
       camera.updateMatrixWorld()
       const stage=host.parentElement!
-      stage.style.setProperty('--seat-size',`${w*.048}px`)
-      stage.style.setProperty('--particle-scale',`${w*.048/78}`)
+      const seatSize=mobileLayout?Math.min(100,w*.204):w*.048
+      stage.style.setProperty('--seat-size',`${seatSize}px`)
+      stage.style.setProperty('--particle-scale',`${seatSize/78}`)
       for(const [i,mount] of mounts.entries()){
-        const p=new THREE.Vector3(mount.position.x,0,0).project(camera)
+        const p=new THREE.Vector3(mount.position.x,0,mount.position.z).project(camera)
         stage.style.setProperty(`--seat-${i}-x`,`${(p.x*.5+.5)*w}px`)
         stage.style.setProperty('--seat-y',`${(-p.y*.5+.5)*h}px`)
+        stage.style.setProperty('--particle-y',`${mobileLayout?100:(-p.y*.5+.5)*h}px`)
       }
     }
     wake()
