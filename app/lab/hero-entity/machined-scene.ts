@@ -98,7 +98,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
       group.scale.setScalar(.5)
 
       // Only a fine recessed seam around the control; no metal pedestal.
-      rim(.49,.005,new THREE.MeshStandardMaterial({color:0x929797,roughness:.7}),group,.002)
+      cylinder(.43,.025,silver,group,.012)
     }else{
       cylinder(.78,.025,dark,group,.008);cylinder(.746,.028,silver,group,.019)
       rim(.743,.012,polished,group,.038);cylinder(.715,.035,silver,group,.035)
@@ -132,9 +132,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   neck.rotation.x=-.16
   // Same diamond pitch and raised relief as the rotary sidewall, on both grip faces.
   const facets:number[]=[]
-  const pitchX=.0432,pitchY=.0467
-  for(const side of [-1,1])for(let row=0;row<9;row++)for(let col=0;col<16;col++){
-    const x=(col-7.5)*pitchX,y=.60+row*pitchY,z=side*.179
+  const pitchX=2*Math.PI*.56/72,pitchY=.7/15
+  for(const side of [-1,1])for(let row=0;row<9;row++)for(let col=0;col<14;col++){
+    const x=(col-6.5)*pitchX,y=.60+row*pitchY,z=side*.179
     const corners=[[x-pitchX/2,y-pitchY/2,z],[x+pitchX/2,y-pitchY/2,z],[x+pitchX/2,y+pitchY/2,z],[x-pitchX/2,y+pitchY/2,z]]
     const peak=[x,y,z+side*.018]
     for(let i=0;i<4;i++){
@@ -146,7 +146,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const gripUV:number[]=[]
   for(let i=0;i<facets.length;i+=3)gripUV.push(facets[i]/.76+.5,facets[i+1]/1.25)
   faceGeometry.setAttribute('uv',new THREE.Float32BufferAttribute(gripUV,2))
-  mesh(faceGeometry,leverMetal,push)
+  mesh(faceGeometry,silver,push)
   push.scale.setScalar(.78);hinge.scale.setScalar(.78)
   const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
@@ -164,7 +164,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const angle=(-135+i*6.75)*Math.PI/180
     const tick=mesh(new THREE.BoxGeometry(i%5===0?.015:.009,.004,i%5===0?.10:.045),dark,mounts[1],Math.sin(angle)*.91,.008,-Math.cos(angle)*.91);tick.rotation.y=-angle
   }
-  dial.scale.setScalar(.78)
+  dial.scale.setScalar(unified?.56:.78)
   let state={...initial}, rotation=(initial.value/100-.5)*Math.PI*1.5, elevation=initial.on?-.34:.34
   let raf=0, last=0, visible=true, running=false, pointerX=0, lightX=-3
   let drag: {id:number;x:number;value:number;kind:string} | null=null
@@ -217,7 +217,19 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
       camera.left=-halfWidth;camera.right=halfWidth;camera.top=halfWidth/aspect;camera.bottom=-halfWidth/aspect
       camera.position.set(0,11,.65)
     }
-    camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
+    camera.lookAt(0,.15,0);camera.updateProjectionMatrix()
+    if(unified){
+      camera.updateMatrixWorld()
+      const stage=host.parentElement!
+      stage.style.setProperty('--seat-size',`${w*.048}px`)
+      stage.style.setProperty('--particle-scale',`${w*.048/78}`)
+      for(const [i,mount] of mounts.entries()){
+        const p=new THREE.Vector3(mount.position.x,0,0).project(camera)
+        stage.style.setProperty(`--seat-${i}-x`,`${(p.x*.5+.5)*w}px`)
+        stage.style.setProperty('--seat-y',`${(-p.y*.5+.5)*h}px`)
+      }
+    }
+    wake()
   });resize.observe(host)
   const visibility=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake()});visibility.observe(host)
   const resume=()=>{if(!document.hidden)wake()};document.addEventListener('visibilitychange',resume)

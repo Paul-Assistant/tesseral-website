@@ -157,6 +157,14 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
           light=.38+nz*.34-ny*.18
           reflection=Math.pow(key,7)*.26+Math.pow(key,30)*.23+Math.pow(fill,12)*.12
           rim=fresnel*(.25+.38*Math.max(0,-nx-ny))
+          if(aluminium){
+            // Radially brushed silver reflects broad opposing studio softboxes.
+            const angle=Math.atan2(d.y,d.x)
+            const brushed=Math.pow(Math.abs(Math.cos(angle-.7-Math.sin(t*.16)*.035)),3)
+            light=.34+nz*.18
+            reflection=brushed*.43+Math.pow(key,16)*.12
+            rim=fresnel*.18
+          }
         } else {
           light=clamp(.38+z*.34-d.y*.18+Math.pow(Math.max(0,-d.x*.38-d.y*.62+z*.6),18)*.65)
           reflection=Math.exp(-Math.pow((d.y+.43+d.x*.18)/.11,2))*.35
