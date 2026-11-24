@@ -38,7 +38,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   }
   const flag=new THREE.Mesh(new THREE.PlaneGeometry(3,7),new THREE.MeshBasicMaterial({color:0x81868b,side:THREE.DoubleSide}))
   flag.position.set(2,6,-1);flag.lookAt(0,0,0);room.add(flag);softboxes.push(flag)
-  const env=pmrem.fromScene(room,.07);scene.environment=env.texture
+  const env=pmrem.fromScene(room,.07);scene.environment=env.texture;scene.environmentIntensity=unified?.65:1
   softboxes.forEach(box=>{box.geometry.dispose();(box.material as THREE.Material).dispose()});pmrem.dispose()
   const textures: THREE.Texture[]=[]
   const scratch=document.createElement('canvas');scratch.width=scratch.height=512
@@ -88,9 +88,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   function cylinder(r:number,h:number,material:THREE.Material,parent:THREE.Object3D,y:number){return mesh(new THREE.CylinderGeometry(r,r,h,96),material,parent,0,y)}
   function rim(r:number,tube:number,material:THREE.Material,parent:THREE.Object3D,y:number){const ring=mesh(new THREE.TorusGeometry(r,tube,12,128),material,parent,0,y);ring.rotation.x=Math.PI/2;return ring}
   const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:unified?.10:.13}),scene,0,-.18);floor.rotation.x=-Math.PI/2
-  scene.add(new THREE.HemisphereLight(0xe9f2ff,0x53514c,.5))
-  const key=new THREE.DirectionalLight(0xffffff,2);key.position.set(-3,7,unified?-4:4);key.castShadow=true;key.shadow.mapSize.set(unified?1024:2048,unified?1024:2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=.018;key.shadow.bias=-.0002;key.shadow.radius=unified?18:7;key.shadow.blurSamples=16;scene.add(key)
-  const fill=new THREE.DirectionalLight(0xe5edff,1);fill.position.set(4,3,-3);scene.add(fill)
+  scene.add(new THREE.HemisphereLight(0xffffff,0x53575a,unified?.25:.5))
+  const key=new THREE.DirectionalLight(0xffffff,unified?3.5:2);key.position.set(unified?3:-3,7,unified?-4:4);key.castShadow=true;key.shadow.mapSize.set(unified?1024:2048,unified?1024:2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=unified?.003:.018;key.shadow.bias=-.0002;key.shadow.radius=unified?18:7;key.shadow.blurSamples=16;scene.add(key)
+  const fill=new THREE.DirectionalLight(0xe5edff,unified?.2:1);fill.position.set(4,3,-3);scene.add(fill)
   const mounts=(unified?[1.2,-1.2]:[-1.52,1.52]).map(x=>{
     const group=new THREE.Group();group.position.x=x;scene.add(group)
     if(!unified)mesh(new RoundedBoxGeometry(2.75,.16,2.65,5,.12),panel,group,0,-.08)
@@ -98,7 +98,10 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
       group.scale.setScalar(.5)
 
       // Only a fine recessed seam around the control; no metal pedestal.
-      cylinder(.43,.025,silver,group,.012)
+      const insertMaterial=new THREE.MeshStandardMaterial({color:0xd2d5d7,metalness:.65,roughness:.48,bumpMap:linearBrush,bumpScale:.004})
+      cylinder(.43,.025,insertMaterial,group,.012)
+      const contact=mesh(new THREE.CircleGeometry(.43,96),new THREE.ShadowMaterial({opacity:.28}),group,0,.025)
+      contact.rotation.x=-Math.PI/2;contact.castShadow=false
     }else{
       cylinder(.78,.025,dark,group,.008);cylinder(.746,.028,silver,group,.019)
       rim(.743,.012,polished,group,.038);cylinder(.715,.035,silver,group,.035)
@@ -132,11 +135,13 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   neck.rotation.x=-.16
   // Same diamond pitch and raised relief as the rotary sidewall, on both grip faces.
   const facets:number[]=[]
-  const pitchX=2*Math.PI*.56/72,pitchY=.7/15
-  for(const side of [-1,1])for(let row=0;row<9;row++)for(let col=0;col<14;col++){
-    const x=(col-6.5)*pitchX,y=.60+row*pitchY,z=side*.179
+  const gripScale=unified?.56/.78:1
+  const pitchX=2*Math.PI*.56/72*gripScale,pitchY=.7/15*gripScale
+  const gripColumns=Math.floor(.69/pitchX),gripRows=Math.floor(.42/pitchY)
+  for(const side of [-1,1])for(let row=0;row<gripRows;row++)for(let col=0;col<gripColumns;col++){
+    const x=(col-(gripColumns-1)/2)*pitchX,y=.60+row*pitchY,z=side*.179
     const corners=[[x-pitchX/2,y-pitchY/2,z],[x+pitchX/2,y-pitchY/2,z],[x+pitchX/2,y+pitchY/2,z],[x-pitchX/2,y+pitchY/2,z]]
-    const peak=[x,y,z+side*.018]
+    const peak=[x,y,z+side*.018*gripScale]
     for(let i=0;i<4;i++){
       const next=(i+1)%4
       facets.push(...corners[side>0?i:next],...corners[side>0?next:i],...peak)
@@ -166,7 +171,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   }
   dial.scale.setScalar(unified?.56:.78)
   let state={...initial}, rotation=(initial.value/100-.5)*Math.PI*1.5, elevation=initial.on?-.34:.34
-  let raf=0, last=0, visible=true, running=false, pointerX=0, lightX=-3
+  let raf=0, last=0, visible=true, running=false, pointerX=0, lightX=unified?3:-3
   let drag: {id:number;x:number;value:number;kind:string} | null=null
   const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches
   const raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2()
@@ -186,12 +191,12 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const targetRotation=(state.value/100-.5)*Math.PI*1.5, targetElevation=state.on?-.34:.34
     const damping=reduced?1:1-Math.exp(-dt*8)
     rotation+=(targetRotation-rotation)*damping;elevation+=(targetElevation-elevation)*damping
-    lightX+=(-3+pointerX*.55-lightX)*(reduced?1:1-Math.exp(-dt*3))
+    lightX+=((unified?3:-3)+pointerX*.55-lightX)*(reduced?1:1-Math.exp(-dt*3))
     dial.rotation.y=rotation;push.rotation.x=elevation
     lime.emissiveIntensity=state.on?.65:0;indicator.visible=state.on
     key.position.x=lightX
     renderer.render(scene,camera)
-    if(Math.abs(rotation-targetRotation)+Math.abs(elevation-targetElevation)+Math.abs(lightX+3-pointerX*.55)>.0002){running=true;raf=requestAnimationFrame(draw)}
+    if(Math.abs(rotation-targetRotation)+Math.abs(elevation-targetElevation)+Math.abs(lightX-(unified?3:-3)-pointerX*.55)>.0002){running=true;raf=requestAnimationFrame(draw)}
   }
   function down(e:PointerEvent){const kind=hit(e);if(!kind)return;drag={id:e.pointerId,x:e.clientX,value:state.value,kind};renderer.domElement.setPointerCapture(e.pointerId);if(kind==='dial')renderer.domElement.style.touchAction='none'}
   function move(e:PointerEvent){

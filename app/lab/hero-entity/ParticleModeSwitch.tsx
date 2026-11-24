@@ -149,7 +149,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
           const length = Math.hypot(nx,ny,nz)
           nx/=length; ny/=length; nz/=length
           const rx=2*nz*nx, ry=2*nz*ny, rz=2*nz*nz-1
-          let lx=-.45+Math.sin(t*.5)*.22, ly=-.65+Math.cos(t*.37)*.1, lz=.7
+          let lx=(aluminium?.45:-.45)+Math.sin(t*.5)*.22, ly=-.65+Math.cos(t*.37)*.1, lz=.7
           const ll=Math.hypot(lx,ly,lz); lx/=ll; ly/=ll; lz/=ll
           const key=Math.max(0,rx*lx+ry*ly+rz*lz)
           const fill=Math.max(0,rx*.78+ry*.15+rz*.6)
