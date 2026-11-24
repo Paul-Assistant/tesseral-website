@@ -4,9 +4,9 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 type State = { on: boolean; value: number; light: boolean }
 
 // A cut diamond surface, not a printed texture: each facet catches its own reflection.
-function knurl(radius: number, height: number, columns: number, rows: number) {
+function knurl(radius: number, height: number, columns: number, rows: number, topRadius = radius) {
   const positions: number[] = []
-  const point = (a: number, y: number, r: number) => [Math.cos(a)*r, y, Math.sin(a)*r]
+  const point = (a: number, y: number, r: number) => { const tapered=r+(topRadius-radius)*y/height; return [Math.cos(a)*tapered, y, Math.sin(a)*tapered] }
   for (let row=0; row<rows; row++) for (let col=0; col<columns; col++) {
     const a=col/columns*Math.PI*2, b=(col+1)/columns*Math.PI*2
     const y=row/rows*height, next=(row+1)/rows*height
@@ -35,7 +35,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const box=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(power,power,power),side:THREE.DoubleSide}))
     box.position.set(x,y,z);box.lookAt(0,0,0);room.add(box);softboxes.push(box)
   }
-  const env=pmrem.fromScene(room,.12);scene.environment=env.texture
+  const flag=new THREE.Mesh(new THREE.PlaneGeometry(3,7),new THREE.MeshBasicMaterial({color:0x101214,side:THREE.DoubleSide}))
+  flag.position.set(2,6,-1);flag.lookAt(0,0,0);room.add(flag);softboxes.push(flag)
+  const env=pmrem.fromScene(room,.07);scene.environment=env.texture
   softboxes.forEach(box=>{box.geometry.dispose();(box.material as THREE.Material).dispose()});pmrem.dispose()
   const textures: THREE.Texture[]=[]
   const scratch=document.createElement('canvas');scratch.width=scratch.height=512
@@ -65,7 +67,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const directions=new THREE.DataTexture(directionData,256,256);directions.needsUpdate=true;textures.push(directions)
   const silver=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.31,bumpMap:linearBrush,bumpScale:.012,anisotropy:.35,envMapIntensity:1.15})
   const polished=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.23,bumpMap:linearBrush,bumpScale:.006,envMapIntensity:1.15})
-  const topMetal=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.31,bumpMap:brushing,bumpScale:.012,anisotropy:.55,anisotropyMap:directions,envMapIntensity:1.1})
+  const topMetal=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.19,bumpMap:brushing,bumpScale:.008,anisotropy:.9,anisotropyMap:directions,envMapIntensity:1.1})
   const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
@@ -115,13 +117,13 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
   cylinder(.49,.13,silver,dial,.08);rim(.5,.026,polished,dial,.12)
-  mesh(knurl(.55,.7,80,15),silver,dial,0,.15)
-  cylinder(.547,.7,silver,dial,.5)
-  rim(.55,.019,polished,dial,.86)
-  cylinder(.543,.035,topMetal,dial,.865)
+  mesh(knurl(.58,.7,72,15,.49),silver,dial,0,.15)
+  mesh(new THREE.CylinderGeometry(.487,.577,.7,96),silver,dial,0,.5)
+  rim(.49,.014,polished,dial,.86)
+  cylinder(.486,.025,topMetal,dial,.865)
   // Planar UVs keep the circular lathe marks concentric across the cap.
-  const cap=mesh(new THREE.CircleGeometry(.535,128),topMetal,dial,0,.885);cap.rotation.x=-Math.PI/2
-  mesh(new RoundedBoxGeometry(.025,.008,.17,2,.005),dark,dial,0,.892,-.37)
+  const cap=mesh(new THREE.CircleGeometry(.485,128),topMetal,dial,0,.885);cap.rotation.x=-Math.PI/2
+  mesh(new RoundedBoxGeometry(.025,.008,.17,2,.005),dark,dial,0,.892,-.335)
   for(let i=0;i<41;i++){
     const angle=(-135+i*6.75)*Math.PI/180
     const tick=mesh(new THREE.BoxGeometry(i%5===0?.015:.009,.004,i%5===0?.10:.045),dark,mounts[1],Math.sin(angle)*.91,.008,-Math.cos(angle)*.91);tick.rotation.y=-angle
