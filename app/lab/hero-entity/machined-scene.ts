@@ -20,14 +20,14 @@ function knurl(radius: number, height: number, columns: number, rows: number, to
   return geometry
 }
 
-export function createMachinedScene(host: HTMLDivElement, initial: State, toggle: () => void, change: (value: number) => void) {
+export function createMachinedScene(host: HTMLDivElement, initial: State, toggle: () => void, change: (value: number) => void, unified = false) {
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'})
   renderer.setPixelRatio(Math.min(devicePixelRatio,matchMedia('(pointer:coarse)').matches?1.5:2))
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap
   renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05
   host.appendChild(renderer.domElement)
   const scene=new THREE.Scene()
-  const camera=new THREE.OrthographicCamera(-4.4,4.4,2.6,-2.6,.1,60)
+  const camera=unified ? new THREE.PerspectiveCamera(15,1,.1,80) : new THREE.OrthographicCamera(-4.4,4.4,2.6,-2.6,.1,60)
   camera.position.set(0,11,.65);camera.lookAt(0,.15,0)
   const pmrem=new THREE.PMREMGenerator(renderer), room=new THREE.Scene()
   room.background=new THREE.Color(0x92979a)
@@ -82,13 +82,13 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   }
   function cylinder(r:number,h:number,material:THREE.Material,parent:THREE.Object3D,y:number){return mesh(new THREE.CylinderGeometry(r,r,h,96),material,parent,0,y)}
   function rim(r:number,tube:number,material:THREE.Material,parent:THREE.Object3D,y:number){const ring=mesh(new THREE.TorusGeometry(r,tube,12,128),material,parent,0,y);ring.rotation.x=Math.PI/2;return ring}
-  const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.13}),scene,0,-.18);floor.rotation.x=-Math.PI/2
+  const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:unified?.10:.13}),scene,0,-.18);floor.rotation.x=-Math.PI/2
   scene.add(new THREE.HemisphereLight(0xe9f2ff,0x53514c,.5))
-  const key=new THREE.DirectionalLight(0xffffff,2);key.position.set(-3,7,4);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=.018;key.shadow.bias=-.0002;key.shadow.radius=7;key.shadow.blurSamples=16;scene.add(key)
+  const key=new THREE.DirectionalLight(0xffffff,2);key.position.set(-3,7,unified?-4:4);key.castShadow=true;key.shadow.mapSize.set(unified?1024:2048,unified?1024:2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=.018;key.shadow.bias=-.0002;key.shadow.radius=unified?18:7;key.shadow.blurSamples=16;scene.add(key)
   const fill=new THREE.DirectionalLight(0xe5edff,1);fill.position.set(4,3,-3);scene.add(fill)
-  const mounts=[-1.52,1.52].map(x=>{
+  const mounts=(unified?[3,-3]:[-1.52,1.52]).map(x=>{
     const group=new THREE.Group();group.position.x=x;scene.add(group)
-    mesh(new RoundedBoxGeometry(2.75,.16,2.65,5,.12),panel,group,0,-.08)
+    if(!unified)mesh(new RoundedBoxGeometry(2.75,.16,2.65,5,.12),panel,group,0,-.08)
     cylinder(.78,.025,dark,group,.008);cylinder(.746,.028,silver,group,.019)
     rim(.743,.012,polished,group,.038);cylinder(.715,.035,silver,group,.035)
     return group
@@ -197,8 +197,15 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const resize=new ResizeObserver(()=>{
     const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h)
     const aspect=w/h,halfWidth=Math.max(3.5,2.1*aspect)
-    camera.left=-halfWidth;camera.right=halfWidth;camera.top=halfWidth/aspect;camera.bottom=-halfWidth/aspect
-    camera.position.set(0,11,.65);camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
+    if(camera instanceof THREE.PerspectiveCamera){
+      camera.aspect=aspect
+      const distance=5.1/(Math.tan(Math.PI/24)*aspect)
+      camera.position.set(0,distance,distance*.12)
+    }else{
+      camera.left=-halfWidth;camera.right=halfWidth;camera.top=halfWidth/aspect;camera.bottom=-halfWidth/aspect
+      camera.position.set(0,11,.65)
+    }
+    camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
   });resize.observe(host)
   const visibility=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake()});visibility.observe(host)
   const resume=()=>{if(!document.hidden)wake()};document.addEventListener('visibilitychange',resume)

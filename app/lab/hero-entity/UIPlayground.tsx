@@ -16,6 +16,7 @@ export default function UIPlayground({light}:{light:boolean}) {
    <article className="living-material-study"><div className="material-caption"><span>06 / PARTICLE LETTERING</span><p>Particles gather first. The wave reveals the centered lettering.</p></div><ParticleModeSwitch variant="living" surface="engraved" particleLabels/><ParticleModeSwitch variant="living" surface="engraved" particleLabels navigation/><div className="material-caption"><span>06B / WITHOUT THE FRAME</span><p>Individual recesses with the same particle lettering.</p></div><ParticleModeSwitch variant="living" surface="individual" particleLabels/><ParticleModeSwitch variant="living" surface="individual" particleLabels navigation/></article>
    <MachinedControls light={light}/>
   </div>
+  <MachinedControls light unified/>
   <div className="material-reference"><span className="material-eyebrow">FROSTED FLOW / REFERENCE</span><MaterialButton kind="frost" label="Feel the surface" selected={false} onSelect={()=>{}}>Feel the surface <span aria-hidden="true">↗</span></MaterialButton></div>
  </section>
 }

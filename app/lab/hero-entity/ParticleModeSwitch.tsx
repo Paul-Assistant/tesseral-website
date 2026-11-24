@@ -7,7 +7,7 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n))
 const ease = (n: number) => n * n * (3 - 2 * n)
 
 /** A small, independent particle surface: no additional WebGL context. */
-export default function ParticleModeSwitch({ variant = 'mercury', navigation = false, surface = 'recesses', particleLabels = false }: { particleLabels?: boolean; surface?: 'recesses' | 'individual' | 'engraved'; variant?: 'mercury' | 'glass' | 'living'; navigation?: boolean }) {
+export default function ParticleModeSwitch({ variant = 'mercury', navigation = false, surface = 'recesses', particleLabels = false, aluminium = false }: { aluminium?: boolean; particleLabels?: boolean; surface?: 'recesses' | 'individual' | 'engraved'; variant?: 'mercury' | 'glass' | 'living'; navigation?: boolean }) {
   const width = navigation ? 524 : 300
   const labels = navigation ? ['Overview', 'The problem', 'How it works', 'Pricing'] : ['Voice', 'Type']
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -68,7 +68,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
       const r = Math.sqrt(random(i + 1)), a = random(i + 9001) * Math.PI * 2
       return { x: Math.cos(a) * r, y: Math.sin(a) * r, r, a, delay: (Math.sin(i * 12.9898) * 43758.5453) % 1 }
     })
-    const colors = Array.from({ length: 128 }, (_, i) => `rgb(${Math.round(40+i*1.68)},${Math.round(44+i*1.65)},${Math.round(45+i*1.60)})`)
+    const colors = Array.from({ length: 128 }, (_, i) => aluminium ? `rgb(${Math.round(48+i*1.57)},${Math.round(50+i*1.57)},${Math.round(52+i*1.57)})` : `rgb(${Math.round(40+i*1.68)},${Math.round(44+i*1.65)},${Math.round(45+i*1.60)})`)
     let frame = 0, last = 0, visible = true, hover = 0, scatter = 0, directionX = 1, directionY = 0
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting })
     observer.observe(root)
@@ -191,7 +191,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
     }
     frame = requestAnimationFrame(draw)
     return () => { cancelled=true; cancelAnimationFrame(frame); observer.disconnect(); delete root.dataset.glyphs }
-  }, [variant, width, navigation, particleLabels])
+  }, [variant, width, navigation, particleLabels, aluminium])
 
   return <div ref={rootRef} className="particle-mode" data-variant={variant} data-surface={surface} data-particle-labels={particleLabels} data-mode={mode} style={{width, aspectRatio:`${width} / 144`}}
     onPointerMove={e => { if(e.pointerType==='touch') return; const r=e.currentTarget.getBoundingClientRect(); motion.current.x=(e.clientX-r.left)*width/r.width; motion.current.y=(e.clientY-r.top)*144/r.height }}

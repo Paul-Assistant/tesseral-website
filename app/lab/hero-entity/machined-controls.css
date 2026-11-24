@@ -4,3 +4,14 @@
 .machined-viewport{width:100%;height:clamp(310px,43vw,480px);position:relative;touch-action:pan-y}.machined-viewport canvas{display:block;width:100%;height:100%;outline:none}.machined-error{position:absolute;inset:30%;text-align:center}
 .machined-controls{display:grid;grid-template-columns:1fr 1fr;gap:50px;width:76%;max-width:670px}.machined-controls>div{min-width:0}.machined-number{font:10px var(--font-mono),monospace;letter-spacing:.08em;opacity:.65;display:block}.machined-number output{float:right}.machined-power{display:flex;align-items:center;gap:10px;border:0;background:none;color:inherit;font:18px var(--font-soft),sans-serif;padding:16px 0 0;cursor:pointer}.machined-power i{width:6px;height:6px;border-radius:50%;background:#747d7b}.machined-power i[data-on=true]{background:#c6ff1b;box-shadow:0 0 10px #c6ff1b70}.machined-controls input{width:100%;accent-color:#aeb7ad;margin:22px 0 0;cursor:ew-resize;height:4px}.machined-controls p{font-size:12px;margin:12px 0 0}.machined-controls button:focus-visible{outline:1px solid #c6ff1b;outline-offset:7px}
 @media(max-width:600px){.machined-controls{width:84%;gap:24px}.machined-controls p{font-size:11px}.machined-viewport{height:310px}}
+.machined-stage{position:relative;width:100%}
+.ui-material-playground .unified-study{position:relative;margin:70px calc(-1 * max(24px,6vw)) 0;width:calc(100% + 2 * max(24px,6vw));padding:60px 0 45px;background:#EDEEED;color:#35383a;border:0;border-radius:0;overflow:hidden;display:flex;align-items:center;flex-direction:column}
+.unified-study .machined-stage{width:100%;max-width:1440px}
+.unified-study .machined-viewport{height:400px}
+.unified-particles{position:absolute;left:50%;top:50%;width:300px;transform:translate(-50%,-50%)}
+.unified-study .particle-mode canvas{filter:drop-shadow(4px 9px 10px #31363b24)}
+.unified-study .particle-mode-seats>span{background:linear-gradient(145deg,#d8dbdd66,#f6f7f6);box-shadow:inset 3px 4px 8px #454b5026,inset -3px -3px 7px #fff,0 1px 0 #fff9}
+.unified-study .machined-controls{direction:rtl;max-width:1000px}.unified-study .machined-controls>div{direction:ltr}
+@media(max-width:650px){.unified-study .machined-viewport{height:260px}.unified-particles{transform:translate(-50%,-50%) scale(.58)}.unified-study .machined-controls{width:88%;gap:45%}.unified-study .machined-power{font-size:14px}.unified-study .machined-controls p{font-size:10px}}
+.unified-particles{transform:translate(-50%,-50%) scale(1.3)}
+@media(max-width:650px){.unified-particles{transform:translate(-50%,-50%) scale(.58)}}
