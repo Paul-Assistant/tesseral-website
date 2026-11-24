@@ -68,7 +68,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const silver=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.31,bumpMap:linearBrush,bumpScale:.012,anisotropy:.35,envMapIntensity:1.15})
   const polished=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.23,bumpMap:linearBrush,bumpScale:.006,envMapIntensity:1.15})
   const topMetal=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.19,bumpMap:brushing,bumpScale:.008,anisotropy:.9,anisotropyMap:directions,envMapIntensity:1.1})
-  const leverMetal=topMetal.clone();leverMetal.bumpMap=linearBrush;leverMetal.bumpScale=.008;leverMetal.anisotropyMap=null;leverMetal.anisotropy=.9;leverMetal.anisotropyRotation=Math.PI/2
+  const leverMetal=topMetal.clone()
   const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
@@ -110,14 +110,20 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const body=new THREE.ExtrudeGeometry(outline,{depth:.18,bevelEnabled:true,bevelThickness:.025,bevelSize:.025,bevelSegments:5,curveSegments:24,steps:12})
   const bodyPositions=body.getAttribute('position')
   const bend=(y:number)=>-.1*y+.045*Math.sin(y*Math.PI)
-  for(let i=0;i<bodyPositions.count;i++)bodyPositions.setZ(i,bodyPositions.getZ(i)-.09+bend(bodyPositions.getY(i)))
+  const bodyUV=body.getAttribute('uv')
+  for(let i=0;i<bodyPositions.count;i++){
+    const x=bodyPositions.getX(i),y=bodyPositions.getY(i),z=bodyPositions.getZ(i)-.09
+    const crown=.025*Math.max(0,1-(x/.43)**2)*Math.sin(Math.min(1,Math.max(0,y))*Math.PI)
+    bodyPositions.setZ(i,z+bend(y)+Math.sign(z)*crown)
+    bodyUV.setXY(i,x/.86+.5,y)
+  }
   body.computeVertexNormals()
   mesh(body,leverMetal,push)
   // Same diamond pitch and raised relief as the rotary sidewall, on both grip faces.
   const facets:number[]=[]
   const pitchX=.0432,pitchY=.0467
   for(const side of [-1,1])for(let row=0;row<9;row++)for(let col=0;col<16;col++){
-    const x=(col-7.5)*pitchX,y=.47+row*pitchY,z=side*.116+bend(y)
+    const x=(col-7.5)*pitchX,y=.47+row*pitchY,z=side*(.116+.025*Math.max(0,1-(x/.43)**2)*Math.sin(y*Math.PI))+bend(y)
     const corners=[[x-pitchX/2,y-pitchY/2,z],[x+pitchX/2,y-pitchY/2,z],[x+pitchX/2,y+pitchY/2,z],[x-pitchX/2,y+pitchY/2,z]]
     const peak=[x,y,z+side*.018]
     for(let i=0;i<4;i++){
