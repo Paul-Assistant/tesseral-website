@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { toCreasedNormals } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 
 type State = { on: boolean; value: number; light: boolean }
@@ -68,7 +69,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const silver=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.31,bumpMap:linearBrush,bumpScale:.012,anisotropy:.35,envMapIntensity:1.15})
   const polished=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.23,bumpMap:linearBrush,bumpScale:.006,envMapIntensity:1.15})
   const topMetal=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.19,bumpMap:brushing,bumpScale:.008,anisotropy:.9,anisotropyMap:directions,envMapIntensity:1.1})
-  const leverMetal=topMetal
+  // Linear brushing on a straight lever; circular brushing belongs only on the dial.
+  // Stretching the dial's radial direction map around this shape created false folds.
+  const leverMetal=new THREE.MeshPhysicalMaterial({color:topMetal.color,metalness:1,roughness:.26,bumpMap:linearBrush,bumpScale:.003,anisotropy:.4,envMapIntensity:1.1})
   const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
@@ -88,7 +91,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     rim(.743,.012,polished,group,.038);cylinder(.715,.035,silver,group,.035)
     return group
   })
-  // An upright paddle on a transverse pivot, with an open fork below the grip.
+  // A simple rounded lever on a fixed transverse pivot.
   // It rocks forward/back between two detents; the base never lifts out of the panel.
   const hinge=new THREE.Group();mounts[0].add(hinge)
   mesh(new RoundedBoxGeometry(.47,.16,.36,4,.04),silver,hinge,0,.12)
@@ -97,25 +100,26 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   // Extrude the reference's rounded side profile across the lever width.
   // The long sides are solid; there is no rectangular frame around the grip.
   const profile=new THREE.Shape()
-  profile.moveTo(-.16,.50);profile.lineTo(-.16,1.06)
-  profile.bezierCurveTo(-.16,1.25,.16,1.25,.16,1.06)
-  profile.lineTo(.16,.50);profile.bezierCurveTo(.16,.30,-.16,.30,-.16,.50)
+  profile.moveTo(-.16,.50);profile.lineTo(-.16,1.04)
+  profile.absarc(0,1.04,.16,Math.PI,0,true)
+  profile.lineTo(.16,.50);profile.absarc(0,.50,.16,0,-Math.PI,true);profile.closePath()
   const body=new THREE.ExtrudeGeometry(profile,{depth:.72,bevelEnabled:true,bevelThickness:.018,bevelSize:.018,bevelSegments:8,curveSegments:32,steps:1})
   body.rotateY(Math.PI/2);body.translate(-.36,0,0)
   const bodyPositions=body.getAttribute('position'),bodyUV=body.getAttribute('uv')
   for(let i=0;i<bodyPositions.count;i++){
     const x=bodyPositions.getX(i),y=bodyPositions.getY(i),z=bodyPositions.getZ(i)
-    const normalY=Math.abs(body.getAttribute('normal').getY(i))
-    bodyUV.setXY(i,x/.76+.5,normalY>.7 ? z/.36+.5 : y/1.23)
+    // Continuous grain follows the side profile over the rounded crown.
+    const grainV=y>1.04 ? (1.04+Math.atan2(y-1.04,z)*.16)/1.25 : y/1.25
+    bodyUV.setXY(i,x/.76+.5,grainV)
   }
-  mesh(body,leverMetal,push)
+  const smoothBody=toCreasedNormals(body,.65);if(smoothBody!==body)body.dispose();mesh(smoothBody,leverMetal,push)
   // Narrow neck meets the underside behind the rounded nose, leaving the front recess open.
   const neck=mesh(new RoundedBoxGeometry(.39,.45,.16,6,.055),leverMetal,push,0,.22,-.075)
   neck.rotation.x=-.16
   // Same diamond pitch and raised relief as the rotary sidewall, on both grip faces.
   const facets:number[]=[]
   const pitchX=.0432,pitchY=.0467
-  for(const side of [1])for(let row=0;row<9;row++)for(let col=0;col<16;col++){
+  for(const side of [-1,1])for(let row=0;row<9;row++)for(let col=0;col<16;col++){
     const x=(col-7.5)*pitchX,y=.60+row*pitchY,z=side*.179
     const corners=[[x-pitchX/2,y-pitchY/2,z],[x+pitchX/2,y-pitchY/2,z],[x+pitchX/2,y+pitchY/2,z],[x-pitchX/2,y+pitchY/2,z]]
     const peak=[x,y,z+side*.018]
@@ -125,6 +129,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     }
   }
   const faceGeometry=new THREE.BufferGeometry();faceGeometry.setAttribute('position',new THREE.Float32BufferAttribute(facets,3));faceGeometry.computeVertexNormals()
+  const gripUV:number[]=[]
+  for(let i=0;i<facets.length;i+=3)gripUV.push(facets[i]/.76+.5,facets[i+1]/1.25)
+  faceGeometry.setAttribute('uv',new THREE.Float32BufferAttribute(gripUV,2))
   mesh(faceGeometry,leverMetal,push)
   push.scale.setScalar(.78);hinge.scale.setScalar(.78)
   const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
