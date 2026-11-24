@@ -56,7 +56,7 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         pen.drawImage(picture,39-size/2,navigation ? 39-size/2 : 16,size,size)
         if(!navigation){pen.font=`11px ${getComputedStyle(button).fontFamily}`;pen.textAlign='center';pen.fillStyle='#172021';pen.fillText(button.getAttribute('aria-label')||'',39,55)}
         const pixels=pen.getImageData(0,0,156,156).data, points=[]
-        for(let y=0;y<156;y+=2)for(let x=0;x<156;x+=2){const a=pixels[(y*156+x)*4+3]/255;if(a>.12)points.push({x:x/2-39,y:y/2-39,alpha:a})}
+        for(let y=0;y<156;y++)for(let x=0;x<156;x++){const a=pixels[(y*156+x)*4+3]/255;if(a>.12)points.push({x:x/2-39,y:y/2-39,alpha:a})}
         glyphs.push(points)
       }
       if(!cancelled && glyphs.length===buttons.length)root.dataset.glyphs='ready'
@@ -87,8 +87,10 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
             : i===m.from ? ease(clamp(progress/.8)) : 1
           root.style.setProperty(`--seat-${i}`,String(depth))
           const lift = i===m.to ? (reduced ? 1 : ease(clamp((now-m.start-1650)/(particleLabels ? 1100 : 650)))) : 0
-          const glyphVisible = i===m.to && (reduced || now-m.start>=1650)
-          root.style.setProperty(`--glyph-${i}`,glyphVisible ? '1' : '0')
+          // The original engraving is buried by the arriving material before its
+          // particle replacement emerges. Selection alone never changes its color.
+          const coverage = i===m.to ? (reduced ? 1 : ease(clamp((progress-.38)/.42))) : 0
+          root.style.setProperty(`--glyph-${i}`,String(coverage))
           root.style.setProperty(`--lift-${i}`,String(lift))
         }
       }
@@ -173,14 +175,16 @@ export default function ParticleModeSwitch({ variant = 'mercury', navigation = f
         }
       }
       if(particleLabels && root.dataset.glyphs==='ready' && (reduced || now-m.start>=1650)) {
-        // Hand off at the engraved size, then grow the same opaque grains in place.
+        // A soft center-out reveal brings fine lettering through the settled grains.
         const lift=reduced ? 1 : ease(clamp((now-m.start-1650)/1100))
         const glyphScale=1+.22*lift
         ctx.fillStyle='#172021'
         for(const [i,d] of (glyphs[m.to]||[]).entries()){
-          const drift=reduced ? 0 : Math.sin(t*2+i*.7)*.22
-          ctx.globalAlpha=d.alpha*.95
-          ctx.beginPath();ctx.arc(94+m.to*112+d.x*glyphScale+drift,68+d.y*glyphScale+drift,.48*glyphScale,0,Math.PI*2);ctx.fill()
+          const drift=reduced ? 0 : Math.sin(t*2+i*.7)*.045
+          const radius=Math.hypot(d.x,d.y)/39
+          const emergence=reduced ? 1 : ease(clamp((lift*1.3-radius*.65)/.32))
+          ctx.globalAlpha=d.alpha*emergence
+          ctx.beginPath();ctx.arc(94+m.to*112+d.x*glyphScale+drift,68+d.y*glyphScale+drift,.29*glyphScale,0,Math.PI*2);ctx.fill()
         }
       }
       ctx.globalAlpha = 1

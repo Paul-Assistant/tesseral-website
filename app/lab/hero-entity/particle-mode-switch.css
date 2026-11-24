@@ -53,3 +53,7 @@
 [data-theme=light] .particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button{color:#7c8983!important;text-shadow:0 1px 0 #ffffffc2!important}
 [data-theme=light] .particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button svg{filter:drop-shadow(0 1px 0 #ffffffc2)!important}
 [data-theme=light] .particle-mode[data-variant=living][data-particle-labels=true] .particle-mode-options button img{filter:opacity(.52) drop-shadow(0 1px 0 #ffffffd9)!important}
+
+/* 06: flowing material passes in front of the engraved artwork. The canvas
+   remains pointer-transparent so native buttons retain their hit targets. */
+.particle-mode[data-particle-labels=true] canvas{z-index:1}
