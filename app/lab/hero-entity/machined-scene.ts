@@ -27,15 +27,15 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   host.appendChild(renderer.domElement)
   const scene=new THREE.Scene()
   const camera=new THREE.PerspectiveCamera(27,1,.1,60)
-  camera.position.set(1.1,6.3,8.5);camera.lookAt(0,.15,0)
+  camera.position.set(.4,10,4.2);camera.lookAt(0,.15,0)
   const pmrem=new THREE.PMREMGenerator(renderer), room=new THREE.Scene()
-  room.background=new THREE.Color(0x353a40)
+  room.background=new THREE.Color(0x92979a)
   const softboxes: THREE.Mesh[]=[]
-  for(const [x,y,z,w,h,power] of [[-3,5,1,2,7,5],[4,3,2,1.2,6,3],[0,4,-4,5,2,4]]){
+  for(const [x,y,z,w,h,power] of [[-3,6,2,5,8,2.3],[4,4,1,4,6,1.5],[0,5,-4,5,4,1.7]]){
     const box=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(power,power,power),side:THREE.DoubleSide}))
     box.position.set(x,y,z);box.lookAt(0,0,0);room.add(box);softboxes.push(box)
   }
-  const env=pmrem.fromScene(room,.025);scene.environment=env.texture
+  const env=pmrem.fromScene(room,.12);scene.environment=env.texture
   softboxes.forEach(box=>{box.geometry.dispose();(box.material as THREE.Material).dispose()});pmrem.dispose()
   const textures: THREE.Texture[]=[]
   const scratch=document.createElement('canvas');scratch.width=scratch.height=512
@@ -53,10 +53,10 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     directionData[i]=Math.round((Math.cos(angle)*.5+.5)*255);directionData[i+1]=Math.round((Math.sin(angle)*.5+.5)*255);directionData[i+2]=255;directionData[i+3]=255
   }
   const directions=new THREE.DataTexture(directionData,256,256);directions.needsUpdate=true;textures.push(directions)
-  const silver=new THREE.MeshPhysicalMaterial({color:0xcbd0d4,metalness:1,roughness:.24,envMapIntensity:1.5})
-  const polished=new THREE.MeshPhysicalMaterial({color:0xe7ebee,metalness:1,roughness:.12,envMapIntensity:1.5})
-  const topMetal=new THREE.MeshPhysicalMaterial({color:0xd9dfe2,metalness:1,roughness:.26,bumpMap:brushing,bumpScale:.012,anisotropy:1,anisotropyMap:directions,envMapIntensity:1.1})
-  const dark=new THREE.MeshStandardMaterial({color:0x171b1e,metalness:.65,roughness:.38})
+  const silver=new THREE.MeshPhysicalMaterial({color:0xcbd0d4,metalness:.92,roughness:.46,bumpMap:brushing,bumpScale:.003,envMapIntensity:1})
+  const polished=new THREE.MeshPhysicalMaterial({color:0xdde0e2,metalness:.95,roughness:.32,envMapIntensity:1})
+  const topMetal=new THREE.MeshPhysicalMaterial({color:0xd9dfe2,metalness:1,roughness:.43,bumpMap:brushing,bumpScale:.007,anisotropy:.45,anisotropyMap:directions,envMapIntensity:1.1})
+  const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
   function mesh(geometry:THREE.BufferGeometry, material:THREE.Material, parent:THREE.Object3D, x=0,y=0,z=0){
@@ -72,18 +72,34 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const group=new THREE.Group();group.position.x=x;scene.add(group)
     mesh(new RoundedBoxGeometry(2.75,.16,2.65,5,.12),panel,group,0,-.08)
     cylinder(.78,.025,dark,group,.008);cylinder(.746,.028,silver,group,.019)
-    rim(.743,.012,polished,group,.038);cylinder(.64,.035,dark,group,.035)
+    rim(.743,.012,polished,group,.038);cylinder(.715,.035,silver,group,.035)
     return group
   })
-  const push=new THREE.Group();mounts[0].add(push);push.userData.control='push'
-  cylinder(.36,.36,silver,push,.04)
-  cylinder(.61,.035,polished,push,.19)
-  mesh(new RoundedBoxGeometry(1.13,.16,.62,6,.07),silver,push,0,.28)
-  mesh(new RoundedBoxGeometry(1.06,.018,.54,3,.04),topMetal,push,0,.369)
-  // Fine cross-cut grip on the leading edge of the low-profile paddle.
-  const grip=mesh(knurl(.03,.78,4,28),polished,push,-.39,.29,.309);grip.rotation.z=-Math.PI/2
-  mesh(new RoundedBoxGeometry(.48,.014,.024,2,.009),dark,push,0,.382,.055)
-  const indicator=mesh(new RoundedBoxGeometry(.22,.016,.018,2,.007),lime,push,0,.384,-.12)
+  // An upright paddle on a transverse pivot, with an open fork below the grip.
+  // It rocks forward/back between two detents; the base never lifts out of the panel.
+  const hinge=new THREE.Group();mounts[0].add(hinge)
+  mesh(new RoundedBoxGeometry(.47,.16,.36,4,.04),silver,hinge,0,.12)
+  const axle=mesh(new THREE.CylinderGeometry(.09,.09,.68,48),polished,hinge,0,.22);axle.rotation.z=Math.PI/2
+  const push=new THREE.Group();push.position.y=.22;mounts[0].add(push);push.userData.control='push'
+  for(const x of [-.29,.29]){
+    const strut=mesh(new RoundedBoxGeometry(.16,.48,.18,5,.045),silver,push,x,.23)
+    strut.rotation.x=-.12
+  }
+  mesh(new RoundedBoxGeometry(.82,.62,.15,6,.045),silver,push,0,.66)
+  const lip=mesh(new THREE.CylinderGeometry(.065,.065,.76,48),polished,push,0,.96,.015);lip.rotation.z=Math.PI/2
+  // Recessed pyramids across the front face, cut into a satin grip plate.
+  const facets:number[]=[]
+  for(let row=0;row<4;row++)for(let col=0;col<6;col++){
+    const x=-.33+col*.112,y=.47+row*.105,z=.113,h=.047
+    const corners=[[x-h,y-h,z],[x+h,y-h,z],[x+h,y+h,z],[x-h,y+h,z]]
+    const valley=[x,y,z-.031]
+    for(let i=0;i<4;i++)facets.push(...corners[i],...corners[(i+1)%4],...valley)
+  }
+  const faceGeometry=new THREE.BufferGeometry();faceGeometry.setAttribute('position',new THREE.Float32BufferAttribute(facets,3));faceGeometry.computeVertexNormals()
+  // The thin backing sits behind the cut facets rather than filling their valleys.
+  mesh(new RoundedBoxGeometry(.71,.44,.012,2,.008),silver,push,0,.625,.072)
+  mesh(faceGeometry,silver,push)
+  const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
   cylinder(.49,.13,silver,dial,.08);rim(.5,.026,polished,dial,.12)
   mesh(knurl(.55,.7,80,15),silver,dial,0,.15)
@@ -97,7 +113,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const angle=(-135+i*6.75)*Math.PI/180
     const tick=mesh(new THREE.BoxGeometry(i%5===0?.015:.009,.004,i%5===0?.10:.045),dark,mounts[1],Math.sin(angle)*.91,.008,-Math.cos(angle)*.91);tick.rotation.y=-angle
   }
-  let state={...initial}, rotation=(initial.value/100-.5)*Math.PI*1.5, elevation=initial.on?.26:-.16
+  let state={...initial}, rotation=(initial.value/100-.5)*Math.PI*1.5, elevation=initial.on?-.34:.34
   let raf=0, last=0, visible=true, running=false, pointerX=0, lightX=-3
   let drag: {id:number;x:number;value:number;kind:string} | null=null
   const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches
@@ -115,11 +131,11 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     running=false
     if(!visible || document.hidden)return
     const dt=Math.min((now-last)/1000,.05);last=now
-    const targetRotation=(state.value/100-.5)*Math.PI*1.5, targetElevation=state.on?.26:-.16
+    const targetRotation=(state.value/100-.5)*Math.PI*1.5, targetElevation=state.on?-.34:.34
     const damping=reduced?1:1-Math.exp(-dt*8)
     rotation+=(targetRotation-rotation)*damping;elevation+=(targetElevation-elevation)*damping
     lightX+=(-3+pointerX*.55-lightX)*(reduced?1:1-Math.exp(-dt*3))
-    dial.rotation.y=rotation;push.position.y=elevation
+    dial.rotation.y=rotation;push.rotation.x=elevation
     lime.emissiveIntensity=state.on?.65:0;indicator.visible=state.on
     key.position.x=lightX
     renderer.render(scene,camera)
@@ -140,7 +156,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   renderer.domElement.addEventListener('pointerdown',down);renderer.domElement.addEventListener('pointermove',move);renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',cancel);renderer.domElement.addEventListener('pointerleave',leave)
   const resize=new ResizeObserver(()=>{
     const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/h
-    camera.position.set(1.1,6.3,8.5).multiplyScalar(Math.max(1,1.65/camera.aspect));camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
+    camera.position.set(.4,10,4.2).multiplyScalar(Math.max(1,1.65/camera.aspect));camera.lookAt(0,.15,0);camera.updateProjectionMatrix();wake()
   });resize.observe(host)
   const visibility=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)wake()});visibility.observe(host)
   const resume=()=>{if(!document.hidden)wake()};document.addEventListener('visibilitychange',resume)
