@@ -71,7 +71,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const topMetal=new THREE.MeshPhysicalMaterial({color:0xd2d5d7,metalness:1,roughness:.19,bumpMap:brushing,bumpScale:.008,anisotropy:.9,anisotropyMap:directions,envMapIntensity:1.1})
   // Linear brushing on a straight lever; circular brushing belongs only on the dial.
   // Stretching the dial's radial direction map around this shape created false folds.
-  const leverMetal=new THREE.MeshPhysicalMaterial({color:topMetal.color,metalness:1,roughness:.26,bumpMap:linearBrush,bumpScale:.003,anisotropy:.4,envMapIntensity:1.1})
+  const leverMetal=topMetal.clone()
+  leverMetal.bumpMap=linearBrush
+  leverMetal.anisotropyMap=null
   const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
