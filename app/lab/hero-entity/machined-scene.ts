@@ -98,8 +98,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
       group.scale.setScalar(.5)
 
       // Only a fine recessed seam around the control; no metal pedestal.
-      const insertMaterial=new THREE.MeshStandardMaterial({color:0xd2d5d7,metalness:.65,roughness:.48,bumpMap:linearBrush,bumpScale:.004})
+      const insertMaterial=new THREE.MeshStandardMaterial({color:0xbfc3c6,metalness:.8,roughness:.35,bumpMap:linearBrush,bumpScale:.004})
       cylinder(.43,.025,insertMaterial,group,.012)
+      rim(.423,.007,insertMaterial,group,.027)
       const contact=mesh(new THREE.CircleGeometry(.43,96),new THREE.ShadowMaterial({opacity:.28}),group,0,.025)
       contact.rotation.x=-Math.PI/2;contact.castShadow=false
     }else{
