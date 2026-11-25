@@ -34,3 +34,7 @@
  .unified-study .machined-controls input{height:20px;margin-top:12px}
  .unified-study .material-caption h3{font-size:30px}
 }
+.realism-study .unified-metal-seats span:nth-child(n+3){display:none}
+.realism-study .machined-viewport{height:520px}
+.realism-study:after{display:none}
+@media(max-width:650px){.realism-study .machined-viewport{height:340px}}

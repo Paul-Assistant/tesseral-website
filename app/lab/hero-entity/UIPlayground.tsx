@@ -18,6 +18,7 @@ export default function UIPlayground({light}:{light:boolean}) {
   </div>
   <MachinedControls light unified/>
   <MachinedControls light unified lowSwitch/>
+  <MachinedControls light unified realism/>
   <div className="material-reference"><span className="material-eyebrow">FROSTED FLOW / REFERENCE</span><MaterialButton kind="frost" label="Feel the surface" selected={false} onSelect={()=>{}}>Feel the surface <span aria-hidden="true">↗</span></MaterialButton></div>
  </section>
 }

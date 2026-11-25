@@ -20,7 +20,27 @@ function knurl(radius: number, height: number, columns: number, rows: number, to
   return geometry
 }
 
-export function createMachinedScene(host: HTMLDivElement, initial: State, toggle: () => void, change: (value: number) => void, unified = false, lowSwitch = false) {
+// Continuous rounded diamond relief, with UVs and shared normals across each cell.
+function machinedGrip(w:number,h:number,columns:number,rows:number,cylindrical:boolean,side=1){
+  const nx=columns*6,ny=rows*6,positions:number[]=[],uv:number[]=[],indices:number[]=[]
+  for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){
+    const u=i/nx,v=j/ny,dx=(u*columns%1-.5)*2,dy=(v*rows%1-.5)*2
+    const r=Math.max(0,1-Math.sqrt(dx*dx+.025)-Math.sqrt(dy*dy+.025))
+    const relief=.018*r*r*(3-2*r)
+    if(cylindrical){const a=u*Math.PI*2,shoulder=Math.max(0,(v-.8)/.2),radius=w/(2*Math.PI)-.025*shoulder+relief;positions.push(Math.cos(a)*radius,v*h,Math.sin(a)*radius)}
+    else positions.push((u-.5)*w,.60+v*h,side*(.179+relief))
+    uv.push(u,v)
+  }
+  for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){
+    const a=j*(nx+1)+i,b=a+1,c=a+nx+1,d=c+1
+    if(cylindrical || side<0)indices.push(a,c,b,b,c,d);else indices.push(a,b,c,b,d,c)
+  }
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals()
+  if(cylindrical){const n=g.getAttribute('normal');for(let j=0;j<=ny;j++){const a=j*(nx+1),b=a+nx,v=new THREE.Vector3(n.getX(a)+n.getX(b),n.getY(a)+n.getY(b),n.getZ(a)+n.getZ(b)).normalize();n.setXYZ(a,v.x,v.y,v.z);n.setXYZ(b,v.x,v.y,v.z)}}
+  return g
+}
+
+export function createMachinedScene(host: HTMLDivElement, initial: State, toggle: () => void, change: (value: number) => void, unified = false, lowSwitch = false, realism = false) {
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'})
   renderer.setPixelRatio(Math.min(devicePixelRatio,2))
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap
@@ -32,13 +52,14 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   const pmrem=new THREE.PMREMGenerator(renderer), room=new THREE.Scene()
   room.background=new THREE.Color(0x92979a)
   const softboxes: THREE.Mesh[]=[]
-  for(const [x,y,z,w,h,power] of [[-3,6,2,3.5,8,2.8],[4,4,1,3,6,1.6],[0,5,-4,5,4,1.9],[0,2,5,6,3.5,1.5],[-2,.5,4,2.5,5,1.3]]){
+  const lighting=realism ? [[3,7,-4,6,6,2.6],[-4,4,2,7,7,.65],[0,6,1,8,8,.5]] : [[-3,6,2,3.5,8,2.8],[4,4,1,3,6,1.6],[0,5,-4,5,4,1.9],[0,2,5,6,3.5,1.5],[-2,.5,4,2.5,5,1.3]]
+  for(const [x,y,z,w,h,power] of lighting){
     const box=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(power,power,power),side:THREE.DoubleSide}))
     box.position.set(x,y,z);box.lookAt(0,0,0);room.add(box);softboxes.push(box)
   }
   const flag=new THREE.Mesh(new THREE.PlaneGeometry(3,7),new THREE.MeshBasicMaterial({color:0x81868b,side:THREE.DoubleSide}))
-  flag.position.set(2,6,-1);flag.lookAt(0,0,0);room.add(flag);softboxes.push(flag)
-  const env=pmrem.fromScene(room,.07);scene.environment=env.texture;scene.environmentIntensity=unified?.65:1
+  flag.position.set(2,6,-1);flag.lookAt(0,0,0);if(!realism)room.add(flag);softboxes.push(flag)
+  const env=pmrem.fromScene(room,realism?.16:.07);scene.environment=env.texture;scene.environmentIntensity=unified?.65:1
   softboxes.forEach(box=>{box.geometry.dispose();(box.material as THREE.Material).dispose()});pmrem.dispose()
   const textures: THREE.Texture[]=[]
   const scratch=document.createElement('canvas');scratch.width=scratch.height=512
@@ -80,6 +101,13 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   leverSide.roughness=.24
   leverSide.bumpScale=.004
   const dark=new THREE.MeshStandardMaterial({color:0x454b50,metalness:.65,roughness:.5})
+  if(realism){
+    for(const material of [silver,polished,topMetal,leverMetal,leverSide]){
+      material.color.set(0xd2d5d7);material.envMapIntensity=1;material.bumpScale=.0015
+      material.roughness=.32;material.anisotropy=.45
+    }
+    topMetal.anisotropy=.65;topMetal.roughness=.27
+  }
   const panel=new THREE.MeshStandardMaterial({color:initial.light?0xc8ced2:0x444b50,metalness:.48,roughness:.42})
   const lime=new THREE.MeshStandardMaterial({color:0xc6ff1b,emissive:0xc6ff1b,emissiveIntensity:0,roughness:.3})
   function mesh(geometry:THREE.BufferGeometry, material:THREE.Material|THREE.Material[], parent:THREE.Object3D, x=0,y=0,z=0){
@@ -95,7 +123,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const group=new THREE.Group();group.position.x=x;scene.add(group)
     if(!unified)mesh(new RoundedBoxGeometry(2.75,.16,2.65,5,.12),panel,group,0,-.08)
     if(unified){
-      group.scale.setScalar(.5)
+      group.scale.setScalar(realism?.9:.5)
 
       // Only a fine recessed seam around the control; no metal pedestal.
       const insertMaterial=new THREE.MeshStandardMaterial({color:0xedeeed,metalness:.12,roughness:.6,bumpMap:linearBrush,bumpScale:.004})
@@ -130,8 +158,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     bodyUV.setXY(i,Math.abs(bodyNormals.getX(i))>.9 ? z/.36+.5 : x/.76+.5,grainV)
   }
   const smoothBody=toCreasedNormals(body,.65);if(smoothBody!==body)body.dispose();const tallBody=mesh(smoothBody,[leverSide,leverMetal],push)
-  tallBody.visible=!lowSwitch
-  if(lowSwitch)mesh(new RoundedBoxGeometry(.76,.20,.46,8,.085),leverMetal,push,0,.12)
+  if(lowSwitch)tallBody.position.y=-.34
   // Narrow neck meets the underside behind the rounded nose, leaving the front recess open.
   const neck=mesh(new RoundedBoxGeometry(.39,.45,.16,6,.055),leverMetal,push,0,.22,-.075)
   neck.rotation.x=-.16;neck.visible=!lowSwitch;hinge.visible=!lowSwitch
@@ -154,17 +181,19 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   for(let i=0;i<facets.length;i+=3)gripUV.push(facets[i]/.76+.5,facets[i+1]/1.25)
   faceGeometry.setAttribute('uv',new THREE.Float32BufferAttribute(gripUV,2))
   const gripMetal=silver.clone()
-  const grip=mesh(faceGeometry,gripMetal,push)
-  grip.visible=!lowSwitch
+  if(realism){faceGeometry.dispose()}
+  const grip=mesh(realism?machinedGrip(.69,.42,20,13,false):faceGeometry,gripMetal,push)
+  if(realism)mesh(machinedGrip(.69,.42,20,13,false,-1),gripMetal,push)
+  if(lowSwitch)grip.position.y=-.34
   push.scale.setScalar(.78);hinge.scale.setScalar(.78)
   if(lowSwitch)push.position.y=.09
   const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
   cylinder(.49,.13,silver,dial,.08);rim(.5,.026,polished,dial,.12)
-  mesh(knurl(.56,.7,72,15,.535),silver,dial,0,.15)
+  mesh(realism?machinedGrip(2*Math.PI*.56,.7,72,15,true):knurl(.56,.7,72,15,.535),silver,dial,0,.15)
   // Straight wall with a short machined shoulder immediately below the cap.
   const dialProfile=[new THREE.Vector2(.557,0),new THREE.Vector2(.557,.56),new THREE.Vector2(.532,.7)]
-  mesh(new THREE.LatheGeometry(dialProfile,96),silver,dial,0,.15)
+  if(!realism)mesh(new THREE.LatheGeometry(dialProfile,96),silver,dial,0,.15)
   rim(.535,.014,polished,dial,.86)
   cylinder(.531,.025,topMetal,dial,.865)
   // Planar UVs keep the circular lathe marks concentric across the cap.
@@ -200,7 +229,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     dial.rotation.y=rotation;push.rotation.x=elevation
     // The tall grip turns away from the overhead softbox in its on detent.
     // Environment light otherwise fills this face almost uniformly.
-    if(unified){
+    if(unified && !realism){
       const facing=(elevation+.34)/.68
       leverMetal.envMapIntensity=.42+facing*.38
       leverSide.envMapIntensity=.42+facing*.38
@@ -218,7 +247,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
       state.value=value;change(value);wake();return
     }
     const kind=hit(e);renderer.domElement.style.cursor=kind==='dial'?'ew-resize':kind?'pointer':'default'
-    pointerX=pointer.x;wake()
+    pointerX=realism?0:pointer.x;wake()
   }
   function up(e:PointerEvent){if(drag?.id!==e.pointerId)return;if(drag.kind==='push' && Math.abs(e.clientX-drag.x)<12)toggle();drag=null;if(renderer.domElement.hasPointerCapture(e.pointerId))renderer.domElement.releasePointerCapture(e.pointerId);renderer.domElement.style.touchAction='pan-y'}
   function cancel(){drag=null;renderer.domElement.style.touchAction='pan-y'}
@@ -230,19 +259,19 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const aspect=w/h,halfWidth=Math.max(3.5,2.1*aspect)
     if(camera instanceof THREE.PerspectiveCamera){
       camera.aspect=aspect
-      const distance=(mobileLayout?1.55:5.1)/(Math.tan(Math.PI/24)*aspect)
-      camera.position.set(0,distance,distance*.12)
+      const distance=(realism?(mobileLayout?1.3:2.4):(mobileLayout?1.55:5.1))/(Math.tan(Math.PI/24)*aspect)
+      camera.position.set(0,distance,distance*(realism?.32:.12))
     }else{
       camera.left=-halfWidth;camera.right=halfWidth;camera.top=halfWidth/aspect;camera.bottom=-halfWidth/aspect
       camera.position.set(0,11,.65)
     }
     camera.lookAt(0,.15,0);camera.updateProjectionMatrix()
     if(unified){
-      mounts[0].position.set(mobileLayout?1.12:1.2,0,0)
-      mounts[1].position.set(mobileLayout?-1.12:-1.2,0,0)
+      mounts[0].position.set(realism?.65:mobileLayout?1.12:1.2,0,0)
+      mounts[1].position.set(realism?-.65:mobileLayout?-1.12:-1.2,0,0)
       camera.updateMatrixWorld()
       const stage=host.parentElement!
-      const seatSize=mobileLayout?w*.158:w*.048
+      const seatSize=realism?w*(mobileLayout?.342:.184):mobileLayout?w*.158:w*.048
       stage.style.setProperty('--seat-size',`${seatSize}px`)
       stage.style.setProperty('--particle-scale',`${seatSize/78}`)
       for(const [i,mount] of mounts.entries()){
