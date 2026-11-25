@@ -1,5 +1,6 @@
 'use client'
 import MachinedControls from './MachinedControls'
+import RenderedAluminiumStudy from './RenderedAluminiumStudy'
 import ParticleModeSwitch from './ParticleModeSwitch'
 import { MaterialButton } from './ButtonStudies'
 import './ui-playground.css'
@@ -19,6 +20,7 @@ export default function UIPlayground({light}:{light:boolean}) {
   <MachinedControls light unified/>
   <MachinedControls light unified lowSwitch/>
   <MachinedControls light unified realism/>
+  <RenderedAluminiumStudy/>
   <div className="material-reference"><span className="material-eyebrow">FROSTED FLOW / REFERENCE</span><MaterialButton kind="frost" label="Feel the surface" selected={false} onSelect={()=>{}}>Feel the surface <span aria-hidden="true">↗</span></MaterialButton></div>
  </section>
 }

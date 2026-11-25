@@ -1,0 +1,9 @@
+.rendered-aluminium-study{width:100%;background:#edeeed;color:#343638;padding:40px 0 32px;text-align:center;scroll-margin-top:24px}
+.rendered-aluminium-study header{padding:0 24px}
+.aluminium-render-frame{position:relative;max-width:1400px;aspect-ratio:1400/850;margin:0 auto;overflow:hidden}
+.aluminium-render-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.rendered-aluminium-study button{border:1px solid #b6b9b6;border-radius:999px;background:#e8eae8;color:#333;padding:12px 25px;cursor:pointer;font:inherit;min-height:44px}
+.rendered-aluminium-study button:focus-visible{outline:2px solid #444;outline-offset:4px}
+.rendered-study-note{font-size:12px;opacity:.65;padding:0 24px;margin-top:16px}
+@media(max-width:650px){.rendered-aluminium-study{padding-top:28px}}
+.ui-material-playground .rendered-aluminium-study{margin:70px calc(-1 * max(24px,6vw)) 0;width:calc(100% + 2 * max(24px,6vw));border:0;border-radius:0}

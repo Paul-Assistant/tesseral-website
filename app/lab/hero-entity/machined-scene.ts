@@ -186,7 +186,13 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   if(realism)mesh(machinedGrip(.69,.42,20,13,false,-1),gripMetal,push)
   if(lowSwitch)grip.position.y=-.34
   push.scale.setScalar(.78);hinge.scale.setScalar(.78)
-  if(lowSwitch)push.position.y=.09
+  if(lowSwitch){
+    push.position.y=.09
+    // A compact fixed axle physically joins the complete upper lever to the insert.
+    mesh(new RoundedBoxGeometry(.32,.08,.14,4,.025),silver,mounts[0],0,.04)
+    const lowAxle=mesh(new THREE.CylinderGeometry(.065,.065,.48,48),polished,mounts[0],0,.08)
+    lowAxle.rotation.z=Math.PI/2
+  }
   const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
   cylinder(.49,.13,silver,dial,.08);rim(.5,.026,polished,dial,.12)
@@ -229,7 +235,7 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     dial.rotation.y=rotation;push.rotation.x=elevation
     // The tall grip turns away from the overhead softbox in its on detent.
     // Environment light otherwise fills this face almost uniformly.
-    if(unified && !realism){
+    if(unified && !realism && !lowSwitch){
       const facing=(elevation+.34)/.68
       leverMetal.envMapIntensity=.42+facing*.38
       leverSide.envMapIntensity=.42+facing*.38
