@@ -20,7 +20,7 @@ function knurl(radius: number, height: number, columns: number, rows: number, to
   return geometry
 }
 
-export function createMachinedScene(host: HTMLDivElement, initial: State, toggle: () => void, change: (value: number) => void, unified = false) {
+export function createMachinedScene(host: HTMLDivElement, initial: State, toggle: () => void, change: (value: number) => void, unified = false, lowSwitch = false) {
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'})
   renderer.setPixelRatio(Math.min(devicePixelRatio,2))
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.VSMShadowMap
@@ -87,9 +87,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   }
   function cylinder(r:number,h:number,material:THREE.Material,parent:THREE.Object3D,y:number){return mesh(new THREE.CylinderGeometry(r,r,h,96),material,parent,0,y)}
   function rim(r:number,tube:number,material:THREE.Material,parent:THREE.Object3D,y:number){const ring=mesh(new THREE.TorusGeometry(r,tube,12,128),material,parent,0,y);ring.rotation.x=Math.PI/2;return ring}
-  const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:unified?.18:.13}),scene,0,-.18);floor.rotation.x=-Math.PI/2
+  const floor=mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:unified?.18:.13}),scene,0,unified?-.002:-.18);floor.rotation.x=-Math.PI/2
   scene.add(new THREE.HemisphereLight(0xffffff,0x53575a,unified?.25:.5))
-  const key=new THREE.DirectionalLight(0xffffff,unified?3.5:2);key.position.set(unified?3:-3,7,unified?-4:4);key.castShadow=true;key.shadow.mapSize.set(unified?1024:2048,unified?1024:2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=unified?.003:.018;key.shadow.bias=-.0002;key.shadow.radius=unified?18:7;key.shadow.blurSamples=16;scene.add(key)
+  const key=new THREE.DirectionalLight(0xffffff,unified?3.5:2);key.position.set(unified?3:-3,7,unified?-4:4);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=4;key.shadow.camera.bottom=-4;key.shadow.normalBias=unified?.003:.018;key.shadow.bias=-.0002;key.shadow.radius=unified?18:7;key.shadow.blurSamples=16;scene.add(key)
   const fill=new THREE.DirectionalLight(0xe5edff,unified?.2:1);fill.position.set(4,3,-3);scene.add(fill)
   const mounts=(unified?[1.2,-1.2]:[-1.52,1.52]).map(x=>{
     const group=new THREE.Group();group.position.x=x;scene.add(group)
@@ -99,10 +99,9 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
 
       // Only a fine recessed seam around the control; no metal pedestal.
       const insertMaterial=new THREE.MeshStandardMaterial({color:0xedeeed,metalness:.12,roughness:.6,bumpMap:linearBrush,bumpScale:.004})
-      cylinder(.43,.025,insertMaterial,group,-.012)
-      rim(.423,.004,insertMaterial,group,.001)
-      const contact=mesh(new THREE.CircleGeometry(.43,96),new THREE.ShadowMaterial({opacity:.28}),group,0,.002)
-      contact.rotation.x=-Math.PI/2;contact.castShadow=false
+      // One clean cap: the old torus intersected this plane and produced edge speckling.
+      const insert=cylinder(.465,.025,insertMaterial,group,-.0125)
+      insert.castShadow=false
     }else{
       cylinder(.78,.025,dark,group,.008);cylinder(.746,.028,silver,group,.019)
       rim(.743,.012,polished,group,.038);cylinder(.715,.035,silver,group,.035)
@@ -130,10 +129,12 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
     const grainV=y>1.04 ? (1.04+Math.atan2(y-1.04,z)*.16)/1.25 : y/1.25
     bodyUV.setXY(i,Math.abs(bodyNormals.getX(i))>.9 ? z/.36+.5 : x/.76+.5,grainV)
   }
-  const smoothBody=toCreasedNormals(body,.65);if(smoothBody!==body)body.dispose();mesh(smoothBody,[leverSide,leverMetal],push)
+  const smoothBody=toCreasedNormals(body,.65);if(smoothBody!==body)body.dispose();const tallBody=mesh(smoothBody,[leverSide,leverMetal],push)
+  tallBody.visible=!lowSwitch
+  if(lowSwitch)mesh(new RoundedBoxGeometry(.76,.20,.46,8,.085),leverMetal,push,0,.12)
   // Narrow neck meets the underside behind the rounded nose, leaving the front recess open.
   const neck=mesh(new RoundedBoxGeometry(.39,.45,.16,6,.055),leverMetal,push,0,.22,-.075)
-  neck.rotation.x=-.16
+  neck.rotation.x=-.16;neck.visible=!lowSwitch;hinge.visible=!lowSwitch
   // Same diamond pitch and raised relief as the rotary sidewall, on both grip faces.
   const facets:number[]=[]
   const gripScale=unified?.56/.78:1
@@ -153,8 +154,10 @@ export function createMachinedScene(host: HTMLDivElement, initial: State, toggle
   for(let i=0;i<facets.length;i+=3)gripUV.push(facets[i]/.76+.5,facets[i+1]/1.25)
   faceGeometry.setAttribute('uv',new THREE.Float32BufferAttribute(gripUV,2))
   const gripMetal=silver.clone()
-  mesh(faceGeometry,gripMetal,push)
+  const grip=mesh(faceGeometry,gripMetal,push)
+  grip.visible=!lowSwitch
   push.scale.setScalar(.78);hinge.scale.setScalar(.78)
+  if(lowSwitch)push.position.y=.09
   const indicator=mesh(new RoundedBoxGeometry(.12,.008,.018,2,.004),lime,mounts[0],0,.058,.59)
   const dial=new THREE.Group();mounts[1].add(dial);dial.userData.control='dial'
   cylinder(.49,.13,silver,dial,.08);rim(.5,.026,polished,dial,.12)
